@@ -1,5 +1,8 @@
 {
   "1.0.0": {
     "en": "initial version"
+  },
+  "1.0.1": {
+    "en": "extend OpenAPI device"
   }
 }
