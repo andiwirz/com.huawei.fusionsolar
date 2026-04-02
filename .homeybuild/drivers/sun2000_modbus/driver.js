@@ -47,25 +47,6 @@ class SUN2000ModbusDriver extends Driver {
     });
   }
 
-  async onRepair(session, device) {
-    session.setHandler('connect', async ({ address, port, modbusId }) => {
-      address = (address || '').trim();
-      port = parseInt(port, 10) || 502;
-      modbusId = parseInt(modbusId, 10) || 1;
-
-      if (!address) {
-        throw new Error(this.homey.__('modbus.pair.errors.noAddress'));
-      }
-
-      // Validate connection
-      await readModbusRegisters(address, port, modbusId, { modelName: REGISTERS.modelName });
-
-      await device.setSettings({ address, port, modbus_id: modbusId });
-
-      return { success: true };
-    });
-  }
-
 }
 
 module.exports = SUN2000ModbusDriver;

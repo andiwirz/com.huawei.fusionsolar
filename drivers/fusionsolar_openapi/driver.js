@@ -30,18 +30,6 @@ class FusionSolarOpenAPIDriver extends Driver {
     });
   }
 
-  async onRepair(session, device) {
-    session.setHandler('login', async ({ baseUrl, username, systemCode }) => {
-      const base = (baseUrl || 'https://eu5.fusionsolar.huawei.com').trim().replace(/\/$/, '');
-
-      // Verify credentials by logging in
-      await login(base, username, systemCode);
-
-      await device.setSettings({ base_url: base, username, system_code: systemCode });
-      return { success: true };
-    });
-  }
-
 }
 
 module.exports = FusionSolarOpenAPIDriver;

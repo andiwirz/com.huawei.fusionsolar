@@ -45,30 +45,6 @@ class DTSU666ModbusDriver extends Driver {
     });
   }
 
-  async onRepair(session, device) {
-    session.setHandler('connect', async ({ address, port, modbusId }) => {
-      address  = (address || '').trim();
-      port     = parseInt(port, 10) || 502;
-      modbusId = parseInt(modbusId, 10) || 1;
-
-      if (!address) {
-        throw new Error(this.homey.__('modbus.pair.errors.noAddress'));
-      }
-
-      const data = await readModbusRegisters(address, port, modbusId, {
-        powerMeterActivePower: POWER_METER_REGISTERS.powerMeterActivePower,
-      });
-
-      if (!isPowerMeterDataValid(data)) {
-        throw new Error(this.homey.__('modbus.pair.errors.meterNotDetected'));
-      }
-
-      await device.setSettings({ address, port, modbus_id: modbusId });
-
-      return { success: true };
-    });
-  }
-
 }
 
 module.exports = DTSU666ModbusDriver;

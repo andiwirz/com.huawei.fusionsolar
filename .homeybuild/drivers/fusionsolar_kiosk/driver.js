@@ -29,19 +29,6 @@ class FusionSolarKioskDriver extends Driver {
     });
   }
 
-  async onRepair(session, device) {
-    session.setHandler('set_kiosk_url', async ({ url }) => {
-      const kioskUrl = (url || '').trim();
-      if (!kioskUrl) throw new Error(this.homey.__('pair.errors.noUrl'));
-
-      const { baseUrl, kk } = parseKioskUrl(kioskUrl);
-      await fetchKioskData(buildApiUrl(baseUrl, kk));
-      await device.setSettings({ kiosk_url: kioskUrl });
-
-      return { success: true };
-    });
-  }
-
 }
 
 module.exports = FusionSolarKioskDriver;

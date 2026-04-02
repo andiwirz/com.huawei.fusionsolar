@@ -45,7 +45,12 @@
       "WebFetch(domain:help-center.meteocontrol.com)",
       "WebFetch(domain:bram.vangenabet.com)",
       "WebFetch(domain:forum.huawei.com)",
-      "WebFetch(domain:www.solar-display.com)"
+      "WebFetch(domain:www.solar-display.com)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/api.py\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/sensor.py\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/const.py\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/__init__.py\")",
+      "Bash(curl -s https://apps.developer.homey.app/the-basics/devices/energy)"
     ]
   }
 }

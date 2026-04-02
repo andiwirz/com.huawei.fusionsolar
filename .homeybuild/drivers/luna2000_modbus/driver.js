@@ -49,30 +49,6 @@ class LUNA2000ModbusDriver extends Driver {
     });
   }
 
-  async onRepair(session, device) {
-    session.setHandler('connect', async ({ address, port, modbusId }) => {
-      address  = (address || '').trim();
-      port     = parseInt(port, 10) || 502;
-      modbusId = parseInt(modbusId, 10) || 1;
-
-      if (!address) {
-        throw new Error(this.homey.__('modbus.pair.errors.noAddress'));
-      }
-
-      const data = await readModbusRegisters(address, port, modbusId, {
-        storageSOC: BATTERY_REGISTERS.storageSOC,
-      });
-
-      if (!isBatteryDataValid(data)) {
-        throw new Error(this.homey.__('modbus.pair.errors.batteryNotDetected'));
-      }
-
-      await device.setSettings({ address, port, modbus_id: modbusId });
-
-      return { success: true };
-    });
-  }
-
 }
 
 module.exports = LUNA2000ModbusDriver;

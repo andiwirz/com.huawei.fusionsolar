@@ -1,4 +1,4 @@
-# FusionSolar Solar Manager – Homey App
+# Huawei FusionSolar Manager – Homey App
 
 **App ID:** `com.huawei.fusionsolar`
 **SDK:** Homey SDK 3
@@ -137,7 +137,7 @@ Direkte Modbus TCP Verbindung zum DTSU666 Smart Meter über den SUN2000 / SDongl
 ### Einrichtung in Homey
 
 1. App aus dem Homey App Store installieren
-2. Gerät hinzufügen: **Geräte → + → FusionSolar Solar Manager**
+2. Gerät hinzufügen: **Geräte → + → Huawei FusionSolar Manager**
 3. Verbindungsart wählen und Verbindungsdaten eingeben
 4. Verbindungstest – bei Erfolg wird das Gerät angelegt
 
