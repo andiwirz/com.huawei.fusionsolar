@@ -7,5 +7,8 @@
   },
   "1.0.2": {
     "en": "cleanup OpenAPI devices"
+  },
+  "1.0.3": {
+    "en": "removed generic OpenAPI device"
   }
 }
