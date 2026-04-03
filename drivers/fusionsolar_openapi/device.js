@@ -19,10 +19,20 @@ const DEV_TYPE_POWER_SENSOR  = 47;  // Power sensor
 
 // Station-level capabilities — always present
 const REQUIRED_CAPABILITIES = [
-  'measure_power',       // real-time AC output (W)
   'meter_power',         // total lifetime yield (kWh)
   'meter_power.daily',   // today's yield (kWh)
   'meter_power_monthly', // this month's yield (kWh)
+];
+
+// Capabilities removed in previous versions — cleaned up on init
+const DEPRECATED_CAPABILITIES = [
+  'measure_power',                  // replaced by measure_power.mppt (Solarleistung)
+  'measure_power.batt_plant',       // moved to dedicated battery device
+  'meter_power.today_batt_input',   // moved to dedicated battery device
+  'measure_power.chargesetting',    // moved to dedicated battery device
+  'measure_voltage.busbar',         // moved to dedicated battery device
+  'meter_power.batt_rated',         // moved to dedicated battery device
+  'openapi_battery_run_state',      // moved to dedicated battery device
 ];
 
 // Inverter-level capabilities — always present (show — until data arrives)
@@ -33,7 +43,7 @@ const INVERTER_CAPABILITIES = [
 
 // Additional inverter capabilities — added dynamically when data is available
 const INVERTER_EXTRA_CAPABILITIES = [
-  'openapi_inverter_state',       // inverter state string
+  'huawei_status',                // inverter state string
   'measure_voltage.ab_u',         // line voltage AB (V)
   'measure_voltage.bc_u',         // line voltage BC (V)
   'measure_voltage.ca_u',         // line voltage CA (V)
@@ -49,21 +59,15 @@ const INVERTER_EXTRA_CAPABILITIES = [
 
 // Battery-level capabilities — added dynamically when battery data is available
 const BATTERY_CAPABILITIES = [
-  'measure_battery',              // SoC (%)
-  'measure_power.batt_plant',     // battery power W (+ = charging, − = discharging)
-  'meter_power.plant_charged',    // charged today (kWh)
-  'meter_power.plant_discharged', // discharged today (kWh)
+  'measure_battery',               // SoC (%)
+  'meter_power.today_batt_output', // discharged today (kWh)
 ];
 
 // Additional battery capabilities — added dynamically when data is available
 const BATTERY_EXTRA_CAPABILITIES = [
   'openapi_battery_status',        // running state string
-  'measure_power.batt_max_charge', // max charge power (W)
-  'measure_power.batt_max_discharge', // max discharge power (W)
-  'measure_voltage.busbar',        // battery voltage (V)
+  'measure_power.dischargesetting',// max discharge power (W)
   'openapi_battery_mode',          // charge/discharge mode string
-  'meter_power.batt_rated',        // rated capacity (kWh)
-  'openapi_battery_run_state',     // run state string
 ];
 
 // Grid meter capabilities — added dynamically when meter data is available
@@ -78,8 +82,8 @@ const POWER_SENSOR_CAPABILITIES = [
   'measure_current.meter_i',   // Phase A current (A)
   'measure_power.grid_import', // active power import (W) — shared with type 17
   'measure_power.grid_export', // active power export (W) — shared with type 17
-  'meter_power.ps_active',     // total imported energy (kWh)
-  'meter_power.ps_reverse',    // total exported energy (kWh)
+  'meter_power.grid_import',   // total imported energy (kWh)
+  'meter_power.grid_export',   // total exported energy (kWh)
 ];
 
 const BATTERY_STATUS_MAP = {
@@ -175,6 +179,11 @@ class FusionSolarOpenAPIDevice extends Device {
   // ─── Capabilities ──────────────────────────────────────────────────────────
 
   async _ensureCapabilities() {
+    for (const cap of DEPRECATED_CAPABILITIES) {
+      if (this.hasCapability(cap)) {
+        try { await this.removeCapability(cap); } catch (_) {}
+      }
+    }
     for (const cap of [...REQUIRED_CAPABILITIES, ...INVERTER_CAPABILITIES]) {
       if (!this.hasCapability(cap)) await this.addCapability(cap);
     }
@@ -335,7 +344,6 @@ class FusionSolarOpenAPIDevice extends Device {
       };
 
       const activePowerW = sumW('active_power');
-      await this._set('measure_power',                activePowerW);       // total plant AC output
       await this._set('measure_power.active_power',   activePowerW);
       await this._set('measure_temperature.invertor', avg('temperature'));
 
@@ -348,7 +356,7 @@ class FusionSolarOpenAPIDevice extends Device {
       const stateVal = num(maps[0].inverter_state);
       if (stateVal !== null) {
         const stateStr = INVERTER_STATE_MAP[stateVal] ?? `State ${stateVal}`;
-        await this._set('openapi_inverter_state', stateStr);
+        await this._set('huawei_status', stateStr);
       }
 
       await this._set('measure_voltage.ab_u', avg('ab_u'));
@@ -411,10 +419,8 @@ class FusionSolarOpenAPIDevice extends Device {
         if (!this.hasCapability(cap)) await this.addCapability(cap).catch(() => {});
       }
 
-      await this._set('measure_battery',              avg('battery_soc'));
-      await this._set('measure_power.batt_plant',     sumRndW('ch_discharge_power')); // already W; + = charging, − = discharging
-      await this._set('meter_power.plant_charged',    sumKwh('charge_cap'));
-      await this._set('meter_power.plant_discharged', sumKwh('discharge_cap'));
+      await this._set('measure_battery',               avg('battery_soc'));
+      await this._set('meter_power.today_batt_output', sumKwh('discharge_cap'));
 
       // Battery status
       const battStatusVal = num(maps[0].battery_status);
@@ -428,16 +434,7 @@ class FusionSolarOpenAPIDevice extends Device {
         await this._set('openapi_battery_mode', BATTERY_MODE_MAP[battModeVal] ?? `Mode ${battModeVal}`);
       }
 
-      // Run state
-      const runStateVal = num(maps[0].run_state);
-      if (runStateVal !== null) {
-        await this._set('openapi_battery_run_state', runStateVal === 1 ? 'Connected' : 'Disconnected');
-      }
-
-      await this._set('measure_power.batt_max_charge',    sumRndW('max_charge_power'));    // W
-      await this._set('measure_power.batt_max_discharge', sumRndW('max_discharge_power')); // W
-      await this._set('measure_voltage.busbar',           avg('busbar_u'));                // V
-      await this._set('meter_power.batt_rated',           sumKwh('rated_capacity'));       // kWh
+      await this._set('measure_power.dischargesetting', sumRndW('max_discharge_power')); // W
 
     } catch (err) {
       this.error('Battery KPI failed:', err.message);

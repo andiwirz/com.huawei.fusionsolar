@@ -29,7 +29,8 @@ class DTSU666ModbusDevice extends Device {
 
   async onInit() {
     this.log(`Device initialised: ${this.getName()}`);
-    this._prevExporting = null;
+    this._prevExporting   = null;
+    this._failureCount    = 0;
     await this._ensureCapabilities();
     await this._startPolling();
 
@@ -110,7 +111,10 @@ class DTSU666ModbusDevice extends Device {
       const meter = await readModbusRegisters(address, port, modbusId, POWER_METER_REGISTERS);
 
       if (!isPowerMeterDataValid(meter)) {
-        await this.setUnavailable(this.homey.__('modbus.errors.meterNotDetected'));
+        this._failureCount += 1;
+        if (this._failureCount >= 3) {
+          await this.setUnavailable(this.homey.__('modbus.errors.meterNotDetected'));
+        }
         this._fetchInProgress = false;
         return;
       }
@@ -146,13 +150,17 @@ class DTSU666ModbusDevice extends Device {
       await this._set('measure_power.phase2',   negate(meter.gridPhaseBPower));
       await this._set('measure_power.phase3',   negate(meter.gridPhaseCPower));
 
+      this._failureCount = 0;
       if (!this.getAvailable()) await this.setAvailable();
 
     } catch (err) {
-      this.error('Fetch error:', err.message);
-      await this.setUnavailable(
-        `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
-      );
+      this._failureCount += 1;
+      this.error(`Fetch error (${this._failureCount}):`, err.message);
+      if (this._failureCount >= 3) {
+        await this.setUnavailable(
+          `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
+        );
+      }
     } finally {
       this._fetchInProgress = false;
     }

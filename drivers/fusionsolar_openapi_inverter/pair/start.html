@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 24px;
+      color: #1a1a1a;
+      background: transparent;
+    }
+
+    h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+    p.subtitle { font-size: 13px; color: #666; margin-bottom: 24px; line-height: 1.5; }
+
+    .field { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+
+    input:focus, select:focus { border-color: #CF0A2C; }
+
+    .hint { font-size: 12px; color: #999; margin-top: 5px; line-height: 1.4; }
+
+    .status {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      line-height: 1.5;
+    }
+    .status.success { background: #edf7f1; border: 1px solid #b2dfcb; color: #1a6638; display: block; }
+    .status.error   { background: #fdf0ee; border: 1px solid #f5c2ba; color: #8b1a0e; display: block; }
+
+    button.primary {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #CF0A2C;
+      color: #fff;
+      transition: opacity 0.15s;
+    }
+    button.primary:disabled { opacity: 0.45; cursor: default; }
+
+    .spinner {
+      display: inline-block;
+      width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #phase-station { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Phase 1: Login -->
+  <div id="phase-login">
+    <h2 id="title">FusionSolar OpenAPI</h2>
+    <p class="subtitle" id="subtitle">Sign in with your FusionSolar Northbound API credentials.</p>
+
+    <div class="field">
+      <label id="label-url">Server URL</label>
+      <input type="text" id="base-url" value="https://eu5.fusionsolar.huawei.com" />
+      <p class="hint" id="hint-url"></p>
+    </div>
+
+    <div class="field">
+      <label id="label-username">Username</label>
+      <input type="text" id="username" autocomplete="username" />
+    </div>
+
+    <div class="field">
+      <label id="label-password">System Code</label>
+      <input type="password" id="system-code" autocomplete="current-password" />
+      <p class="hint" id="hint-password"></p>
+    </div>
+
+    <div class="status" id="status-login"><span id="status-login-text"></span></div>
+
+    <button class="primary" id="btn-login" onclick="doLogin()">
+      <span id="btn-login-label">Sign in</span>
+    </button>
+  </div>
+
+  <!-- Phase 2: Station selection -->
+  <div id="phase-station">
+    <h2 id="title2">Select Station</h2>
+    <p class="subtitle" id="subtitle2">Select the solar plant to add to Homey.</p>
+
+    <div class="field">
+      <label id="label-name">Device name</label>
+      <input type="text" id="device-name" />
+    </div>
+
+    <div class="field">
+      <label id="label-station">Station</label>
+      <select id="station-select" onchange="onStationChange()"></select>
+    </div>
+
+    <div class="status" id="status-station"><span id="status-station-text"></span></div>
+
+    <button class="primary" id="btn-add" onclick="doAdd()">
+      <span id="btn-add-label">Add device</span>
+    </button>
+  </div>
+
+  <script>
+    const i18n = {
+      en: {
+        title:          'FusionSolar OpenAPI',
+        subtitle:       'Sign in with your FusionSolar Northbound API credentials.',
+        labelUrl:       'Server URL',
+        hintUrl:        'Regional server. EU default: eu5.fusionsolar.huawei.com',
+        labelUsername:  'Username',
+        labelPassword:  'System Code',
+        hintPassword:   'The system code (API password) from your FusionSolar account.',
+        btnLogin:       'Sign in',
+        btnLoggingIn:   'Signing in…',
+        title2:         'Select Station',
+        subtitle2:      'Select the solar plant to add to Homey.',
+        labelName:      'Device name',
+        labelStation:   'Station',
+        btnAdd:         'Add device',
+        btnAdding:      'Adding…',
+        defaultName:    'SUN2000 Inverter (OpenAPI)',
+        errNoStations:  'No stations found for this account.',
+        successLogin:   '✓ Login successful',
+      },
+      de: {
+        title:          'FusionSolar OpenAPI',
+        subtitle:       'Melde dich mit deinen FusionSolar Northbound API-Zugangsdaten an.',
+        labelUrl:       'Server URL',
+        hintUrl:        'Regionaler Server. EU Standard: eu5.fusionsolar.huawei.com',
+        labelUsername:  'Benutzername',
+        labelPassword:  'System Code',
+        hintPassword:   'Der System Code (API-Passwort) aus deinem FusionSolar-Konto.',
+        btnLogin:       'Anmelden',
+        btnLoggingIn:   'Anmelden…',
+        title2:         'Anlage auswählen',
+        subtitle2:      'Wähle die Solaranlage, die zu Homey hinzugefügt werden soll.',
+        labelName:      'Gerätename',
+        labelStation:   'Anlage',
+        btnAdd:         'Gerät hinzufügen',
+        btnAdding:      'Wird hinzugefügt…',
+        defaultName:    'SUN2000 Wechselrichter (OpenAPI)',
+        errNoStations:  'Keine Anlagen für dieses Konto gefunden.',
+        successLogin:   '✓ Anmeldung erfolgreich',
+      },
+    };
+
+    const lang = navigator.language.startsWith('de') ? 'de' : 'en';
+    const t = i18n[lang];
+
+    // Apply translations
+    document.getElementById('title').textContent         = t.title;
+    document.getElementById('subtitle').textContent      = t.subtitle;
+    document.getElementById('label-url').textContent     = t.labelUrl;
+    document.getElementById('hint-url').textContent      = t.hintUrl;
+    document.getElementById('label-username').textContent = t.labelUsername;
+    document.getElementById('label-password').textContent = t.labelPassword;
+    document.getElementById('hint-password').textContent  = t.hintPassword;
+    document.getElementById('btn-login-label').textContent = t.btnLogin;
+    document.getElementById('title2').textContent         = t.title2;
+    document.getElementById('subtitle2').textContent      = t.subtitle2;
+    document.getElementById('label-name').textContent     = t.labelName;
+    document.getElementById('label-station').textContent  = t.labelStation;
+    document.getElementById('btn-add-label').textContent  = t.btnAdd;
+    document.getElementById('device-name').value          = t.defaultName;
+
+    let _stations = [];
+    let _baseUrl  = '';
+    let _username = '';
+    let _systemCode = '';
+
+    async function doLogin() {
+      const baseUrl    = document.getElementById('base-url').value.trim();
+      const username   = document.getElementById('username').value.trim();
+      const systemCode = document.getElementById('system-code').value;
+      const btn        = document.getElementById('btn-login');
+      const lbl        = document.getElementById('btn-login-label');
+
+      btn.disabled = true;
+      lbl.innerHTML = '<span class="spinner"></span>' + t.btnLoggingIn;
+      document.getElementById('status-login').className = 'status';
+
+      try {
+        const result = await Homey.emit('login', { baseUrl, username, systemCode });
+        if (!result?.success) throw new Error('Unexpected response');
+
+        _stations   = result.stations;
+        _baseUrl    = baseUrl;
+        _username   = username;
+        _systemCode = systemCode;
+
+        // Populate station dropdown
+        const sel = document.getElementById('station-select');
+        sel.innerHTML = '';
+        for (const s of _stations) {
+          const opt = document.createElement('option');
+          opt.value       = s.stationCode;
+          opt.textContent = s.stationName || s.stationCode;
+          sel.appendChild(opt);
+        }
+
+        // Keep the default device name — do not override with station name
+
+        document.getElementById('status-login').className = 'status success';
+        document.getElementById('status-login-text').textContent = t.successLogin;
+
+        // Switch to phase 2
+        document.getElementById('phase-login').style.display   = 'none';
+        document.getElementById('phase-station').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('status-login').className = 'status error';
+        document.getElementById('status-login-text').textContent = '✗ ' + (err.message || 'Login failed');
+        btn.disabled = false;
+        lbl.textContent = t.btnLogin;
+      }
+    }
+
+    function onStationChange() {
+      // Station name shown in dropdown — device name field stays as typed
+    }
+
+    async function doAdd() {
+      const stationCode = document.getElementById('station-select').value;
+      const name        = document.getElementById('device-name').value.trim() || t.defaultName;
+      const btn         = document.getElementById('btn-add');
+      const lbl         = document.getElementById('btn-add-label');
+
+      btn.disabled = true;
+      lbl.innerHTML = '<span class="spinner"></span>' + t.btnAdding;
+      document.getElementById('status-station').className = 'status';
+
+      try {
+        await Homey.createDevice({
+          name,
+          data: { id: `openapi:${_baseUrl}:${stationCode}` },
+          settings: {
+            base_url:     _baseUrl,
+            username:     _username,
+            system_code:  _systemCode,
+            station_code: stationCode,
+            poll_interval: 10,
+          },
+        });
+
+        await Homey.done();
+
+      } catch (err) {
+        document.getElementById('status-station').className = 'status error';
+        document.getElementById('status-station-text').textContent = '✗ ' + (err.message || 'Failed to add device');
+        btn.disabled = false;
+        lbl.textContent = t.btnAdd;
+      }
+    }
+  </script>
+</body>
+</html>

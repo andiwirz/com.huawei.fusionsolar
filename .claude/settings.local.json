@@ -50,7 +50,19 @@
       "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/sensor.py\")",
       "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/const.py\")",
       "Bash(curl -s \"https://raw.githubusercontent.com/olibos/Home-Assistant-FusionSolar-OpenApi/main/custom_components/fusion_solar_openapi/__init__.py\")",
-      "Bash(curl -s https://apps.developer.homey.app/the-basics/devices/energy)"
+      "Bash(curl -s https://apps.developer.homey.app/the-basics/devices/energy)",
+      "WebFetch(domain:www.debacher.de)",
+      "Bash(sed 's/defaultName:    .FusionSolar Plant \\(OpenAPI\\)./defaultName:    ''''LUNA2000 Battery \\(OpenAPI\\)''''/g; s/defaultName:    .FusionSolar Anlage \\(OpenAPI\\)./defaultName:    ''''LUNA2000 Batterie \\(OpenAPI\\)''''/g' /c/Users/andi/OneDrive/Documents/GitHub/com.huawei.fusionsolar/drivers/fusionsolar_openapi/pair/start.html)",
+      "Bash(sed 's/defaultName:    .FusionSolar Plant \\(OpenAPI\\)./defaultName:    ''''Power Sensor \\(OpenAPI\\)''''/g; s/defaultName:    .FusionSolar Anlage \\(OpenAPI\\)./defaultName:    ''''Leistungssensor \\(OpenAPI\\)''''/g' /c/Users/andi/OneDrive/Documents/GitHub/com.huawei.fusionsolar/drivers/fusionsolar_openapi/pair/start.html)",
+      "Bash(python3:*)",
+      "Bash(grep -c '\"\"capabilities\"\"' /c/Users/andi/OneDrive/Documents/GitHub/com.huawei.fusionsolar/app.json)",
+      "Bash(dir \"C:\\\\Users\\\\andi\\\\OneDrive\\\\Documents\\\\GitHub\\\\com.huawei.fusionsolar\\\\drivers\" /b /ad)",
+      "Bash(base=\"C:/Users/andi/OneDrive/Documents/GitHub/com.huawei.fusionsolar/drivers\")",
+      "Bash(src=\"$base/fusionsolar_openapi/assets/images\")",
+      "Bash(for driver:*)",
+      "Bash(do)",
+      "Bash(dst=\"$base/$driver/assets/images\")",
+      "Bash(node -e \":*)"
     ]
   }
 }

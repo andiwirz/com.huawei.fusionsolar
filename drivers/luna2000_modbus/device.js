@@ -11,6 +11,19 @@ const { readModbusRegisters, writeModbusRegister } = require('../../lib/modbus-c
 const DEFAULT_INTERVAL_S = 60;
 const MIN_INTERVAL_S = 10;
 
+// Capabilities removed in previous versions — cleaned up on init
+const DEPRECATED_CAPABILITIES = [
+  'luna2000_unit1_status', // renamed to luna2000_battery_status
+];
+
+const UNIT1_STATUS_MAP = {
+  0: 'Offline',
+  1: 'Standby',
+  2: 'Running',
+  3: 'Fault',
+  4: 'Sleep mode',
+};
+
 // All battery capabilities are always present (device IS a LUNA2000)
 const REQUIRED_CAPABILITIES = [
   'measure_power',           // combined W: positive = charging, negative = discharging
@@ -23,6 +36,7 @@ const REQUIRED_CAPABILITIES = [
   'measure_power.dischargesetting',
   'meter_power.today_batt_input',
   'meter_power.today_batt_output',
+  'luna2000_battery_status',
   'storage_working_mode_settings',
   'storage_force_charge_discharge',
   'storage_excess_pv_energy_use_in_tou',
@@ -50,6 +64,7 @@ class LUNA2000ModbusDevice extends Device {
   async onInit() {
     this.log(`Device initialised: ${this.getName()}`);
     this._prevChargingState = null;
+    this._failureCount      = 0;
     await this._ensureCapabilities();
     this._registerControlListeners();
     await this._startPolling();
@@ -80,6 +95,11 @@ class LUNA2000ModbusDevice extends Device {
   // ─── Capabilities ──────────────────────────────────────────────────────────
 
   async _ensureCapabilities() {
+    for (const cap of DEPRECATED_CAPABILITIES) {
+      if (this.hasCapability(cap)) {
+        try { await this.removeCapability(cap); } catch (_) {}
+      }
+    }
     for (const cap of REQUIRED_CAPABILITIES) {
       if (!this.hasCapability(cap)) {
         await this.addCapability(cap);
@@ -143,7 +163,10 @@ class LUNA2000ModbusDevice extends Device {
       const batt = await readModbusRegisters(address, port, modbusId, BATTERY_REGISTERS);
 
       if (!isBatteryDataValid(batt)) {
-        await this.setUnavailable(this.homey.__('modbus.errors.batteryNotDetected'));
+        this._failureCount += 1;
+        if (this._failureCount >= 3) {
+          await this.setUnavailable(this.homey.__('modbus.errors.batteryNotDetected'));
+        }
         this._fetchInProgress = false;
         return;
       }
@@ -165,6 +188,9 @@ class LUNA2000ModbusDevice extends Device {
       await this._set('measure_power.batt_discharge',  Math.max(0, -power));
       await this._set('measure_power.chargesetting',   batt.storageMaxChargePower ?? null);
       await this._set('measure_power.dischargesetting', batt.storageMaxDischargePower ?? null);
+      if (batt.storageUnit1Status !== null && batt.storageUnit1Status !== undefined) {
+        await this._set('luna2000_battery_status', UNIT1_STATUS_MAP[batt.storageUnit1Status] ?? `Status ${batt.storageUnit1Status}`);
+      }
       await this._set('meter_power.today_batt_input',  batt.storageDayCharge ?? null);
       await this._set('meter_power.today_batt_output', batt.storageDayDischarge ?? null);
 
@@ -185,13 +211,17 @@ class LUNA2000ModbusDevice extends Device {
       }
       this._prevChargingState = chargingState;
 
+      this._failureCount = 0;
       if (!this.getAvailable()) await this.setAvailable();
 
     } catch (err) {
-      this.error('Fetch error:', err.message);
-      await this.setUnavailable(
-        `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
-      );
+      this._failureCount += 1;
+      this.error(`Fetch error (${this._failureCount}):`, err.message);
+      if (this._failureCount >= 3) {
+        await this.setUnavailable(
+          `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
+        );
+      }
     } finally {
       this._fetchInProgress = false;
     }

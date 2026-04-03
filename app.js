@@ -1,15 +1,14 @@
 'use strict';
 
-const { App } = require('homey');
+const { App }             = require('homey');
+const OpenAPICoordinator  = require('./lib/openapi-coordinator');
 
 class FusionSolarKioskApp extends App {
 
-  async onUninit() {
-    this.log('FusionSolar app is stopping...');
-  }
-
   async onInit() {
     this.log('FusionSolar app is running...');
+
+    this._coordinator = new OpenAPICoordinator(this.homey);
 
     this.homey.flow
       .getConditionCard('is_producing')
@@ -24,6 +23,14 @@ class FusionSolarKioskApp extends App {
         const power = device.getCapabilityValue('measure_power');
         return typeof power === 'number' && power > 0;
       });
+  }
+
+  async onUninit() {
+    this.log('FusionSolar app is stopping...');
+  }
+
+  getCoordinator() {
+    return this._coordinator;
   }
 
 }

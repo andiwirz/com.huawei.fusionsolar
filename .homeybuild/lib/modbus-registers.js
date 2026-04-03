@@ -84,14 +84,15 @@ const POWER_METER_REGISTERS = {
 // Luna2000 battery storage registers
 // Only present when a battery is connected to the SUN2000
 const BATTERY_REGISTERS = {
-  storageMaxChargePower:    [37046, 2, 'UINT32', 'Max Charge Power (W)',       0],
-  storageMaxDischargePower: [37048, 2, 'UINT32', 'Max Discharge Power (W)',    0],
-  storageSOC:               [37760, 1, 'UINT16', 'State of Charge (%)',       -1],
-  storageChargeDischarge:   [37765, 2, 'INT32',  'Charge/Discharge Power (W)', 0],
-  storageDayCharge:         [37784, 2, 'UINT32', 'Today Charged (kWh)',       -2],
-  storageDayDischarge:      [37786, 2, 'UINT32', 'Today Discharged (kWh)',    -2],
-  storageTotalCharge:       [37780, 2, 'UINT32', 'Total Charged (kWh)',       -2],
-  storageTotalDischarge:    [37782, 2, 'UINT32', 'Total Discharged (kWh)',    -2],
+  storageMaxChargePower:    [37046, 2, 'UINT32', 'Max Charge Power (W)',              0],
+  storageMaxDischargePower: [37048, 2, 'UINT32', 'Max Discharge Power (W)',           0],
+  storageUnit1Status:       [37762, 1, 'UINT16', 'Energy Storage Running Status',       0],
+  storageSOC:               [37760, 1, 'UINT16', 'State of Charge (%)',              -1],
+  storageChargeDischarge:   [37765, 2, 'INT32',  'Charge/Discharge Power (W)',        0],
+  storageDayCharge:         [37784, 2, 'UINT32', 'Today Charged (kWh)',              -2],
+  storageDayDischarge:      [37786, 2, 'UINT32', 'Today Discharged (kWh)',           -2],
+  storageTotalCharge:       [37780, 2, 'UINT32', 'Total Charged (kWh)',              -2],
+  storageTotalDischarge:    [37782, 2, 'UINT32', 'Total Discharged (kWh)',           -2],
 };
 
 // Writable control registers (47xxx address range)

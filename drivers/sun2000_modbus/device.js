@@ -30,22 +30,22 @@ const REQUIRED_CAPABILITIES = [
 
 // Dynamic capabilities – added when external power meter (DTSU666) is detected
 const POWER_METER_CAPABILITIES = [
-  'measure_voltage.grid_phase1',
-  'measure_voltage.grid_phase2',
-  'measure_voltage.grid_phase3',
-  'measure_current.grid_phase1',
-  'measure_current.grid_phase2',
-  'measure_current.grid_phase3',
   'measure_power.grid_active_power',
-  'measure_power.grid_phase1',
-  'measure_power.grid_phase2',
-  'measure_power.grid_phase3',
   'meter_power.grid_export',
   'meter_power.grid_import',
 ];
 
 // Old capability names from previous app versions – removed during migration
 const DEPRECATED_CAPABILITIES = [
+  'measure_voltage.grid_phase1',
+  'measure_voltage.grid_phase2',
+  'measure_voltage.grid_phase3',
+  'measure_current.grid_phase1',
+  'measure_current.grid_phase2',
+  'measure_current.grid_phase3',
+  'measure_power.grid_phase1',
+  'measure_power.grid_phase2',
+  'measure_power.grid_phase3',
   'meter_power_daily',
   'meter_power_cumulative',
   'meter_power_monthly',
@@ -85,6 +85,7 @@ class SUN2000ModbusDevice extends Device {
 
   async onInit() {
     this.log(`Device initialised: ${this.getName()}`);
+    this._failureCount = 0;
     await this._ensureCapabilities();
     this._registerControlListeners();
     await this._startPolling();
@@ -212,13 +213,17 @@ class SUN2000ModbusDevice extends Device {
           .catch(() => {});
       }
 
+      this._failureCount = 0;
       if (!this.getAvailable()) await this.setAvailable();
 
     } catch (err) {
-      this.error('Fetch error:', err.message);
-      await this.setUnavailable(
-        `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
-      );
+      this._failureCount += 1;
+      this.error(`Fetch error (${this._failureCount}):`, err.message);
+      if (this._failureCount >= 3) {
+        await this.setUnavailable(
+          `${this.homey.__('modbus.errors.fetchFailed')}: ${err.message}`,
+        );
+      }
     } finally {
       this._fetchInProgress = false;
     }
@@ -245,10 +250,11 @@ class SUN2000ModbusDevice extends Device {
       await this._set('measure_current.grid_phase1',  meter.gridPhaseACurrent ?? null);
       await this._set('measure_current.grid_phase2',  meter.gridPhaseBCurrent ?? null);
       await this._set('measure_current.grid_phase3',  meter.gridPhaseCCurrent ?? null);
-      await this._set('measure_power.grid_active_power', meter.powerMeterActivePower ?? null);
-      await this._set('measure_power.grid_phase1',    meter.gridPhaseAPower ?? null);
-      await this._set('measure_power.grid_phase2',    meter.gridPhaseBPower ?? null);
-      await this._set('measure_power.grid_phase3',    meter.gridPhaseCPower ?? null);
+      const negate = (v) => (v !== null && v !== undefined) ? -v : null;
+      await this._set('measure_power.grid_active_power', negate(meter.powerMeterActivePower));
+      await this._set('measure_power.grid_phase1',    negate(meter.gridPhaseAPower));
+      await this._set('measure_power.grid_phase2',    negate(meter.gridPhaseBPower));
+      await this._set('measure_power.grid_phase3',    negate(meter.gridPhaseCPower));
       await this._set('meter_power.grid_export',      meter.gridExportedEnergy ?? null);
       await this._set('meter_power.grid_import',      meter.gridAccumulatedEnergy ?? null);
 
