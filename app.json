@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "compatibility": ">=12.3.0",
   "runtime": "nodejs",
   "sdk": 3,
@@ -1198,6 +1198,238 @@
           "hint": {
             "en": "How often to read data from the power meter.",
             "de": "Wie oft Daten vom Energiezähler abgerufen werden."
+          }
+        }
+      ]
+    },
+    {
+      "id": "emma_modbus",
+      "name": {
+        "en": "EMMA Energy Manager (Modbus)",
+        "de": "EMMA Energiemanager (Modbus)"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "repair": [
+        {
+          "id": "start"
+        }
+      ],
+      "energy": {
+        "cumulative": true,
+        "cumulativeImportedCapability": "meter_power",
+        "cumulativeExportedCapability": "meter_power.exported",
+        "batteries": [
+          "OTHER"
+        ]
+      },
+      "capabilities": [
+        "measure_power",
+        "meter_power",
+        "meter_power.exported",
+        "meter_power.imported_today",
+        "meter_power.exported_today",
+        "measure_power.pv",
+        "meter_power.pv_total",
+        "meter_power.pv_daily",
+        "meter_power.inv_total",
+        "meter_power.inv_daily",
+        "measure_power.load",
+        "meter_power.consumption_today",
+        "measure_power.battery",
+        "measure_battery",
+        "meter_power.charged",
+        "meter_power.discharged",
+        "meter_power.charged_today",
+        "meter_power.discharged_today"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "Grid Active Power",
+            "de": "Netzwirkleistung"
+          }
+        },
+        "meter_power": {
+          "title": {
+            "en": "Grid Import Energy",
+            "de": "Netzbezug gesamt"
+          }
+        },
+        "meter_power.exported": {
+          "title": {
+            "en": "Grid Export Energy",
+            "de": "Netzeinspeisung gesamt"
+          }
+        },
+        "meter_power.imported_today": {
+          "title": {
+            "en": "Grid Import Today",
+            "de": "Netzbezug heute"
+          }
+        },
+        "meter_power.exported_today": {
+          "title": {
+            "en": "Grid Export Today",
+            "de": "Netzeinspeisung heute"
+          }
+        },
+        "measure_power.pv": {
+          "title": {
+            "en": "Solar Power",
+            "de": "Solarleistung"
+          }
+        },
+        "meter_power.pv_total": {
+          "title": {
+            "en": "Total PV Energy Yield",
+            "de": "Gesamtertrag PV"
+          }
+        },
+        "meter_power.pv_daily": {
+          "title": {
+            "en": "PV Yield Today",
+            "de": "PV-Ertrag heute"
+          }
+        },
+        "meter_power.inv_total": {
+          "title": {
+            "en": "Inverter Total Yield",
+            "de": "Gesamtertrag Wechselrichter"
+          }
+        },
+        "meter_power.inv_daily": {
+          "title": {
+            "en": "Inverter Yield Today",
+            "de": "Wechselrichter-Ertrag heute"
+          }
+        },
+        "measure_power.load": {
+          "title": {
+            "en": "House Load",
+            "de": "Hauslast"
+          }
+        },
+        "meter_power.consumption_today": {
+          "title": {
+            "en": "Consumption Today",
+            "de": "Hausverbrauch heute"
+          }
+        },
+        "measure_power.battery": {
+          "title": {
+            "en": "Battery Power",
+            "de": "Batterieleistung"
+          }
+        },
+        "measure_battery": {
+          "title": {
+            "en": "State of Charge",
+            "de": "Ladezustand"
+          }
+        },
+        "meter_power.charged": {
+          "title": {
+            "en": "Total Energy Charged",
+            "de": "Gesamte geladene Energie"
+          }
+        },
+        "meter_power.discharged": {
+          "title": {
+            "en": "Total Energy Discharged",
+            "de": "Gesamte entladene Energie"
+          }
+        },
+        "meter_power.charged_today": {
+          "title": {
+            "en": "Charged Energy Today",
+            "de": "Ladeenergie heute"
+          }
+        },
+        "meter_power.discharged_today": {
+          "title": {
+            "en": "Discharged Energy Today",
+            "de": "Entladeenergie heute"
+          }
+        }
+      },
+      "images": {
+        "small": "/drivers/emma_modbus/assets/images/small.png",
+        "large": "/drivers/emma_modbus/assets/images/large.png",
+        "xlarge": "/drivers/emma_modbus/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "start"
+        }
+      ],
+      "settings": [
+        {
+          "id": "address",
+          "type": "text",
+          "label": {
+            "en": "IP Address",
+            "de": "IP-Adresse"
+          },
+          "value": "",
+          "hint": {
+            "en": "IP address of the SUN2000MA / EMMA device.",
+            "de": "IP-Adresse des SUN2000MA / EMMA Geräts."
+          },
+          "highlight": true
+        },
+        {
+          "id": "port",
+          "type": "number",
+          "label": {
+            "en": "Modbus Port",
+            "de": "Modbus Port"
+          },
+          "value": 502,
+          "min": 1,
+          "max": 65535,
+          "hint": {
+            "en": "Default 502. SDongle: 6607. Some EMMA configurations: 1502.",
+            "de": "Standard 502. SDongle: 6607. Einige EMMA-Konfigurationen: 1502."
+          }
+        },
+        {
+          "id": "modbus_id",
+          "type": "number",
+          "label": {
+            "en": "Modbus Unit ID",
+            "de": "Modbus Geräte-ID"
+          },
+          "value": 0,
+          "min": 0,
+          "max": 247,
+          "hint": {
+            "en": "Modbus unit ID of the EMMA device (default: 0).",
+            "de": "Modbus Geräte-ID des EMMA Geräts (Standard: 0)."
+          }
+        },
+        {
+          "id": "poll_interval",
+          "type": "number",
+          "label": {
+            "en": "Update Interval",
+            "de": "Aktualisierungsintervall"
+          },
+          "units": {
+            "en": "seconds",
+            "de": "Sekunden"
+          },
+          "value": 60,
+          "min": 10,
+          "max": 300,
+          "hint": {
+            "en": "How often to read data from the EMMA device.",
+            "de": "Wie oft Daten vom EMMA Gerät abgerufen werden."
           }
         }
       ]

@@ -13,5 +13,8 @@
   },
   "1.0.4": {
     "en": "fix modbus pairing issue with multiple devices"
+  },
+  "1.0.5": {
+    "en": "new icons, EMMA beta driver implementation"
   }
 }
