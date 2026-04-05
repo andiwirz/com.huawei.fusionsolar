@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "compatibility": ">=12.3.0",
   "runtime": "nodejs",
   "sdk": 3,

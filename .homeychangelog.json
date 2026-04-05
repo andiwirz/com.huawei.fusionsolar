@@ -22,5 +22,8 @@
   },
   "1.0.7": {
     "en": "remove invalid actions"
+  },
+  "1.0.8": {
+    "en": "extend timeout on modbus writes"
   }
 }
