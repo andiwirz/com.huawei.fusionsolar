@@ -16,5 +16,8 @@
   },
   "1.0.5": {
     "en": "new icons, EMMA beta driver implementation"
+  },
+  "1.0.6": {
+    "en": "fix for Control registers written back on every app start"
   }
 }
