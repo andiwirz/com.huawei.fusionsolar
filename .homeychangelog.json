@@ -19,5 +19,8 @@
   },
   "1.0.6": {
     "en": "fix for Control registers written back on every app start"
+  },
+  "1.0.7": {
+    "en": "remove invalid actions"
   }
 }

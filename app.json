@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "compatibility": ">=12.3.0",
   "runtime": "nodejs",
   "sdk": 3,
@@ -94,20 +94,6 @@
             "en": "Zero Power Grid Connection",
             "de": "Nulleinspeisung"
           }
-        },
-        {
-          "id": "6",
-          "title": {
-            "en": "Power Limited (kW)",
-            "de": "Leistungsbegrenzung (kW)"
-          }
-        },
-        {
-          "id": "7",
-          "title": {
-            "en": "Power Limited (%)",
-            "de": "Leistungsbegrenzung (%)"
-          }
         }
       ]
     },
@@ -185,21 +171,21 @@
       "insights": false,
       "values": [
         {
-          "id": "0",
+          "id": "170",
           "title": {
             "en": "Stop",
             "de": "Stopp"
           }
         },
         {
-          "id": "1",
+          "id": "187",
           "title": {
             "en": "Charge",
             "de": "Laden"
           }
         },
         {
-          "id": "2",
+          "id": "204",
           "title": {
             "en": "Discharge",
             "de": "Entladen"
@@ -936,6 +922,21 @@
           "title": {
             "en": "Battery Status",
             "de": "Batteriestatus"
+          }
+        },
+        "storage_force_charge_discharge": {
+          "uiComponent": null
+        },
+        "storage_excess_pv_energy_use_in_tou": {
+          "title": {
+            "en": "Excess PV Energy Use (TOU mode only)",
+            "de": "PV-Überschuss-Nutzung (nur TOU-Modus)"
+          }
+        },
+        "remote_charge_discharge_control_mode": {
+          "title": {
+            "en": "Remote Dispatch Mode (overrides Working Mode)",
+            "de": "Fernsteuerung (übersteuert Betriebsmodus)"
           }
         }
       },
@@ -2185,6 +2186,61 @@
               "en": "State",
               "de": "Status"
             }
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "luna2000_set_force_charge_discharge",
+        "title": {
+          "en": "Set force charge/discharge",
+          "de": "Zwangsladen/Entladen steuern"
+        },
+        "titleFormatted": {
+          "en": "Set force charge/discharge to [[mode]]",
+          "de": "Zwangsladen/Entladen auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Force the LUNA2000 battery to charge, discharge, or stop. The battery returns to its normal working mode after the command completes.",
+          "de": "LUNA2000-Batterie zum Laden, Entladen oder Stoppen zwingen. Die Batterie kehrt nach Abschluss in den normalen Betriebsmodus zurück."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "170",
+                "label": {
+                  "en": "Stop",
+                  "de": "Stopp"
+                }
+              },
+              {
+                "id": "187",
+                "label": {
+                  "en": "Force Charge",
+                  "de": "Zwangsladen"
+                }
+              },
+              {
+                "id": "204",
+                "label": {
+                  "en": "Force Discharge",
+                  "de": "Zwangsentladen"
+                }
+              }
+            ]
           }
         ]
       }
