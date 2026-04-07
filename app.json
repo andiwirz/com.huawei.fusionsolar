@@ -1,12 +1,20 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.0.14",
+  "version": "1.1.0",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
   "platforms": [
     "local"
   ],
+  "homeyCommunityTopicId": 153353,
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "AndiWirz"
+      }
+    }
+  },
   "brandColor": "#CF0A2C",
   "name": {
     "en": "Huawei FusionSolar Manager",
@@ -62,6 +70,18 @@
       "uiComponent": "sensor",
       "insights": false,
       "icon": "/assets/capabilities/huawei_status.svg"
+    },
+    "dtsu666_meter_status": {
+      "type": "string",
+      "title": {
+        "en": "Meter Status",
+        "de": "Zählerstatus"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": false,
+      "icon": "/assets/capabilities/dtsu666_meter_status.svg"
     },
     "smartcharger_rated_power": {
       "type": "number",
@@ -838,8 +858,8 @@
         },
         "measure_temperature.invertor": {
           "title": {
-            "en": "Heatsink Temperature",
-            "de": "Kühlkörpertemperatur"
+            "en": "Inverter Temperature",
+            "de": "Wechselrichter-Temperatur"
           }
         },
         "meter_power": {
@@ -992,6 +1012,7 @@
       "capabilities": [
         "measure_power",
         "measure_power.active_power",
+        "measure_temperature.invertor",
         "meter_power",
         "meter_power.daily",
         "measure_power.grid_active_power",
@@ -1011,6 +1032,12 @@
           "title": {
             "en": "Active Power",
             "de": "Wirkleistung"
+          }
+        },
+        "measure_temperature.invertor": {
+          "title": {
+            "en": "Inverter Temperature",
+            "de": "Wechselrichter-Temperatur"
           }
         },
         "meter_power": {
@@ -1561,7 +1588,8 @@
         "measure_current.phase3",
         "measure_power.phase1",
         "measure_power.phase2",
-        "measure_power.phase3"
+        "measure_power.phase3",
+        "dtsu666_meter_status"
       ],
       "capabilitiesOptions": {
         "measure_power": {
@@ -1738,7 +1766,16 @@
         "meter_power.imported_today",
         "meter_power.exported_today",
         "measure_power.load",
-        "meter_power.consumption_today"
+        "meter_power.consumption_today",
+        "measure_voltage.phase1",
+        "measure_voltage.phase2",
+        "measure_voltage.phase3",
+        "measure_current.phase1",
+        "measure_current.phase2",
+        "measure_current.phase3",
+        "measure_power.phase1",
+        "measure_power.phase2",
+        "measure_power.phase3"
       ],
       "capabilitiesOptions": {
         "measure_power": {
@@ -1781,6 +1818,60 @@
           "title": {
             "en": "House Consumption Today",
             "de": "Hausverbrauch heute"
+          }
+        },
+        "measure_voltage.phase1": {
+          "title": {
+            "en": "Phase A Voltage",
+            "de": "Spannung Phase A"
+          }
+        },
+        "measure_voltage.phase2": {
+          "title": {
+            "en": "Phase B Voltage",
+            "de": "Spannung Phase B"
+          }
+        },
+        "measure_voltage.phase3": {
+          "title": {
+            "en": "Phase C Voltage",
+            "de": "Spannung Phase C"
+          }
+        },
+        "measure_current.phase1": {
+          "title": {
+            "en": "Phase A Current",
+            "de": "Strom Phase A"
+          }
+        },
+        "measure_current.phase2": {
+          "title": {
+            "en": "Phase B Current",
+            "de": "Strom Phase B"
+          }
+        },
+        "measure_current.phase3": {
+          "title": {
+            "en": "Phase C Current",
+            "de": "Strom Phase C"
+          }
+        },
+        "measure_power.phase1": {
+          "title": {
+            "en": "Phase A Power",
+            "de": "Leistung Phase A"
+          }
+        },
+        "measure_power.phase2": {
+          "title": {
+            "en": "Phase B Power",
+            "de": "Leistung Phase B"
+          }
+        },
+        "measure_power.phase3": {
+          "title": {
+            "en": "Phase C Power",
+            "de": "Leistung Phase C"
           }
         }
       },
@@ -1861,7 +1952,7 @@
       ]
     },
     {
-      "id": "fusionsolar_openapi_inverter",
+      "id": "sun2000_openapi_fusionsolar",
       "name": {
         "en": "Inverter SUN 2000 (OpenAPI)",
         "de": "Inverter SUN 2000 (OpenAPI)"
@@ -1933,8 +2024,8 @@
         },
         "measure_temperature.invertor": {
           "title": {
-            "en": "Heatsink Temperature",
-            "de": "Kühlkörpertemperatur"
+            "en": "Inverter Temperature",
+            "de": "Wechselrichter-Temperatur"
           }
         },
         "measure_power.active_power": {
@@ -1963,9 +2054,9 @@
         }
       },
       "images": {
-        "small": "/drivers/fusionsolar_openapi_inverter/assets/images/small.png",
-        "large": "/drivers/fusionsolar_openapi_inverter/assets/images/large.png",
-        "xlarge": "/drivers/fusionsolar_openapi_inverter/assets/images/xlarge.png"
+        "small": "/drivers/sun2000_openapi_fusionsolar/assets/images/small.png",
+        "large": "/drivers/sun2000_openapi_fusionsolar/assets/images/large.png",
+        "xlarge": "/drivers/sun2000_openapi_fusionsolar/assets/images/xlarge.png"
       },
       "pair": [
         {
@@ -2036,7 +2127,7 @@
       ]
     },
     {
-      "id": "fusionsolar_openapi_battery",
+      "id": "luna2000_openapi_fusionsolar",
       "name": {
         "en": "Battery LUNA 2000 (OpenAPI)",
         "de": "Batterie LUNA 2000 (OpenAPI)"
@@ -2116,9 +2207,9 @@
         }
       },
       "images": {
-        "small": "/drivers/fusionsolar_openapi_battery/assets/images/small.png",
-        "large": "/drivers/fusionsolar_openapi_battery/assets/images/large.png",
-        "xlarge": "/drivers/fusionsolar_openapi_battery/assets/images/xlarge.png"
+        "small": "/drivers/luna2000_openapi_fusionsolar/assets/images/small.png",
+        "large": "/drivers/luna2000_openapi_fusionsolar/assets/images/large.png",
+        "xlarge": "/drivers/luna2000_openapi_fusionsolar/assets/images/xlarge.png"
       },
       "pair": [
         {
@@ -2189,7 +2280,7 @@
       ]
     },
     {
-      "id": "fusionsolar_openapi_meter",
+      "id": "powermeter_openapi_fusionsolar",
       "name": {
         "en": "Power Meter (OpenAPI)",
         "de": "Energiezähler (OpenAPI)"
@@ -2284,9 +2375,9 @@
         }
       },
       "images": {
-        "small": "/drivers/fusionsolar_openapi_meter/assets/images/small.png",
-        "large": "/drivers/fusionsolar_openapi_meter/assets/images/large.png",
-        "xlarge": "/drivers/fusionsolar_openapi_meter/assets/images/xlarge.png"
+        "small": "/drivers/powermeter_openapi_fusionsolar/assets/images/small.png",
+        "large": "/drivers/powermeter_openapi_fusionsolar/assets/images/large.png",
+        "xlarge": "/drivers/powermeter_openapi_fusionsolar/assets/images/xlarge.png"
       },
       "pair": [
         {
@@ -2365,6 +2456,10 @@
           "en": "Power output changed",
           "de": "Leistungsabgabe hat sich geändert"
         },
+        "hint": {
+          "en": "Fires when the plant's current power output changes. Use the Power token to react to the new value.",
+          "de": "Wird ausgelöst, wenn sich die aktuelle Leistungsabgabe der Anlage ändert. Das Token Leistung enthält den neuen Wert."
+        },
         "args": [
           {
             "type": "device",
@@ -2389,6 +2484,10 @@
           "en": "Daily energy updated",
           "de": "Tagesertrag aktualisiert"
         },
+        "hint": {
+          "en": "Fires when the plant's daily energy yield is updated. Note: Huawei caches data for ~30 minutes, so updates may be infrequent.",
+          "de": "Wird ausgelöst, wenn der Tagesertrag der Anlage aktualisiert wird. Huawei cached Daten ~30 Minuten, daher kann das Intervall variieren."
+        },
         "args": [
           {
             "type": "device",
@@ -2410,8 +2509,12 @@
       {
         "id": "modbus_power_changed",
         "title": {
-          "en": "Power output changed (Modbus)",
-          "de": "Leistungsabgabe geändert (Modbus)"
+          "en": "Power output changed",
+          "de": "Leistungsabgabe geändert"
+        },
+        "hint": {
+          "en": "Fires when the inverter's active power output changes. Reads the current value from the SUN2000 via Modbus.",
+          "de": "Wird ausgelöst, wenn sich die Wirkleistungsabgabe des Wechselrichters ändert. Der Wert wird über Modbus vom SUN2000 gelesen."
         },
         "args": [
           {
@@ -2432,16 +2535,262 @@
         ]
       },
       {
-        "id": "openapi_power_changed",
+        "id": "sun2000_status_changed",
         "title": {
-          "en": "Power output changed (OpenAPI)",
-          "de": "Leistungsabgabe geändert (OpenAPI)"
+          "en": "Inverter status changed",
+          "de": "Wechselrichter-Status hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires when the SUN2000 inverter's operating status changes. Select a specific status to trigger only on that transition.",
+          "de": "Wird ausgelöst, wenn sich der Betriebsstatus des SUN2000-Wechselrichters ändert. Wähle einen Status, um nur bei einem bestimmten Übergang auszulösen."
+        },
+        "titleFormatted": {
+          "en": "Inverter status changed to [[status]]",
+          "de": "Wechselrichter-Status hat sich geändert auf [[status]]"
         },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=fusionsolar_openapi_inverter"
+            "filter": "driver_id=sun2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Standby: initialising",
+                "label": {
+                  "en": "Standby: initialising",
+                  "de": "Standby: Initialisierung"
+                }
+              },
+              {
+                "id": "Standby: insulation resistance detecting",
+                "label": {
+                  "en": "Standby: insulation resistance detecting",
+                  "de": "Standby: Isolationswiderstand prüfen"
+                }
+              },
+              {
+                "id": "Standby: irradiation detecting",
+                "label": {
+                  "en": "Standby: irradiation detecting",
+                  "de": "Standby: Einstrahlung prüfen"
+                }
+              },
+              {
+                "id": "Standby: grid detecting",
+                "label": {
+                  "en": "Standby: grid detecting",
+                  "de": "Standby: Netz prüfen"
+                }
+              },
+              {
+                "id": "Standby: no irradiation",
+                "label": {
+                  "en": "Standby: no irradiation",
+                  "de": "Standby: keine Einstrahlung"
+                }
+              },
+              {
+                "id": "Standby: backup power system abnormal",
+                "label": {
+                  "en": "Standby: backup power system abnormal",
+                  "de": "Standby: Notstrom-Anomalie"
+                }
+              },
+              {
+                "id": "Starting",
+                "label": {
+                  "en": "Starting",
+                  "de": "Startet"
+                }
+              },
+              {
+                "id": "On-grid",
+                "label": {
+                  "en": "On-grid",
+                  "de": "Netzbetrieb"
+                }
+              },
+              {
+                "id": "On-grid: power limited",
+                "label": {
+                  "en": "On-grid: power limited",
+                  "de": "Netzbetrieb: Leistungsbegrenzung"
+                }
+              },
+              {
+                "id": "On-grid: self-derating",
+                "label": {
+                  "en": "On-grid: self-derating",
+                  "de": "Netzbetrieb: Selbstdrosselung"
+                }
+              },
+              {
+                "id": "Off-grid operation",
+                "label": {
+                  "en": "Off-grid operation",
+                  "de": "Inselbetrieb"
+                }
+              },
+              {
+                "id": "Shutdown: fault",
+                "label": {
+                  "en": "Shutdown: fault",
+                  "de": "Abschaltung: Störung"
+                }
+              },
+              {
+                "id": "Shutdown: command",
+                "label": {
+                  "en": "Shutdown: command",
+                  "de": "Abschaltung: Befehl"
+                }
+              },
+              {
+                "id": "Shutdown: OVGR",
+                "label": {
+                  "en": "Shutdown: OVGR",
+                  "de": "Abschaltung: OVGR"
+                }
+              },
+              {
+                "id": "Shutdown: communication interrupted",
+                "label": {
+                  "en": "Shutdown: communication interrupted",
+                  "de": "Abschaltung: Kommunikationsausfall"
+                }
+              },
+              {
+                "id": "Shutdown: limited power",
+                "label": {
+                  "en": "Shutdown: limited power",
+                  "de": "Abschaltung: Leistungslimit"
+                }
+              },
+              {
+                "id": "Shutdown: manual startup required",
+                "label": {
+                  "en": "Shutdown: manual startup required",
+                  "de": "Abschaltung: manueller Start erforderl."
+                }
+              },
+              {
+                "id": "Shutdown: rapid shutdown",
+                "label": {
+                  "en": "Shutdown: rapid shutdown",
+                  "de": "Abschaltung: Schnellabschaltung"
+                }
+              },
+              {
+                "id": "Shutdown: commanded rapid shutdown",
+                "label": {
+                  "en": "Shutdown: commanded rapid shutdown",
+                  "de": "Abschaltung: befohl. Schnellabschaltung"
+                }
+              },
+              {
+                "id": "Shutdown: backup power system abnormal",
+                "label": {
+                  "en": "Shutdown: backup power system abnormal",
+                  "de": "Abschaltung: Notstrom-Anomalie"
+                }
+              },
+              {
+                "id": "Grid scheduling: cosφ-P curve",
+                "label": {
+                  "en": "Grid scheduling: cosφ-P curve",
+                  "de": "Netzregelung: cosφ-P-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: Q-U curve",
+                "label": {
+                  "en": "Grid scheduling: Q-U curve",
+                  "de": "Netzregelung: Q-U-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: PF-U curve",
+                "label": {
+                  "en": "Grid scheduling: PF-U curve",
+                  "de": "Netzregelung: PF-U-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: Q-P curve",
+                "label": {
+                  "en": "Grid scheduling: Q-P curve",
+                  "de": "Netzregelung: Q-P-Kurve"
+                }
+              },
+              {
+                "id": "Inspecting",
+                "label": {
+                  "en": "Inspecting",
+                  "de": "Inspektion"
+                }
+              },
+              {
+                "id": "AFCI check",
+                "label": {
+                  "en": "AFCI check",
+                  "de": "AFCI-Prüfung"
+                }
+              },
+              {
+                "id": "I-V scanning",
+                "label": {
+                  "en": "I-V scanning",
+                  "de": "I-V-Scan"
+                }
+              },
+              {
+                "id": "Running: off-grid charging",
+                "label": {
+                  "en": "Running: off-grid charging",
+                  "de": "Betrieb: Insel-Laden"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "example": {
+              "en": "On-grid",
+              "de": "Netzbetrieb"
+            }
+          }
+        ]
+      },
+      {
+        "id": "openapi_power_changed",
+        "title": {
+          "en": "Power output changed",
+          "de": "Leistungsabgabe geändert"
+        },
+        "hint": {
+          "en": "Fires when the inverter's active power output changes. Reads the current value via the FusionSolar OpenAPI.",
+          "de": "Wird ausgelöst, wenn sich die Wirkleistungsabgabe des Wechselrichters ändert. Der Wert wird über die FusionSolar OpenAPI abgerufen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=sun2000_openapi_fusionsolar"
           }
         ],
         "tokens": [
@@ -2460,6 +2809,10 @@
         "title": {
           "en": "Battery state of charge changed",
           "de": "Ladezustand der Batterie hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires every time the battery's state of charge changes. The SoC token contains the new percentage value.",
+          "de": "Wird ausgelöst, wenn sich der Ladezustand der Batterie ändert. Das Token Ladezustand enthält den neuen Prozentwert."
         },
         "args": [
           {
@@ -2482,14 +2835,18 @@
       {
         "id": "openapi_battery_soc_changed",
         "title": {
-          "en": "Battery state of charge changed (OpenAPI)",
-          "de": "Ladezustand der Batterie hat sich geändert (OpenAPI)"
+          "en": "Battery state of charge changed",
+          "de": "Ladezustand der Batterie hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires every time the battery's state of charge changes. Reads the current value via the FusionSolar OpenAPI.",
+          "de": "Wird ausgelöst, wenn sich der Ladezustand der Batterie ändert. Der Wert wird über die FusionSolar OpenAPI abgerufen."
         },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=fusionsolar_openapi_battery"
+            "filter": "driver_id=luna2000_openapi_fusionsolar"
           }
         ],
         "tokens": [
@@ -2506,14 +2863,18 @@
       {
         "id": "openapi_battery_charging_state_changed",
         "title": {
-          "en": "Battery charging state changed (OpenAPI)",
-          "de": "Batterie-Ladestatus hat sich geändert (OpenAPI)"
+          "en": "Battery charging state changed",
+          "de": "Batterie-Ladestatus hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires when the battery switches between charging, discharging, and idle. The State token contains the new value.",
+          "de": "Wird ausgelöst, wenn die Batterie zwischen Laden, Entladen und Leerlauf wechselt. Das Token Status enthält den neuen Wert."
         },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=fusionsolar_openapi_battery"
+            "filter": "driver_id=luna2000_openapi_fusionsolar"
           }
         ],
         "tokens": [
@@ -2533,11 +2894,15 @@
           "en": "Grid export started",
           "de": "Einspeisung ins Netz begonnen"
         },
+        "hint": {
+          "en": "Fires when the meter switches from importing to exporting — i.e. when surplus PV power starts flowing back to the grid.",
+          "de": "Wird ausgelöst, wenn der Zähler von Netzbezug auf Einspeisung wechselt — d.h. wenn überschüssige PV-Energie ins Netz fließt."
+        },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus"
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus||driver_id=powermeter_openapi_fusionsolar"
           }
         ],
         "tokens": [
@@ -2557,11 +2922,15 @@
           "en": "Grid import started",
           "de": "Netzbezug begonnen"
         },
+        "hint": {
+          "en": "Fires when the meter switches from exporting to importing — i.e. when grid power is being drawn again.",
+          "de": "Wird ausgelöst, wenn der Zähler von Einspeisung auf Netzbezug wechselt — d.h. wenn wieder Strom aus dem Netz bezogen wird."
+        },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus"
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus||driver_id=powermeter_openapi_fusionsolar"
           }
         ],
         "tokens": [
@@ -2576,10 +2945,155 @@
         ]
       },
       {
+        "id": "luna2000_battery_status_changed",
+        "title": {
+          "en": "Battery unit status changed",
+          "de": "Batterie-Betriebsstatus hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires when the LUNA2000 battery unit's operating status changes. Select a specific status to trigger only on that transition.",
+          "de": "Wird ausgelöst, wenn sich der Betriebsstatus der LUNA2000-Batterieeinheit ändert. Wähle einen Status, um nur bei einem bestimmten Übergang auszulösen."
+        },
+        "titleFormatted": {
+          "en": "Battery unit status changed to [[status]]",
+          "de": "Batterie-Betriebsstatus hat sich geändert auf [[status]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Offline",
+                "label": {
+                  "en": "Offline",
+                  "de": "Offline"
+                }
+              },
+              {
+                "id": "Standby",
+                "label": {
+                  "en": "Standby",
+                  "de": "Standby"
+                }
+              },
+              {
+                "id": "Running",
+                "label": {
+                  "en": "Running",
+                  "de": "Laufend"
+                }
+              },
+              {
+                "id": "Fault",
+                "label": {
+                  "en": "Fault",
+                  "de": "Störung"
+                }
+              },
+              {
+                "id": "Sleep mode",
+                "label": {
+                  "en": "Sleep mode",
+                  "de": "Schlafmodus"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "example": {
+              "en": "Fault",
+              "de": "Störung"
+            }
+          }
+        ]
+      },
+      {
+        "id": "dtsu666_meter_status_changed",
+        "title": {
+          "en": "Meter status changed",
+          "de": "Zählerstatus hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires when the grid meter's online/offline status changes. Select a specific status to trigger only on that transition.",
+          "de": "Wird ausgelöst, wenn sich der Online/Offline-Status des Netzwerkzählers ändert. Wähle einen Status, um nur bei einem bestimmten Übergang auszulösen."
+        },
+        "titleFormatted": {
+          "en": "Meter status changed to [[status]]",
+          "de": "Zählerstatus hat sich geändert auf [[status]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=dtsu666_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Offline",
+                "label": {
+                  "en": "Offline",
+                  "de": "Offline"
+                }
+              },
+              {
+                "id": "Normal",
+                "label": {
+                  "en": "Normal",
+                  "de": "Normal"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "example": {
+              "en": "Offline",
+              "de": "Offline"
+            }
+          }
+        ]
+      },
+      {
         "id": "luna2000_charging_state_changed",
         "title": {
           "en": "Battery charging state changed",
           "de": "Batterie-Ladestatus hat sich geändert"
+        },
+        "hint": {
+          "en": "Fires when the battery switches between charging, discharging, and idle. The State token contains the new value.",
+          "de": "Wird ausgelöst, wenn die Batterie zwischen Laden, Entladen und Leerlauf wechselt. Das Token Status enthält den neuen Wert."
         },
         "args": [
           {
@@ -2605,6 +3119,10 @@
           "en": "Battery started charging",
           "de": "Batterie hat mit dem Laden begonnen"
         },
+        "hint": {
+          "en": "Fires when the battery transitions from idle or discharging to charging (power above 50 W).",
+          "de": "Wird ausgelöst, wenn die Batterie von Leerlauf oder Entladen auf Laden wechselt (Leistung über 50 W)."
+        },
         "args": [
           {
             "type": "device",
@@ -2618,6 +3136,10 @@
         "title": {
           "en": "Battery started discharging",
           "de": "Batterie hat mit dem Entladen begonnen"
+        },
+        "hint": {
+          "en": "Fires when the battery transitions from idle or charging to discharging (power above 50 W).",
+          "de": "Wird ausgelöst, wenn die Batterie von Leerlauf oder Laden auf Entladen wechselt (Leistung über 50 W)."
         },
         "args": [
           {
@@ -2633,6 +3155,10 @@
           "en": "EV charging started",
           "de": "Laden des Fahrzeugs hat begonnen"
         },
+        "hint": {
+          "en": "Fires when the EV charger detects that charging of a vehicle has begun.",
+          "de": "Wird ausgelöst, wenn die Wallbox erkennt, dass das Laden eines Fahrzeugs begonnen hat."
+        },
         "args": [
           {
             "type": "device",
@@ -2646,6 +3172,10 @@
         "title": {
           "en": "EV charging stopped",
           "de": "Laden des Fahrzeugs wurde beendet"
+        },
+        "hint": {
+          "en": "Fires when the EV charger detects that charging of a vehicle has ended.",
+          "de": "Wird ausgelöst, wenn die Wallbox erkennt, dass das Laden eines Fahrzeugs beendet wurde."
         },
         "args": [
           {
@@ -3078,6 +3608,10 @@
           "en": "Battery is !{{charging|not charging}}",
           "de": "Batterie !{{lädt|lädt nicht}}"
         },
+        "hint": {
+          "en": "True when the battery is actively charging (power above 50 W).",
+          "de": "Wahr, wenn die Batterie aktiv geladen wird (Leistung über 50 W)."
+        },
         "args": [
           {
             "type": "device",
@@ -3091,6 +3625,10 @@
         "title": {
           "en": "Battery is !{{discharging|not discharging}}",
           "de": "Batterie !{{entlädt|entlädt nicht}}"
+        },
+        "hint": {
+          "en": "True when the battery is actively discharging (power above 50 W).",
+          "de": "Wahr, wenn die Batterie aktiv entladen wird (Leistung über 50 W)."
         },
         "args": [
           {
@@ -3106,11 +3644,356 @@
           "en": "Grid is !{{exporting|importing}}",
           "de": "Netz !{{speist ein|bezieht}}"
         },
+        "hint": {
+          "en": "True when the meter reports a negative active power — i.e. surplus energy is being fed into the grid.",
+          "de": "Wahr, wenn der Zähler eine negative Wirkleistung meldet — d.h. überschüssige Energie wird ins Netz eingespeist."
+        },
         "args": [
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus"
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus||driver_id=powermeter_openapi_fusionsolar"
+          }
+        ]
+      },
+      {
+        "id": "dtsu666_meter_status_is",
+        "title": {
+          "en": "Meter status !{{is|is not}}",
+          "de": "Zählerstatus !{{ist|ist nicht}}"
+        },
+        "hint": {
+          "en": "Checks the current online status of the DTSU666 grid meter (Offline or Normal).",
+          "de": "Prüft den aktuellen Online-Status des DTSU666-Netzwerkzählers (Offline oder Normal)."
+        },
+        "titleFormatted": {
+          "en": "Meter status !{{is|is not}} [[status]]",
+          "de": "Zählerstatus !{{ist|ist nicht}} [[status]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=dtsu666_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Offline",
+                "label": {
+                  "en": "Offline",
+                  "de": "Offline"
+                }
+              },
+              {
+                "id": "Normal",
+                "label": {
+                  "en": "Normal",
+                  "de": "Normal"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_battery_status_is",
+        "title": {
+          "en": "Battery unit status !{{is|is not}}",
+          "de": "Batterie-Betriebsstatus !{{ist|ist nicht}}"
+        },
+        "hint": {
+          "en": "Checks the current operating status of the LUNA2000 battery unit (e.g. Running, Fault, Sleep mode).",
+          "de": "Prüft den aktuellen Betriebsstatus der LUNA2000-Batterieeinheit (z.B. Laufend, Störung, Schlafmodus)."
+        },
+        "titleFormatted": {
+          "en": "Battery unit status !{{is|is not}} [[status]]",
+          "de": "Batterie-Betriebsstatus !{{ist|ist nicht}} [[status]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Offline",
+                "label": {
+                  "en": "Offline",
+                  "de": "Offline"
+                }
+              },
+              {
+                "id": "Standby",
+                "label": {
+                  "en": "Standby",
+                  "de": "Standby"
+                }
+              },
+              {
+                "id": "Running",
+                "label": {
+                  "en": "Running",
+                  "de": "Laufend"
+                }
+              },
+              {
+                "id": "Fault",
+                "label": {
+                  "en": "Fault",
+                  "de": "Störung"
+                }
+              },
+              {
+                "id": "Sleep mode",
+                "label": {
+                  "en": "Sleep mode",
+                  "de": "Schlafmodus"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sun2000_status_is",
+        "title": {
+          "en": "Inverter status !{{is|is not}}",
+          "de": "Wechselrichter-Status !{{ist|ist nicht}}"
+        },
+        "hint": {
+          "en": "Checks the current operating status of the SUN2000 inverter (e.g. On-grid, Shutdown: fault).",
+          "de": "Prüft den aktuellen Betriebsstatus des SUN2000-Wechselrichters (z.B. Netzbetrieb, Abschaltung: Störung)."
+        },
+        "titleFormatted": {
+          "en": "Inverter status !{{is|is not}} [[status]]",
+          "de": "Wechselrichter-Status !{{ist|ist nicht}} [[status]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=sun2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "status",
+            "title": {
+              "en": "Status",
+              "de": "Status"
+            },
+            "values": [
+              {
+                "id": "Standby: initialising",
+                "label": {
+                  "en": "Standby: initialising",
+                  "de": "Standby: Initialisierung"
+                }
+              },
+              {
+                "id": "Standby: insulation resistance detecting",
+                "label": {
+                  "en": "Standby: insulation resistance detecting",
+                  "de": "Standby: Isolationswiderstand prüfen"
+                }
+              },
+              {
+                "id": "Standby: irradiation detecting",
+                "label": {
+                  "en": "Standby: irradiation detecting",
+                  "de": "Standby: Einstrahlung prüfen"
+                }
+              },
+              {
+                "id": "Standby: grid detecting",
+                "label": {
+                  "en": "Standby: grid detecting",
+                  "de": "Standby: Netz prüfen"
+                }
+              },
+              {
+                "id": "Standby: no irradiation",
+                "label": {
+                  "en": "Standby: no irradiation",
+                  "de": "Standby: keine Einstrahlung"
+                }
+              },
+              {
+                "id": "Standby: backup power system abnormal",
+                "label": {
+                  "en": "Standby: backup power system abnormal",
+                  "de": "Standby: Notstrom-Anomalie"
+                }
+              },
+              {
+                "id": "Starting",
+                "label": {
+                  "en": "Starting",
+                  "de": "Startet"
+                }
+              },
+              {
+                "id": "On-grid",
+                "label": {
+                  "en": "On-grid",
+                  "de": "Netzbetrieb"
+                }
+              },
+              {
+                "id": "On-grid: power limited",
+                "label": {
+                  "en": "On-grid: power limited",
+                  "de": "Netzbetrieb: Leistungsbegrenzung"
+                }
+              },
+              {
+                "id": "On-grid: self-derating",
+                "label": {
+                  "en": "On-grid: self-derating",
+                  "de": "Netzbetrieb: Selbstdrosselung"
+                }
+              },
+              {
+                "id": "Off-grid operation",
+                "label": {
+                  "en": "Off-grid operation",
+                  "de": "Inselbetrieb"
+                }
+              },
+              {
+                "id": "Shutdown: fault",
+                "label": {
+                  "en": "Shutdown: fault",
+                  "de": "Abschaltung: Störung"
+                }
+              },
+              {
+                "id": "Shutdown: command",
+                "label": {
+                  "en": "Shutdown: command",
+                  "de": "Abschaltung: Befehl"
+                }
+              },
+              {
+                "id": "Shutdown: OVGR",
+                "label": {
+                  "en": "Shutdown: OVGR",
+                  "de": "Abschaltung: OVGR"
+                }
+              },
+              {
+                "id": "Shutdown: communication interrupted",
+                "label": {
+                  "en": "Shutdown: communication interrupted",
+                  "de": "Abschaltung: Kommunikationsausfall"
+                }
+              },
+              {
+                "id": "Shutdown: limited power",
+                "label": {
+                  "en": "Shutdown: limited power",
+                  "de": "Abschaltung: Leistungslimit"
+                }
+              },
+              {
+                "id": "Shutdown: manual startup required",
+                "label": {
+                  "en": "Shutdown: manual startup required",
+                  "de": "Abschaltung: manueller Start erforderl."
+                }
+              },
+              {
+                "id": "Shutdown: rapid shutdown",
+                "label": {
+                  "en": "Shutdown: rapid shutdown",
+                  "de": "Abschaltung: Schnellabschaltung"
+                }
+              },
+              {
+                "id": "Shutdown: commanded rapid shutdown",
+                "label": {
+                  "en": "Shutdown: commanded rapid shutdown",
+                  "de": "Abschaltung: befohl. Schnellabschaltung"
+                }
+              },
+              {
+                "id": "Shutdown: backup power system abnormal",
+                "label": {
+                  "en": "Shutdown: backup power system abnormal",
+                  "de": "Abschaltung: Notstrom-Anomalie"
+                }
+              },
+              {
+                "id": "Grid scheduling: cosφ-P curve",
+                "label": {
+                  "en": "Grid scheduling: cosφ-P curve",
+                  "de": "Netzregelung: cosφ-P-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: Q-U curve",
+                "label": {
+                  "en": "Grid scheduling: Q-U curve",
+                  "de": "Netzregelung: Q-U-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: PF-U curve",
+                "label": {
+                  "en": "Grid scheduling: PF-U curve",
+                  "de": "Netzregelung: PF-U-Kurve"
+                }
+              },
+              {
+                "id": "Grid scheduling: Q-P curve",
+                "label": {
+                  "en": "Grid scheduling: Q-P curve",
+                  "de": "Netzregelung: Q-P-Kurve"
+                }
+              },
+              {
+                "id": "Inspecting",
+                "label": {
+                  "en": "Inspecting",
+                  "de": "Inspektion"
+                }
+              },
+              {
+                "id": "AFCI check",
+                "label": {
+                  "en": "AFCI check",
+                  "de": "AFCI-Prüfung"
+                }
+              },
+              {
+                "id": "I-V scanning",
+                "label": {
+                  "en": "I-V scanning",
+                  "de": "I-V-Scan"
+                }
+              },
+              {
+                "id": "Running: off-grid charging",
+                "label": {
+                  "en": "Running: off-grid charging",
+                  "de": "Betrieb: Insel-Laden"
+                }
+              }
+            ]
           }
         ]
       },
@@ -3135,8 +4018,8 @@
       {
         "id": "modbus_is_producing",
         "title": {
-          "en": "Is !{{producing|not producing}} (Modbus)",
-          "de": "Erzeugt !{{gerade Strom|gerade keinen Strom}} (Modbus)"
+          "en": "Is !{{producing|not producing}}",
+          "de": "Erzeugt !{{gerade Strom|gerade keinen Strom}}"
         },
         "hint": {
           "en": "Checks whether the SUN2000 inverter is currently generating power.",
