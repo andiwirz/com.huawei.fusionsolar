@@ -40,5 +40,8 @@
   },
   "1.0.13": {
     "en": "add action flows on luna2000 emma modbus device and fixed some translation issues"
+  },
+  "1.0.14": {
+    "en": "additional flows"
   }
 }

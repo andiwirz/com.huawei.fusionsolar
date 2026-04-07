@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -2598,9 +2598,118 @@
             }
           }
         ]
+      },
+      {
+        "id": "luna2000_charging_started",
+        "title": {
+          "en": "Battery started charging",
+          "de": "Batterie hat mit dem Laden begonnen"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_emma_modbus"
+          }
+        ]
+      },
+      {
+        "id": "luna2000_discharging_started",
+        "title": {
+          "en": "Battery started discharging",
+          "de": "Batterie hat mit dem Entladen begonnen"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_emma_modbus"
+          }
+        ]
+      },
+      {
+        "id": "smartcharger_charging_started",
+        "title": {
+          "en": "EV charging started",
+          "de": "Laden des Fahrzeugs hat begonnen"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=smartcharger_emma_modbus"
+          }
+        ]
+      },
+      {
+        "id": "smartcharger_charging_stopped",
+        "title": {
+          "en": "EV charging stopped",
+          "de": "Laden des Fahrzeugs wurde beendet"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=smartcharger_emma_modbus"
+          }
+        ]
       }
     ],
     "actions": [
+      {
+        "id": "sun2000_set_active_power_mode",
+        "title": {
+          "en": "Set active power control mode",
+          "de": "Wirkleistungs-Steuermodus setzen"
+        },
+        "titleFormatted": {
+          "en": "Set active power control mode to [[mode]]",
+          "de": "Wirkleistungs-Steuermodus auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Sets the active power control mode of the SUN2000 inverter via Modbus (register 47415).",
+          "de": "Setzt den Wirkleistungs-Steuermodus des SUN2000 Wechselrichters über Modbus (Register 47415)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=sun2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Unlimited",
+                  "de": "Unbegrenzt"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "DI Active Scheduling",
+                  "de": "DI Aktive Planung"
+                }
+              },
+              {
+                "id": "5",
+                "label": {
+                  "en": "Zero Power Grid Connection",
+                  "de": "Nulleinspeisung"
+                }
+              }
+            ]
+          }
+        ]
+      },
       {
         "id": "luna2000_emma_set_working_mode",
         "title": {
@@ -2708,6 +2817,207 @@
         ]
       },
       {
+        "id": "luna2000_set_working_mode",
+        "title": {
+          "en": "Set storage working mode",
+          "de": "Speicher-Betriebsmodus setzen"
+        },
+        "titleFormatted": {
+          "en": "Set storage working mode to [[mode]]",
+          "de": "Speicher-Betriebsmodus auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Sets the working mode of the LUNA2000 battery via Modbus (register 47086).",
+          "de": "Setzt den Betriebsmodus der LUNA2000-Batterie über Modbus (Register 47086)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Adaptive",
+                  "de": "Adaptiv"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "Fixed Charge/Discharge",
+                  "de": "Festes Laden/Entladen"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Maximise Self-Consumption",
+                  "de": "Eigenverbrauch maximieren"
+                }
+              },
+              {
+                "id": "3",
+                "label": {
+                  "en": "Time of Use (LG)",
+                  "de": "Zeitabhängige Nutzung (LG)"
+                }
+              },
+              {
+                "id": "4",
+                "label": {
+                  "en": "Fully Fed to Grid",
+                  "de": "Volleinspeisung"
+                }
+              },
+              {
+                "id": "5",
+                "label": {
+                  "en": "Time of Use (LUNA2000)",
+                  "de": "Zeitabhängige Nutzung (LUNA2000)"
+                }
+              },
+              {
+                "id": "6",
+                "label": {
+                  "en": "Third-party Scheduling",
+                  "de": "Drittanbieter-Steuerung"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_excess_pv",
+        "title": {
+          "en": "Set excess PV energy use (TOU)",
+          "de": "PV-Überschuss-Nutzung setzen (TOU)"
+        },
+        "titleFormatted": {
+          "en": "Set excess PV energy use to [[mode]]",
+          "de": "PV-Überschuss-Nutzung auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Sets what happens to surplus PV power in TOU mode via Modbus (register 47299).",
+          "de": "Legt fest, was mit überschüssigem PV-Strom im TOU-Modus geschieht, über Modbus (Register 47299)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Feed to Grid",
+                  "de": "Ins Netz einspeisen"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "Charge Battery",
+                  "de": "Batterie laden"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_remote_mode",
+        "title": {
+          "en": "Set remote charge/discharge mode",
+          "de": "Fernsteuerung Laden/Entladen setzen"
+        },
+        "titleFormatted": {
+          "en": "Set remote charge/discharge mode to [[mode]]",
+          "de": "Fernsteuerung Laden/Entladen auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Sets the remote charge/discharge control mode of the LUNA2000 battery via Modbus (register 47589). Overrides the storage working mode.",
+          "de": "Setzt den Fernsteuerungs-Modus der LUNA2000-Batterie über Modbus (Register 47589). Überschreibt den Speicher-Betriebsmodus."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Local Control",
+                  "de": "Lokale Steuerung"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "Remote: Max Self-Consumption",
+                  "de": "Fern: Max Eigenverbrauch"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Remote: Fully Fed to Grid",
+                  "de": "Fern: Volleinspeisung"
+                }
+              },
+              {
+                "id": "3",
+                "label": {
+                  "en": "Remote: Time of Use",
+                  "de": "Fern: Zeitabhängige Nutzung"
+                }
+              },
+              {
+                "id": "4",
+                "label": {
+                  "en": "Remote: AI Control",
+                  "de": "Fern: KI-Steuerung"
+                }
+              },
+              {
+                "id": "5",
+                "label": {
+                  "en": "Remote: Third-party Scheduling",
+                  "de": "Fern: Drittanbieter-Steuerung"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
         "id": "luna2000_set_force_charge_discharge",
         "title": {
           "en": "Set force charge/discharge",
@@ -2762,6 +3072,48 @@
       }
     ],
     "conditions": [
+      {
+        "id": "luna2000_is_charging",
+        "title": {
+          "en": "Battery is !{{charging|not charging}}",
+          "de": "Batterie !{{lädt|lädt nicht}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_emma_modbus"
+          }
+        ]
+      },
+      {
+        "id": "luna2000_is_discharging",
+        "title": {
+          "en": "Battery is !{{discharging|not discharging}}",
+          "de": "Batterie !{{entlädt|entlädt nicht}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_emma_modbus"
+          }
+        ]
+      },
+      {
+        "id": "grid_is_exporting",
+        "title": {
+          "en": "Grid is !{{exporting|importing}}",
+          "de": "Netz !{{speist ein|bezieht}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_emma_modbus"
+          }
+        ]
+      },
       {
         "id": "is_producing",
         "title": {
