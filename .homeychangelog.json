@@ -55,5 +55,8 @@
   },
   "1.1.3": {
     "en": "fix sun2000 icon.svg"
+  },
+  "1.1.4": {
+    "en": "add settings on luna2000 and sun2000 modbus devices"
   }
 }

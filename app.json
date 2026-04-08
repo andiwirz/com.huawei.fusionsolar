@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -635,19 +635,22 @@
           "title": {
             "en": "Solar Power",
             "de": "Solarleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Total Energy",
             "de": "Gesamtertrag"
-          }
+          },
+          "insights": true
         },
         "meter_power.daily": {
           "title": {
             "en": "Daily Energy",
             "de": "Tagesgesamtertrag"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -729,37 +732,43 @@
           "title": {
             "en": "Charging Power",
             "de": "Ladeleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Total Energy Charged",
             "de": "Gesamtgeladene Energie"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase1": {
           "title": {
             "en": "Phase A Voltage",
             "de": "Spannung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase2": {
           "title": {
             "en": "Phase B Voltage",
             "de": "Spannung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase3": {
           "title": {
             "en": "Phase C Voltage",
             "de": "Spannung Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_temperature": {
           "title": {
             "en": "Charger Temperature",
             "de": "Lader Temperatur"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -872,85 +881,99 @@
           "title": {
             "en": "Solar Power",
             "de": "Solarleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.active_power": {
           "title": {
             "en": "Active Power",
             "de": "Wirkleistung"
-          }
+          },
+          "insights": true
         },
         "measure_temperature.invertor": {
           "title": {
             "en": "Inverter Temperature",
             "de": "Wechselrichter-Temperatur"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Total Energy",
             "de": "Gesamtertrag"
-          }
+          },
+          "insights": true
         },
         "meter_power.daily": {
           "title": {
             "en": "Daily Energy",
             "de": "Tagesgesamtertrag"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.pv1": {
           "title": {
             "en": "PV1 Voltage",
             "de": "Spannung PV1"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.pv2": {
           "title": {
             "en": "PV2 Voltage",
             "de": "Spannung PV2"
-          }
+          },
+          "insights": true
         },
         "measure_current.pv1": {
           "title": {
             "en": "PV1 Current",
             "de": "Strom PV1"
-          }
+          },
+          "insights": true
         },
         "measure_current.pv2": {
           "title": {
             "en": "PV2 Current",
             "de": "Strom PV2"
-          }
+          },
+          "insights": true
         },
         "measure_power.grid_active_power": {
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.grid_export": {
           "title": {
             "en": "Grid Export Energy",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.grid_import": {
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "optimizer_total_count": {
           "title": {
             "en": "Total Optimizers",
             "de": "Optimierer gesamt"
-          }
+          },
+          "insights": true
         },
         "optimizer_online_count": {
           "title": {
             "en": "Online Optimizers",
             "de": "Online-Optimierer"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -1026,6 +1049,36 @@
             "en": "How often to read data from the inverter.",
             "de": "Wie oft Daten vom Wechselrichter abgerufen werden."
           }
+        },
+        {
+          "id": "max_feed_in_power",
+          "type": "number",
+          "label": {
+            "en": "Max feed-in power (W)",
+            "de": "Maximale Einspeiseleistung (W)"
+          },
+          "min": 0,
+          "max": 100000,
+          "step": 100,
+          "hint": {
+            "en": "Maximum power fed into the grid in watts (register 47416). Only effective when active power control mode is set to 'Limited by power'. Synced from the inverter every 5 poll cycles.",
+            "de": "Maximale Einspeiseleistung in Watt (Register 47416). Nur wirksam wenn der Einspeisemodus auf 'Leistungsbegrenzt' gesetzt ist. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert."
+          }
+        },
+        {
+          "id": "max_feed_in_power_pct",
+          "type": "number",
+          "label": {
+            "en": "Max feed-in power (%)",
+            "de": "Maximale Einspeiseleistung (%)"
+          },
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "hint": {
+            "en": "Maximum power fed into the grid as percentage of rated power (register 47418). Only effective when active power control mode is set to 'Limited by percentage'. Synced from the inverter every 5 poll cycles.",
+            "de": "Maximale Einspeiseleistung als Prozentsatz der Nennleistung (Register 47418). Nur wirksam wenn der Einspeisemodus auf 'Prozentbegrenzt' gesetzt ist. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert."
+          }
         }
       ]
     },
@@ -1062,61 +1115,71 @@
           "title": {
             "en": "Solar Power",
             "de": "Solarleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.active_power": {
           "title": {
             "en": "Active Power",
             "de": "Wirkleistung"
-          }
+          },
+          "insights": true
         },
         "measure_temperature.invertor": {
           "title": {
             "en": "Inverter Temperature",
             "de": "Wechselrichter-Temperatur"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Total Energy",
             "de": "Gesamtertrag"
-          }
+          },
+          "insights": true
         },
         "meter_power.daily": {
           "title": {
             "en": "Daily Energy",
             "de": "Tagesgesamtertrag"
-          }
+          },
+          "insights": true
         },
         "measure_power.grid_active_power": {
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.grid_export": {
           "title": {
             "en": "Grid Export Energy",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.grid_import": {
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.pv_total": {
           "title": {
             "en": "Total PV Energy",
             "de": "PV Gesamtertrag"
-          }
+          },
+          "insights": true
         },
         "meter_power.pv_daily": {
           "title": {
             "en": "PV Energy Today",
             "de": "PV Ertrag heute"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -1235,61 +1298,71 @@
           "title": {
             "en": "Battery Power",
             "de": "Batterieleistung"
-          }
+          },
+          "insights": true
         },
         "measure_battery": {
           "title": {
             "en": "State of Charge",
             "de": "Ladezustand"
-          }
+          },
+          "insights": true
         },
         "meter_power.charged": {
           "title": {
             "en": "Total Energy Charged",
             "de": "Gesamte geladene Energie"
-          }
+          },
+          "insights": true
         },
         "meter_power.discharged": {
           "title": {
             "en": "Total Energy Discharged",
             "de": "Gesamte entladene Energie"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_charge": {
           "title": {
             "en": "Battery Charge Power",
             "de": "Batterieladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_discharge": {
           "title": {
             "en": "Battery Discharge Power",
             "de": "Batterieentladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.chargesetting": {
           "title": {
             "en": "Max Charge Power",
             "de": "Maximale Ladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.dischargesetting": {
           "title": {
             "en": "Max Discharge Power",
             "de": "Maximale Entladeleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_input": {
           "title": {
             "en": "Battery Charged Today",
             "de": "Tagesgesamtladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_output": {
           "title": {
             "en": "Battery Discharged Today",
             "de": "Tagesgesamtentladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "luna2000_battery_status": {
           "title": {
@@ -1386,6 +1459,121 @@
             "en": "How often to read data from the battery.",
             "de": "Wie oft Daten von der Batterie abgerufen werden."
           }
+        },
+        {
+          "id": "max_charge_power",
+          "type": "number",
+          "label": {
+            "en": "Max charge power (W)",
+            "de": "Maximale Ladeleistung (W)"
+          },
+          "min": 0,
+          "max": 100000,
+          "step": 100,
+          "hint": {
+            "en": "Maximum power the battery charges at (register 47075). Synced from the inverter every 5 poll cycles.",
+            "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert."
+          }
+        },
+        {
+          "id": "max_discharge_power",
+          "type": "number",
+          "label": {
+            "en": "Max discharge power (W)",
+            "de": "Maximale Entladeleistung (W)"
+          },
+          "min": 0,
+          "max": 100000,
+          "step": 100,
+          "hint": {
+            "en": "Maximum power the battery discharges at (register 47077). Synced from the inverter every 5 poll cycles.",
+            "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert."
+          }
+        },
+        {
+          "id": "max_grid_charge_power",
+          "type": "number",
+          "label": {
+            "en": "Max grid charge power (W)",
+            "de": "Maximale Netzladeleistung (W)"
+          },
+          "min": 0,
+          "max": 100000,
+          "step": 100,
+          "hint": {
+            "en": "Maximum power when charging the battery from the grid (register 47244). Only effective when 'Charge from grid' is enabled.",
+            "de": "Maximale Leistung beim Laden der Batterie aus dem Netz (Register 47244). Nur wirksam wenn 'Batterie aus dem Netz laden' aktiviert ist."
+          }
+        },
+        {
+          "id": "charge_from_grid",
+          "type": "checkbox",
+          "label": {
+            "en": "Charge battery from grid",
+            "de": "Batterie aus dem Netz laden"
+          },
+          "value": false,
+          "hint": {
+            "en": "Enables or disables grid charging (register 47087). Synced from the inverter every 5 poll cycles.",
+            "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Stromnetz (Register 47087). Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert."
+          }
+        },
+        {
+          "id": "grid_charge_cutoff_soc",
+          "type": "number",
+          "label": {
+            "en": "Grid charge cutoff SoC (%)",
+            "de": "Netzlade-Ziel-SoC (%)"
+          },
+          "min": 20,
+          "max": 100,
+          "hint": {
+            "en": "Battery SoC at which grid charging stops (register 47088). Range: 20–100 %, default 50 %.",
+            "de": "Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %."
+          }
+        },
+        {
+          "id": "charging_cutoff_capacity",
+          "type": "number",
+          "label": {
+            "en": "Charging cutoff capacity (%)",
+            "de": "Maximaler Ladezustand (%)"
+          },
+          "min": 90,
+          "max": 100,
+          "hint": {
+            "en": "Maximum SoC the battery charges to (register 47081). Range: 90–100 %, default 100 %.",
+            "de": "Maximaler Ladezustand, bis zu dem die Batterie geladen wird (Register 47081). Bereich: 90–100 %, Standard 100 %."
+          }
+        },
+        {
+          "id": "discharge_cutoff_capacity",
+          "type": "number",
+          "label": {
+            "en": "Discharge cutoff capacity (%)",
+            "de": "Minimaler Entladezustand (%)"
+          },
+          "min": 0,
+          "max": 20,
+          "hint": {
+            "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are deployed, the configured value is applied. If no PV modules are deployed and the configured value is below 15 %, it is treated as 15 %.",
+            "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Wenn PV-Module bereitgestellt werden, wird der konfigurierte Wert angewendet. Wenn keine PV-Module bereitgestellt werden und der konfigurierte Wert unter 15 % liegt, wird der Wert als 15 % behandelt."
+          }
+        },
+        {
+          "id": "backup_power_soc",
+          "type": "number",
+          "label": {
+            "en": "Backup power SoC (%)",
+            "de": "Backup-Energie-SoC (%)"
+          },
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "hint": {
+            "en": "Minimum SoC reserved for backup power during grid outages (register 47102). Range: 0–100 %, default 0 %.",
+            "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %."
+          }
         }
       ]
     },
@@ -1427,49 +1615,57 @@
           "title": {
             "en": "Battery Power",
             "de": "Batterieleistung"
-          }
+          },
+          "insights": true
         },
         "measure_battery": {
           "title": {
             "en": "State of Charge",
             "de": "Ladezustand"
-          }
+          },
+          "insights": true
         },
         "meter_power.charged": {
           "title": {
             "en": "Total Energy Charged",
             "de": "Gesamte geladene Energie"
-          }
+          },
+          "insights": true
         },
         "meter_power.discharged": {
           "title": {
             "en": "Total Energy Discharged",
             "de": "Gesamte entladene Energie"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_charge": {
           "title": {
             "en": "Battery Charge Power",
             "de": "Batterieladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_discharge": {
           "title": {
             "en": "Battery Discharge Power",
             "de": "Batterieentladeleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_input": {
           "title": {
             "en": "Battery Charged Today",
             "de": "Tagesgesamtladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_output": {
           "title": {
             "en": "Battery Discharged Today",
             "de": "Tagesgesamtentladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "storage_working_mode_settings": {
           "title": {
@@ -1487,19 +1683,22 @@
           "title": {
             "en": "Backup SOC",
             "de": "Backup-Ladestand"
-          }
+          },
+          "insights": true
         },
         "meter_power.chargeable_capacity": {
           "title": {
             "en": "Chargeable Capacity",
             "de": "Ladbare Kapazität"
-          }
+          },
+          "insights": true
         },
         "meter_power.dischargeable_capacity": {
           "title": {
             "en": "Dischargeable Capacity",
             "de": "Entladbare Kapazität"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -1632,73 +1831,85 @@
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.exported": {
           "title": {
             "en": "Grid Export Energy",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase1": {
           "title": {
             "en": "Phase A Voltage",
             "de": "Spannung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase2": {
           "title": {
             "en": "Phase B Voltage",
             "de": "Spannung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase3": {
           "title": {
             "en": "Phase C Voltage",
             "de": "Spannung Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase1": {
           "title": {
             "en": "Phase A Current",
             "de": "Strom Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase2": {
           "title": {
             "en": "Phase B Current",
             "de": "Strom Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase3": {
           "title": {
             "en": "Phase C Current",
             "de": "Strom Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase1": {
           "title": {
             "en": "Phase A Power",
             "de": "Leistung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase2": {
           "title": {
             "en": "Phase B Power",
             "de": "Leistung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase3": {
           "title": {
             "en": "Phase C Power",
             "de": "Leistung Phase C"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -1818,97 +2029,113 @@
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.exported": {
           "title": {
             "en": "Grid Export Energy",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.imported_today": {
           "title": {
             "en": "Grid Import Today",
             "de": "Netzbezug heute"
-          }
+          },
+          "insights": true
         },
         "meter_power.exported_today": {
           "title": {
             "en": "Grid Export Today",
             "de": "Netzeinspeisung heute"
-          }
+          },
+          "insights": true
         },
         "measure_power.load": {
           "title": {
             "en": "House Consumption",
             "de": "Hausverbrauch"
-          }
+          },
+          "insights": true
         },
         "meter_power.consumption_today": {
           "title": {
             "en": "House Consumption Today",
             "de": "Hausverbrauch heute"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase1": {
           "title": {
             "en": "Phase A Voltage",
             "de": "Spannung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase2": {
           "title": {
             "en": "Phase B Voltage",
             "de": "Spannung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.phase3": {
           "title": {
             "en": "Phase C Voltage",
             "de": "Spannung Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase1": {
           "title": {
             "en": "Phase A Current",
             "de": "Strom Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase2": {
           "title": {
             "en": "Phase B Current",
             "de": "Strom Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_current.phase3": {
           "title": {
             "en": "Phase C Current",
             "de": "Strom Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase1": {
           "title": {
             "en": "Phase A Power",
             "de": "Leistung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase2": {
           "title": {
             "en": "Phase B Power",
             "de": "Leistung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase3": {
           "title": {
             "en": "Phase C Power",
             "de": "Leistung Phase C"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -2020,73 +2247,85 @@
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Grid Import",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.exported": {
           "title": {
             "en": "Grid Export",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.pv1": {
           "title": {
             "en": "PV1 Voltage",
             "de": "Spannung PV1"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.pv2": {
           "title": {
             "en": "PV2 Voltage",
             "de": "Spannung PV2"
-          }
+          },
+          "insights": true
         },
         "measure_current.pv1": {
           "title": {
             "en": "PV1 Current",
             "de": "Strom PV1"
-          }
+          },
+          "insights": true
         },
         "measure_current.pv2": {
           "title": {
             "en": "PV2 Current",
             "de": "Strom PV2"
-          }
+          },
+          "insights": true
         },
         "measure_temperature.invertor": {
           "title": {
             "en": "Inverter Temperature",
             "de": "Wechselrichter-Temperatur"
-          }
+          },
+          "insights": true
         },
         "measure_power.active_power": {
           "title": {
             "en": "Active Power",
             "de": "Wirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.inv_daily": {
           "title": {
             "en": "Daily Yield",
             "de": "Tagesgesamtertrag"
-          }
+          },
+          "insights": true
         },
         "meter_power.inv_total": {
           "title": {
             "en": "Total Yield",
             "de": "Gesamtertrag"
-          }
+          },
+          "insights": true
         },
         "measure_power.mppt": {
           "title": {
             "en": "Solar Power",
             "de": "Solarleistung"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -2185,55 +2424,64 @@
           "title": {
             "en": "Battery Power",
             "de": "Batterieleistung"
-          }
+          },
+          "insights": true
         },
         "measure_battery": {
           "title": {
             "en": "State of Charge",
             "de": "Ladezustand"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_charge": {
           "title": {
             "en": "Battery Charge Power",
             "de": "Batterieladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.batt_discharge": {
           "title": {
             "en": "Battery Discharge Power",
             "de": "Batterieentladeleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_input": {
           "title": {
             "en": "Battery Charged Today",
             "de": "Tagesgesamtladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "meter_power.today_batt_output": {
           "title": {
             "en": "Battery Discharged Today",
             "de": "Tagesgesamtentladung der Batterie"
-          }
+          },
+          "insights": true
         },
         "measure_power.chargesetting": {
           "title": {
             "en": "Max Charge Power",
             "de": "Maximale Ladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_power.dischargesetting": {
           "title": {
             "en": "Max Discharge Power",
             "de": "Maximale Entladeleistung"
-          }
+          },
+          "insights": true
         },
         "measure_battery.soh": {
           "title": {
             "en": "State of Health",
             "de": "Gesundheitszustand"
-          }
+          },
+          "insights": true
         },
         "openapi_battery_status": {
           "title": {
@@ -2341,73 +2589,85 @@
           "title": {
             "en": "Grid Active Power",
             "de": "Netzwirkleistung"
-          }
+          },
+          "insights": true
         },
         "meter_power": {
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
-          }
+          },
+          "insights": true
         },
         "meter_power.exported": {
           "title": {
             "en": "Grid Export Energy",
             "de": "Netzeinspeisung gesamt"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.meter_u": {
           "title": {
             "en": "Phase A Voltage",
             "de": "Spannung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.b_u": {
           "title": {
             "en": "Phase B Voltage",
             "de": "Spannung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_voltage.c_u": {
           "title": {
             "en": "Phase C Voltage",
             "de": "Spannung Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_current.meter_i": {
           "title": {
             "en": "Phase A Current",
             "de": "Strom Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_current.b_i": {
           "title": {
             "en": "Phase B Current",
             "de": "Strom Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_current.c_i": {
           "title": {
             "en": "Phase C Current",
             "de": "Strom Phase C"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase1": {
           "title": {
             "en": "Active Power Phase A",
             "de": "Leistung Phase A"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase2": {
           "title": {
             "en": "Active Power Phase B",
             "de": "Leistung Phase B"
-          }
+          },
+          "insights": true
         },
         "measure_power.phase3": {
           "title": {
             "en": "Active Power Phase C",
             "de": "Leistung Phase C"
-          }
+          },
+          "insights": true
         }
       },
       "images": {
@@ -3405,11 +3665,17 @@
           {
             "type": "number",
             "name": "power",
-            "title": { "en": "Power (kW)", "de": "Leistung (kW)" },
+            "title": {
+              "en": "Power (kW)",
+              "de": "Leistung (kW)"
+            },
             "min": 0,
             "max": 100,
             "step": 0.1,
-            "placeholder": { "en": "e.g. 3.0", "de": "z.B. 3.0" }
+            "placeholder": {
+              "en": "e.g. 3.0",
+              "de": "z.B. 3.0"
+            }
           }
         ]
       },
@@ -3789,6 +4055,89 @@
             "placeholder": {
               "en": "e.g. 100",
               "de": "z.B. 100"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_charge_from_grid",
+        "title": {
+          "en": "Set charge from grid",
+          "de": "Netzladen aktivieren/deaktivieren"
+        },
+        "titleFormatted": {
+          "en": "Set charge from grid to [[mode]]",
+          "de": "Netzladen auf [[mode]] setzen"
+        },
+        "hint": {
+          "en": "Enables or disables charging the battery from the grid (register 47087).",
+          "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Netz (Register 47087)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "de": "Modus"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Disable",
+                  "de": "Deaktiviert"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "Enable",
+                  "de": "Aktiviert"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_grid_charge_cutoff_soc",
+        "title": {
+          "en": "Set grid charge cutoff SoC",
+          "de": "Netzlade-Ziel-SoC setzen"
+        },
+        "titleFormatted": {
+          "en": "Set grid charge cutoff SoC to [[target_soc]] %",
+          "de": "Netzlade-Ziel-SoC auf [[target_soc]] % setzen"
+        },
+        "hint": {
+          "en": "Sets the state of charge at which grid charging stops (register 47088). Range: 20–100 %, default 50 %.",
+          "de": "Setzt den Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "target_soc",
+            "title": {
+              "en": "Cutoff SoC (%)",
+              "de": "Ziel-Ladezustand (%)"
+            },
+            "min": 20,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 50",
+              "de": "z.B. 50"
             }
           }
         ]
