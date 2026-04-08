@@ -49,5 +49,8 @@
   },
   "1.1.1": {
     "en": "add capability optimizer_total_count and optimizer_online_count"
+  },
+  "1.1.2": {
+    "en": "fixes for certification"
   }
 }
