@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -102,6 +102,30 @@
         "en": "Product Name",
         "de": "Produktname"
       },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": false
+    },
+    "optimizer_total_count": {
+      "type": "number",
+      "title": {
+        "en": "Total Optimizers",
+        "de": "Optimierer gesamt"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": false
+    },
+    "optimizer_online_count": {
+      "type": "number",
+      "title": {
+        "en": "Online Optimizers",
+        "de": "Online-Optimierer"
+      },
+      "decimals": 0,
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
@@ -914,6 +938,18 @@
           "title": {
             "en": "Grid Import Energy",
             "de": "Netzbezug gesamt"
+          }
+        },
+        "optimizer_total_count": {
+          "title": {
+            "en": "Total Optimizers",
+            "de": "Optimierer gesamt"
+          }
+        },
+        "optimizer_online_count": {
+          "title": {
+            "en": "Online Optimizers",
+            "de": "Online-Optimierer"
           }
         }
       },

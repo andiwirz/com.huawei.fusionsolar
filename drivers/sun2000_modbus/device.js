@@ -28,6 +28,12 @@ const REQUIRED_CAPABILITIES = [
   'activepower_controlmode',
 ];
 
+// Dynamic capabilities – added when optimizers are registered (register 37200 > 0)
+const OPTIMIZER_CAPABILITIES = [
+  'optimizer_total_count',
+  'optimizer_online_count',
+];
+
 // Dynamic capabilities – added when external power meter (DTSU666) is detected
 const POWER_METER_CAPABILITIES = [
   'measure_power.grid_active_power',
@@ -263,6 +269,7 @@ class SUN2000ModbusDevice extends Device {
       await this._set('measure_voltage.pv2',        data.pv2Voltage ?? null);
       await this._set('measure_current.pv1',        data.pv1Current ?? null);
       await this._set('measure_current.pv2',        data.pv2Current ?? null);
+      await this._updateOptimizerCapabilities(data.totalOptimizers, data.onlineOptimizers);
 
       if (data.deviceStatus !== null && data.deviceStatus !== undefined) {
         const label = statusLabel(data.deviceStatus);
@@ -303,6 +310,22 @@ class SUN2000ModbusDevice extends Device {
       }
     } finally {
       this._fetchInProgress = false;
+    }
+  }
+
+  async _updateOptimizerCapabilities(total, online) {
+    const hasOptimizers = typeof total === 'number' && Number.isFinite(total) && total > 0;
+
+    if (hasOptimizers) {
+      for (const cap of OPTIMIZER_CAPABILITIES) {
+        if (!this.hasCapability(cap)) await this.addCapability(cap);
+      }
+      await this._set('optimizer_total_count',  total);
+      await this._set('optimizer_online_count', online ?? null);
+    } else {
+      for (const cap of OPTIMIZER_CAPABILITIES) {
+        if (this.hasCapability(cap)) await this.removeCapability(cap);
+      }
     }
   }
 

@@ -30,6 +30,10 @@ const REGISTERS = {
   deviceStatus:           [32089,  1, 'UINT16',  'Device Status',             0],
   accumulatedYieldEnergy: [32106,  2, 'UINT32',  'Accumulated Yield (kWh)',  -2],
   dailyYieldEnergy:       [32114,  2, 'UINT32',  'Daily Yield (kWh)',        -2],
+
+  // ── Optimizer ─────────────────────────────────────────────────────────────
+  totalOptimizers:        [37200,  1, 'UINT16',  'Total Optimizers',          0],
+  onlineOptimizers:       [37201,  1, 'UINT16',  'Online Optimizers',         0],
 };
 
 // Human-readable status codes (Huawei Modbus spec, Table 4-2)
