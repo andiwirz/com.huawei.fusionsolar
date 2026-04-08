@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.1",
+  "version": "1.1.3",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -3633,6 +3633,132 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_start_force_charge",
+        "title": {
+          "en": "Start force charge",
+          "de": "Zwangsladen starten"
+        },
+        "titleFormatted": {
+          "en": "Start force charge at [[power]] W to [[target_soc]] %",
+          "de": "Zwangsladen starten mit [[power]] W bis [[target_soc]] %"
+        },
+        "hint": {
+          "en": "Sets the charge power limit and cutoff SoC, then immediately starts force charging the LUNA2000 battery (registers 47102, 47104, 47100).",
+          "de": "Setzt Ladeleistungslimit und Ziel-SoC und startet dann sofort das Zwangsladen der LUNA2000-Batterie (Register 47102, 47104, 47100)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Charge Power (W)",
+              "de": "Ladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 2500",
+              "de": "z.B. 2500"
+            }
+          },
+          {
+            "type": "number",
+            "name": "target_soc",
+            "title": {
+              "en": "Target SoC (%)",
+              "de": "Ziel-Ladezustand (%)"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 100",
+              "de": "z.B. 100"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_force_charge_power",
+        "title": {
+          "en": "Set force charge power",
+          "de": "Zwangslade-Leistung setzen"
+        },
+        "titleFormatted": {
+          "en": "Set force charge power to [[power]] W",
+          "de": "Zwangslade-Leistung auf [[power]] W setzen"
+        },
+        "hint": {
+          "en": "Sets the maximum charge power limit for force charging (register 47102). Does not start force charging — use 'Start force charge' or 'Set force charge/discharge' for that.",
+          "de": "Setzt das Ladeleistungslimit für das Zwangsladen (Register 47102). Startet kein Zwangsladen — verwende dafür 'Zwangsladen starten' oder 'Zwangsladen/Entladen steuern'."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Charge Power (W)",
+              "de": "Ladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 2500",
+              "de": "z.B. 2500"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_force_charge_soc",
+        "title": {
+          "en": "Set force charge target percentage",
+          "de": "Zwangslade-Ziel-SoC setzen"
+        },
+        "titleFormatted": {
+          "en": "Set force charge target to [[target_soc]] %",
+          "de": "Zwangslade-Ziel auf [[target_soc]] % setzen"
+        },
+        "hint": {
+          "en": "Sets the cutoff state of charge at which force charging stops (register 47104). Does not start force charging.",
+          "de": "Setzt den Ziel-Ladezustand, bei dem das Zwangsladen stoppt (Register 47104). Startet kein Zwangsladen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "target_soc",
+            "title": {
+              "en": "Target SoC (%)",
+              "de": "Ziel-Ladezustand (%)"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 100",
+              "de": "z.B. 100"
+            }
           }
         ]
       }

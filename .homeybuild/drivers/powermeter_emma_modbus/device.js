@@ -126,10 +126,9 @@ class PowerMeterEmmaModbusDevice extends Device {
         return;
       }
 
-      // feedInPower: + = export to grid, − = import from grid
-      // Homey convention: + = import, − = export → negate
-      const gridPower = d.feedInPower !== null && d.feedInPower !== undefined
-        ? -d.feedInPower : null;
+      // feedInPower (register 30358): + = import from grid, − = export to grid
+      // Matches Homey convention directly — no negation needed.
+      const gridPower = d.feedInPower ?? null;
 
       await this._set('measure_power',                 gridPower);
       await this._set('meter_power',                   d.totalSupplyFromGrid  ?? null);
@@ -139,17 +138,16 @@ class PowerMeterEmmaModbusDevice extends Device {
       await this._set('measure_power.load',            d.loadPower            ?? null);
       await this._set('meter_power.consumption_today', d.consumptionToday     ?? null);
 
-      // Phase data (built-in meter) — same sign convention as feedInPower: + = export → negate
-      const negate = (v) => (v !== null && v !== undefined) ? -v : null;
+      // Phase data — same sign convention as feedInPower: + = import, − = export
       await this._set('measure_voltage.phase1', d.phaseAVoltage ?? null);
       await this._set('measure_voltage.phase2', d.phaseBVoltage ?? null);
       await this._set('measure_voltage.phase3', d.phaseCVoltage ?? null);
       await this._set('measure_current.phase1', d.phaseACurrent ?? null);
       await this._set('measure_current.phase2', d.phaseBCurrent ?? null);
       await this._set('measure_current.phase3', d.phaseCCurrent ?? null);
-      await this._set('measure_power.phase1',   negate(d.phaseAPower));
-      await this._set('measure_power.phase2',   negate(d.phaseBPower));
-      await this._set('measure_power.phase3',   negate(d.phaseCPower));
+      await this._set('measure_power.phase1',   d.phaseAPower ?? null);
+      await this._set('measure_power.phase2',   d.phaseBPower ?? null);
+      await this._set('measure_power.phase3',   d.phaseCPower ?? null);
 
       // Fire export/import transition triggers (null = first run, skip)
       if (gridPower !== null && this._prevExporting !== null) {

@@ -190,6 +190,61 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_set_force_charge_discharge')
       .registerRunListener(async ({ mode }) =>
         writeEnum('luna2000_set_force_charge_discharge', 'storage_force_charge_discharge', mode));
+
+    this.homey.flow
+      .getActionCard('luna2000_start_force_charge')
+      .registerRunListener(async ({ device, power, target_soc }) => {
+        const h = host(), p = port(), u = unitId();
+        const powerW  = Math.round(Math.max(0, power));
+        const socRaw  = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
+        this.log(`Force charge: power=${powerW} W, SoC cutoff=${target_soc}% (raw ${socRaw})`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusRegister(h, p, u, 47102, powerW);
+          await writeModbusRegister(h, p, u, 47104, socRaw);
+          await writeModbusRegister(h, p, u, 47100, 187); // 0xBB = Force Charge
+          this.log('Force charge command sent');
+        } catch (err) {
+          this.error('Force charge failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress = false;
+        }
+      });
+
+    this.homey.flow
+      .getActionCard('luna2000_set_force_charge_power')
+      .registerRunListener(async ({ device, power }) => {
+        const powerW = Math.round(Math.max(0, power));
+        this.log(`Set force charge power: ${powerW} W`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusRegister(host(), port(), unitId(), 47102, powerW);
+          this.log('Force charge power written');
+        } catch (err) {
+          this.error('Set force charge power failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress = false;
+        }
+      });
+
+    this.homey.flow
+      .getActionCard('luna2000_set_force_charge_soc')
+      .registerRunListener(async ({ device, target_soc }) => {
+        const socRaw = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
+        this.log(`Set force charge cutoff SoC: ${target_soc}% (raw ${socRaw})`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusRegister(host(), port(), unitId(), 47104, socRaw);
+          this.log('Force charge cutoff SoC written');
+        } catch (err) {
+          this.error('Set force charge SoC failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress = false;
+        }
+      });
   }
 
   // ─── Conditions ────────────────────────────────────────────────────────────

@@ -155,6 +155,29 @@ class LUNA2000EmmaModbusDevice extends Device {
       .registerRunListener(async ({ mode }) => {
         await writeEnum('luna2000_emma_set_excess_pv', CONTROL_WRITE_MAP.storage_excess_pv_energy_use_in_tou, 'storage_excess_pv_energy_use_in_tou', mode);
       });
+
+    this.homey.flow
+      .getActionCard('luna2000_emma_set_max_grid_charge_power')
+      .registerRunListener(async ({ device, power }) => {
+        const kw  = Math.max(0, parseFloat(power) || 0);
+        const raw = Math.round(kw * 1000);
+        this.log(`Set max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusU32(host(), port(), unitId(), 40002, raw);
+          this.log('Max grid charge power written');
+          // Keep device setting in sync
+          this._updatingSettingFromModbus = true;
+          await this.setSettings({ max_grid_charge_power: kw })
+            .catch((err) => this.log('setSettings sync failed:', err.message));
+        } catch (err) {
+          this.error('Set max grid charge power failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress           = false;
+          this._updatingSettingFromModbus = false;
+        }
+      });
   }
 
   // ─── Conditions ────────────────────────────────────────────────────────────

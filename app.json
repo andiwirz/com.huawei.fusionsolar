@@ -3383,6 +3383,37 @@
         ]
       },
       {
+        "id": "luna2000_emma_set_max_grid_charge_power",
+        "title": {
+          "en": "Set max grid charging power",
+          "de": "Max. Netzladeleistung setzen"
+        },
+        "titleFormatted": {
+          "en": "Set max grid charging power to [[power]] kW",
+          "de": "Max. Netzladeleistung auf [[power]] kW setzen"
+        },
+        "hint": {
+          "en": "Sets the maximum power the LUNA2000 battery may draw from the grid for charging via EMMA Modbus (register 40002). Useful for time-of-use tariff automations.",
+          "de": "Setzt die maximale Leistung, mit der die LUNA2000-Batterie über das Netz geladen werden darf, über EMMA Modbus (Register 40002). Nützlich für Zeitarif-Automatisierungen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_emma_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": { "en": "Power (kW)", "de": "Leistung (kW)" },
+            "min": 0,
+            "max": 100,
+            "step": 0.1,
+            "placeholder": { "en": "e.g. 3.0", "de": "z.B. 3.0" }
+          }
+        ]
+      },
+      {
         "id": "luna2000_set_working_mode",
         "title": {
           "en": "Set storage working mode",
