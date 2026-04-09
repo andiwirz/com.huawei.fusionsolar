@@ -61,5 +61,8 @@
   },
   "1.1.5": {
     "en": "new flow cards"
+  },
+  "1.1.6": {
+    "en": "add optimizer_count.svg"
   }
 }
