@@ -58,5 +58,8 @@
   },
   "1.1.4": {
     "en": "add settings on luna2000 and sun2000 modbus devices"
+  },
+  "1.1.5": {
+    "en": "new flow cards"
   }
 }

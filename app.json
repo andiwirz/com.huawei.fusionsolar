@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -3936,16 +3936,16 @@
       {
         "id": "luna2000_start_force_charge",
         "title": {
-          "en": "Start force charge",
-          "de": "Zwangsladen starten"
+          "en": "Start charging until SoC %",
+          "de": "Laden bis SoC % starten"
         },
         "titleFormatted": {
-          "en": "Start force charge at [[power]] W to [[target_soc]] %",
-          "de": "Zwangsladen starten mit [[power]] W bis [[target_soc]] %"
+          "en": "Start charging with [[power]] W until [[target_soc]] %",
+          "de": "Laden mit [[power]] W bis [[target_soc]] % starten"
         },
         "hint": {
-          "en": "Sets the charge power limit and cutoff SoC, then immediately starts force charging the LUNA2000 battery (registers 47102, 47104, 47100).",
-          "de": "Setzt Ladeleistungslimit und Ziel-SoC und startet dann sofort das Zwangsladen der LUNA2000-Batterie (Register 47102, 47104, 47100)."
+          "en": "Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47247, 47101, 47100).",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47247, 47101, 47100)."
         },
         "args": [
           {
@@ -3981,6 +3981,162 @@
             "placeholder": {
               "en": "e.g. 100",
               "de": "z.B. 100"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_start_force_discharge",
+        "title": {
+          "en": "Start discharging until SoC %",
+          "de": "Entladen bis SoC % starten"
+        },
+        "titleFormatted": {
+          "en": "Start discharging with [[power]] W until [[target_soc]] %",
+          "de": "Entladen mit [[power]] W bis [[target_soc]] % starten"
+        },
+        "hint": {
+          "en": "Starts force discharging the LUNA2000 at the given power until the target SoC is reached (registers 47247, 47101, 47100).",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47247, 47101, 47100)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Discharge Power (W)",
+              "de": "Entladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 2500",
+              "de": "z.B. 2500"
+            }
+          },
+          {
+            "type": "number",
+            "name": "target_soc",
+            "title": {
+              "en": "Stop at SoC (%)",
+              "de": "Stoppen bei SoC (%)"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 10",
+              "de": "z.B. 10"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_start_force_charge_duration",
+        "title": {
+          "en": "Start charging for minutes",
+          "de": "Laden für Minuten starten"
+        },
+        "titleFormatted": {
+          "en": "Start charging with [[power]] W for [[duration]] minutes",
+          "de": "Laden mit [[power]] W für [[duration]] Minuten starten"
+        },
+        "hint": {
+          "en": "Starts force charging the LUNA2000 at the given power and automatically stops after the specified duration (registers 47247, 47100).",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung und stoppt automatisch nach der angegebenen Dauer (Register 47247, 47100)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Charge Power (W)",
+              "de": "Ladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 2500",
+              "de": "z.B. 2500"
+            }
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "title": {
+              "en": "Duration (minutes)",
+              "de": "Dauer (Minuten)"
+            },
+            "min": 1,
+            "max": 1440,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 60",
+              "de": "z.B. 60"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_start_force_discharge_duration",
+        "title": {
+          "en": "Start discharging for minutes",
+          "de": "Entladen für Minuten starten"
+        },
+        "titleFormatted": {
+          "en": "Start discharging with [[power]] W for [[duration]] minutes",
+          "de": "Entladen mit [[power]] W für [[duration]] Minuten starten"
+        },
+        "hint": {
+          "en": "Starts force discharging the LUNA2000 at the given power and automatically stops after the specified duration (registers 47247, 47100).",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung und stoppt automatisch nach der angegebenen Dauer (Register 47247, 47100)."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Discharge Power (W)",
+              "de": "Entladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 2500",
+              "de": "z.B. 2500"
+            }
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "title": {
+              "en": "Duration (minutes)",
+              "de": "Dauer (Minuten)"
+            },
+            "min": 1,
+            "max": 1440,
+            "step": 1,
+            "placeholder": {
+              "en": "e.g. 60",
+              "de": "z.B. 60"
             }
           }
         ]
