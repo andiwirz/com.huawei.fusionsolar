@@ -117,7 +117,8 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
-      "insights": false
+      "insights": false,
+      "icon": "/assets/capabilities/optimizer_count.svg"
     },
     "optimizer_online_count": {
       "type": "number",
@@ -129,7 +130,8 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
-      "insights": false
+      "insights": false,
+      "icon": "/assets/capabilities/optimizer_count.svg"
     },
     "activepower_controlmode": {
       "type": "enum",
