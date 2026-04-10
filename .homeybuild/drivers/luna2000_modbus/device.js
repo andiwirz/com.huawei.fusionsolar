@@ -252,12 +252,13 @@ class LUNA2000ModbusDevice extends Device {
         const h = host(), p = port(), u = unitId();
         const powerW  = Math.round(Math.max(0, power));
         const socRaw  = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
-        this.log(`Force charge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
+        const already = this.getCapabilityValue('storage_force_charge_discharge') === '1';
+        this.log(`Force charge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})${already ? ' [already charging — skipping command]' : ''}`);
         this._writeInProgress = true;
         try {
-          await writeModbusU32(h, p, u, 47247, powerW);          // Force charge power (UINT32, raw=W)
-          await writeModbusRegister(h, p, u, 47101, socRaw);     // Target SOC (UINT16, raw = % × 10)
-          await writeModbusRegister(h, p, u, 47100, 1);          // Command: 1 = Charge
+          await writeModbusU32(h, p, u, 47247, powerW);
+          await writeModbusRegister(h, p, u, 47101, socRaw);
+          if (!already) await writeModbusRegister(h, p, u, 47100, 1);
           this.log('Force charge command sent');
         } catch (err) {
           this.error('Force charge failed:', err.message);
@@ -273,12 +274,13 @@ class LUNA2000ModbusDevice extends Device {
         const h = host(), p = port(), u = unitId();
         const powerW  = Math.round(Math.max(0, power));
         const socRaw  = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
-        this.log(`Force discharge: power=${powerW} W, stop at SoC=${target_soc}% (raw ${socRaw})`);
+        const already = this.getCapabilityValue('storage_force_charge_discharge') === '2';
+        this.log(`Force discharge: power=${powerW} W, stop at SoC=${target_soc}% (raw ${socRaw})${already ? ' [already discharging — skipping command]' : ''}`);
         this._writeInProgress = true;
         try {
-          await writeModbusU32(h, p, u, 47247, powerW);          // Force discharge power (UINT32, raw=W)
-          await writeModbusRegister(h, p, u, 47101, socRaw);     // Target SOC (UINT16, raw = % × 10)
-          await writeModbusRegister(h, p, u, 47100, 2);          // Command: 2 = Discharge
+          await writeModbusU32(h, p, u, 47247, powerW);
+          await writeModbusRegister(h, p, u, 47101, socRaw);
+          if (!already) await writeModbusRegister(h, p, u, 47100, 2);
           this.log('Force discharge command sent');
         } catch (err) {
           this.error('Force discharge failed:', err.message);
@@ -294,18 +296,18 @@ class LUNA2000ModbusDevice extends Device {
         const h = host(), p = port(), u = unitId();
         const powerW     = Math.round(Math.max(0, power));
         const durationMs = Math.round(Math.max(1, duration) * 60 * 1000);
-        this.log(`Force charge for ${duration} min: power=${powerW} W`);
-        // Cancel any pending auto-stop from a previous timed command
+        const already    = this.getCapabilityValue('storage_force_charge_discharge') === '1';
+        this.log(`Force charge for ${duration} min: power=${powerW} W${already ? ' [already charging — skipping command]' : ''}`);
         if (this._forceTimer) { this.homey.clearTimeout(this._forceTimer); this._forceTimer = null; }
         this._writeInProgress = true;
         try {
           await writeModbusU32(h, p, u, 47247, powerW);
-          await writeModbusRegister(h, p, u, 47100, 1);          // Command: 1 = Charge
+          if (!already) await writeModbusRegister(h, p, u, 47100, 1);
           this.log('Force charge (timed) command sent');
           this._forceTimer = this.homey.setTimeout(async () => {
             this._forceTimer = null;
             try {
-              await writeModbusRegister(h, p, u, 47100, 0);      // Command: 0 = Stop
+              await writeModbusRegister(h, p, u, 47100, 0);
               this.log(`Force charge auto-stopped after ${duration} min`);
             } catch (err) {
               this.error('Force charge auto-stop failed:', err.message);
@@ -325,18 +327,18 @@ class LUNA2000ModbusDevice extends Device {
         const h = host(), p = port(), u = unitId();
         const powerW     = Math.round(Math.max(0, power));
         const durationMs = Math.round(Math.max(1, duration) * 60 * 1000);
-        this.log(`Force discharge for ${duration} min: power=${powerW} W`);
-        // Cancel any pending auto-stop from a previous timed command
+        const already    = this.getCapabilityValue('storage_force_charge_discharge') === '2';
+        this.log(`Force discharge for ${duration} min: power=${powerW} W${already ? ' [already discharging — skipping command]' : ''}`);
         if (this._forceTimer) { this.homey.clearTimeout(this._forceTimer); this._forceTimer = null; }
         this._writeInProgress = true;
         try {
           await writeModbusU32(h, p, u, 47247, powerW);
-          await writeModbusRegister(h, p, u, 47100, 2);          // Command: 2 = Discharge
+          if (!already) await writeModbusRegister(h, p, u, 47100, 2);
           this.log('Force discharge (timed) command sent');
           this._forceTimer = this.homey.setTimeout(async () => {
             this._forceTimer = null;
             try {
-              await writeModbusRegister(h, p, u, 47100, 0);      // Command: 0 = Stop
+              await writeModbusRegister(h, p, u, 47100, 0);
               this.log(`Force discharge auto-stopped after ${duration} min`);
             } catch (err) {
               this.error('Force discharge auto-stop failed:', err.message);
