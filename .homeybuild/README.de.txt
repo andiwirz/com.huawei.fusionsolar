@@ -1,5 +1,0 @@
-Die App unterstützt drei unabhängige Verbindungsarten: die öffentliche Kiosk-URL (kein Konto erforderlich), die offizielle FusionSolar Northbound API sowie direkte Modbus TCP Kommunikation mit dem SUN2000 Wechselrichter, der LUNA2000 Batterie und dem DTSU666 Energiezähler.
-
-Jeder Gerätetyp erscheint separat in Homey. Der SUN2000 Wechselrichter liefert Solarleistung, PV-String-Spannungen und -Ströme sowie Tages- und Gesamtertrag. Die LUNA2000 Batterie zeigt Ladezustand, Lade- und Entladeleistung und ermöglicht die direkte Steuerung des Speicherbetriebsmodus. Der DTSU666 Energiezähler erfasst Netzbezug und -einspeisung über alle drei Phasen und wird im Homey Energiedashboard als P1-Zähler eingebunden. Die Kiosk- und OpenAPI-Geräte liefern anlagenweite Energiedaten inklusive Tages-, Monats- und Jahreserträgen.
-
-Alle Werte stehen in Homey Insights und Flows zur Verfügung – zum Beispiel um eine Wärmepumpe einzuschalten, sobald Energie ins Netz eingespeist wird, oder um Verbraucher zu reduzieren, wenn der Batterieladezustand unter einen Schwellenwert fällt.
