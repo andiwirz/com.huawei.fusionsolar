@@ -64,5 +64,8 @@
   },
   "1.1.6": {
     "en": "add optimizer_count.svg"
+  },
+  "1.1.7": {
+    "en": "fix new flowcards if already in state charging or discharging"
   }
 }
