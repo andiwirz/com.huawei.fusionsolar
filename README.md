@@ -2,378 +2,378 @@
 
 **App ID:** `com.huawei.fusionsolar`
 **SDK:** Homey SDK 3
-**Mindest-Firmware:** Homey >= 12.4.5
-**Kompatibel mit:** Homey Pro (Early 2023)
-> ⚠️ **Homey Pro (Early 2019) wird nicht unterstützt.** Der Homey Pro 2019 ist durch Athom auf Homey OS 10.x limitiert und kann die erforderliche Firmware 12.4.5 nicht erreichen. Die App lässt sich zwar herunterladen, wird aber nicht installiert.
+**Minimum firmware:** Homey >= 12.4.5
+**Compatible with:** Homey Pro (Early 2023) and all newer Homey devices running firmware >= 12.4.5
+> ⚠️ **Homey Pro (Early 2019) is not supported.** The Homey Pro 2019 is capped by Athom at Homey OS 10.x and cannot reach the required firmware 12.4.5. The app may appear to download but will not install.
 
 ---
 
-## Unterstützte Verbindungsarten
+## Supported Connection Types
 
-Diese App unterstützt vier unabhängige Verbindungsarten zu einer Huawei FusionSolar Anlage:
+This app supports four independent connection methods to a Huawei FusionSolar installation:
 
-| Verbindung      | Beschreibung                                                                    |
-|-----------------|---------------------------------------------------------------------------------|
-| **Kiosk**       | Liest Anlagendaten über die öffentliche Kiosk-URL (kein Konto erforderlich)    |
-| **OpenAPI**     | Verbindet sich über die offizielle Northbound API mit FusionSolar-Konto        |
-| **Modbus TCP**  | Direkte Kommunikation mit SUN2000, LUNA2000 und DTSU666 über das lokale Netz  |
-| **EMMA Modbus** | Direkte Kommunikation über das EMMA Energy Management Module (SUN2000MA)       |
-
----
-
-## Geräte
-
-### FusionSolar Anlage (Kiosk)
-
-Verbindung über die öffentliche Kiosk-URL. Kein FusionSolar-Konto erforderlich.
-
-| Capability        | Beschreibung                    |
-|-------------------|---------------------------------|
-| Solarleistung     | Aktuelle Erzeugungsleistung (W) |
-| Gesamtertrag      | Kumulierter Gesamtertrag (kWh)  |
-| Tagesgesamtertrag | Tagesertrag (kWh)               |
-| Monatsertrag      | Monatsertrag (kWh)              |
-| Jahresertrag      | Jahresertrag (kWh)              |
+| Connection      | Description                                                                        |
+|-----------------|------------------------------------------------------------------------------------|
+| **Kiosk**       | Reads plant data via the public Kiosk URL (no account required)                   |
+| **OpenAPI**     | Connects via the official Northbound API using a FusionSolar account              |
+| **Modbus TCP**  | Direct communication with SUN2000, LUNA2000 and DTSU666 over the local network   |
+| **EMMA Modbus** | Direct communication via the EMMA Energy Management Module (SUN2000MA)            |
 
 ---
 
-### Inverter SUN 2000 (OpenAPI)
+## Devices
 
-Verbindung über die Huawei FusionSolar Northbound API. Liefert Wechselrichter-, Netz- und PV-String-Daten.
+### FusionSolar Plant (Kiosk)
 
-| Capability             | Beschreibung                                                      |
-|------------------------|-------------------------------------------------------------------|
-| Solarleistung          | DC-Eingangsleistung der PV-Strings (W)                           |
-| Wirkleistung           | AC-Ausgangsleistung (W)                                          |
-| Kühlkörpertemperatur   | Innentemperatur des Wechselrichters (°C)                         |
-| Gesamtertrag           | Kumulierter Gesamtertrag (kWh)                                   |
-| Tagesgesamtertrag      | Tagesertrag (kWh)                                                |
-| Spannung PV1 / PV2     | DC-Spannung der PV-Strings (V)                                   |
-| Strom PV1 / PV2        | DC-Strom der PV-Strings (A)                                      |
-| Netzwirkleistung       | Aktuell: positiv = Bezug, negativ = Einspeisung (W)              |
-| Netzeinspeisung gesamt | Kumulierte Gesamteinspeisung ins Netz (kWh)                      |
-| Netzbezug gesamt       | Kumulierter Gesamtbezug aus dem Netz (kWh)                       |
+Connection via the public Kiosk URL. No FusionSolar account required.
 
-> Netzwerte werden vom Power Sensor (Typ 47) oder Grid Meter (Typ 17) der Anlage bezogen.
+| Capability       | Description                     |
+|------------------|---------------------------------|
+| Solar power      | Current generation power (W)    |
+| Total yield      | Cumulative total yield (kWh)    |
+| Daily yield      | Today's energy yield (kWh)      |
+| Monthly yield    | Monthly energy yield (kWh)      |
+| Yearly yield     | Annual energy yield (kWh)       |
 
 ---
 
-### Batterie LUNA 2000 (OpenAPI)
+### Inverter SUN2000 (OpenAPI)
 
-Verbindung über die Huawei FusionSolar Northbound API.
+Connection via the Huawei FusionSolar Northbound API. Provides inverter, grid and PV string data.
 
-| Capability               | Beschreibung                                         |
+| Capability              | Description                                                        |
+|-------------------------|--------------------------------------------------------------------|
+| Solar power             | DC input power from PV strings (W)                                |
+| Active power            | AC output power (W)                                               |
+| Heat sink temperature   | Internal inverter temperature (°C)                                |
+| Total yield             | Cumulative total yield (kWh)                                      |
+| Daily yield             | Today's energy yield (kWh)                                        |
+| PV1 / PV2 voltage       | DC voltage of PV strings (V)                                      |
+| PV1 / PV2 current       | DC current of PV strings (A)                                      |
+| Grid active power       | Current: positive = import, negative = export (W)                 |
+| Total grid export       | Cumulative total energy exported to grid (kWh)                    |
+| Total grid import       | Cumulative total energy imported from grid (kWh)                  |
+
+> Grid values are sourced from the plant's Power Sensor (type 47) or Grid Meter (type 17).
+
+---
+
+### Battery LUNA2000 (OpenAPI)
+
+Connection via the Huawei FusionSolar Northbound API.
+
+| Capability               | Description                                          |
 |--------------------------|------------------------------------------------------|
-| Batterieleistung         | Aktuell: positiv = laden, negativ = entladen (W)     |
-| Ladezustand              | SoC in Prozent (%)                                   |
-| Batterieladeleistung     | Aktuelle Ladeleistung (W)                            |
-| Batterieentladeleistung  | Aktuelle Entladeleistung (W)                         |
-| Maximale Ladeleistung    | Konfiguriertes Maximum (W)                           |
-| Maximale Entladeleistung | Konfiguriertes Maximum (W)                           |
-| Tagesgesamtladung        | Heute geladene Energie (kWh)                         |
-| Tagesgesamtentladung     | Heute entladene Energie (kWh)                        |
-| Gesundheitszustand       | State of Health / SoH (%)                            |
-| Batteriestatus           | Betriebszustand als Text (z. B. Running, Standby)    |
+| Battery power            | Current: positive = charging, negative = discharging (W) |
+| State of charge          | SoC in percent (%)                                   |
+| Battery charge power     | Current charge power (W)                             |
+| Battery discharge power  | Current discharge power (W)                          |
+| Max charge power         | Configured maximum (W)                               |
+| Max discharge power      | Configured maximum (W)                               |
+| Daily charged energy     | Energy charged today (kWh)                           |
+| Daily discharged energy  | Energy discharged today (kWh)                        |
+| State of health          | SoH in percent (%)                                   |
+| Battery status           | Operating state as text (e.g. Running, Standby)      |
 
 ---
 
-### Energiezähler (OpenAPI)
+### Power Meter (OpenAPI)
 
-Verbindung über die Huawei FusionSolar Northbound API. Wird als P1-Zähler (kumulativ) registriert.
+Connection via the Huawei FusionSolar Northbound API. Registered as a P1 meter (cumulative).
 
-| Capability             | Beschreibung                                              |
-|------------------------|-----------------------------------------------------------|
-| Netzwirkleistung       | Aktuell: positiv = Bezug, negativ = Einspeisung (W)       |
-| Netzbezug gesamt       | Kumulierter Gesamtbezug (kWh)                             |
-| Netzeinspeisung gesamt | Kumulierte Gesamteinspeisung (kWh)                        |
-| Spannung Phase A/B/C   | Phasenspannungen (V) – dynamisch                          |
-| Strom Phase A/B/C      | Phasenströme (A) – dynamisch                              |
-| Leistung Phase A/B/C   | Phasenleistungen (W) – dynamisch                          |
-
----
-
-### Inverter SUN 2000 (Modbus)
-
-Direkte Modbus TCP Verbindung zum SUN2000 Wechselrichter oder SDongle.
-
-| Capability                 | Beschreibung                                              |
-|----------------------------|-----------------------------------------------------------|
-| Solarleistung              | DC-Eingangsleistung der PV-Strings (W)                    |
-| Wirkleistung               | AC-Ausgangsleistung (W)                                   |
-| Kühlkörpertemperatur       | Innentemperatur des Wechselrichters (°C)                  |
-| Gesamtertrag               | Kumulierter Gesamtertrag (kWh)                            |
-| Tagesgesamtertrag          | Tagesertrag (kWh)                                         |
-| Spannung PV1 / PV2         | DC-Spannung der PV-Strings (V)                            |
-| Strom PV1 / PV2            | DC-Strom der PV-Strings (A)                               |
-| Status des Wechselrichters | Betriebszustand als Text                                  |
-| Wirkleistungs-Steuermodus  | Einstellbare Einspeisebegrenzung                          |
-| Netzwirkleistung           | Aktuell (W) – nur wenn DTSU666 verbunden                  |
-| Netzbezug gesamt           | Kumuliert (kWh) – nur wenn DTSU666 verbunden              |
-| Netzeinspeisung gesamt     | Kumuliert (kWh) – nur wenn DTSU666 verbunden              |
+| Capability              | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| Grid active power       | Current: positive = import, negative = export (W)         |
+| Total grid import       | Cumulative total energy imported (kWh)                    |
+| Total grid export       | Cumulative total energy exported (kWh)                    |
+| Phase A/B/C voltage     | Phase voltages (V) — dynamic                              |
+| Phase A/B/C current     | Phase currents (A) — dynamic                              |
+| Phase A/B/C power       | Phase power (W) — dynamic                                 |
 
 ---
 
-### Inverter SUN 2000 (EMMA Modbus)
+### Inverter SUN2000 (Modbus)
 
-Liest Wechselrichterdaten über das EMMA Energy Management Module (unit ID 0). Kein SDongle oder separater Zähler erforderlich.
+Direct Modbus TCP connection to the SUN2000 inverter or SDongle.
 
-| Capability             | Beschreibung                                              |
-|------------------------|-----------------------------------------------------------|
-| Solarleistung          | PV-Ausgangsleistung (W)                                  |
-| Wirkleistung           | Wechselrichter Wirkleistung (W)                          |
-| PV Gesamtertrag        | Kumulierter PV-Gesamtertrag (kWh)                        |
-| PV Ertrag heute        | PV-Ertrag heute (kWh)                                    |
-| Gesamtertrag           | Wechselrichter Gesamtertrag (kWh)                        |
-| Tagesgesamtertrag      | Wechselrichter Tagesertrag (kWh)                         |
-| Netzwirkleistung       | Aktuell: positiv = Bezug, negativ = Einspeisung (W)      |
-| Netzbezug gesamt       | Kumulierter Gesamtbezug (kWh)                            |
-| Netzeinspeisung gesamt | Kumulierte Gesamteinspeisung (kWh)                       |
+| Capability                  | Description                                               |
+|-----------------------------|-----------------------------------------------------------|
+| Solar power                 | DC input power from PV strings (W)                        |
+| Active power                | AC output power (W)                                       |
+| Heat sink temperature       | Internal inverter temperature (°C)                        |
+| Total yield                 | Cumulative total yield (kWh)                              |
+| Daily yield                 | Today's energy yield (kWh)                                |
+| PV1 / PV2 voltage           | DC voltage of PV strings (V)                              |
+| PV1 / PV2 current           | DC current of PV strings (A)                              |
+| Inverter status             | Operating state as text                                   |
+| Active power control mode   | Configurable feed-in limit                                |
+| Grid active power           | Current (W) — only when DTSU666 is connected              |
+| Total grid import           | Cumulative (kWh) — only when DTSU666 is connected         |
+| Total grid export           | Cumulative (kWh) — only when DTSU666 is connected         |
 
 ---
 
-### Batterie LUNA 2000 (Modbus)
+### Inverter SUN2000 (EMMA Modbus)
 
-Direkte Modbus TCP Verbindung zur LUNA2000 Batterie über den SUN2000 / SDongle.
+Reads inverter data via the EMMA Energy Management Module (unit ID 0). No SDongle or separate meter required.
 
-#### Lesbare Werte
+| Capability              | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| Solar power             | PV output power (W)                                       |
+| Active power            | Inverter active power (W)                                 |
+| Total PV yield          | Cumulative total PV yield (kWh)                           |
+| PV yield today          | PV energy yield today (kWh)                               |
+| Total yield             | Inverter total yield (kWh)                                |
+| Daily yield             | Inverter daily yield (kWh)                                |
+| Grid active power       | Current: positive = import, negative = export (W)         |
+| Total grid import       | Cumulative total energy imported (kWh)                    |
+| Total grid export       | Cumulative total energy exported (kWh)                    |
 
-| Capability                  | Beschreibung                                         |
+---
+
+### Battery LUNA2000 (Modbus)
+
+Direct Modbus TCP connection to the LUNA2000 battery via SUN2000 / SDongle.
+
+#### Readable Values
+
+| Capability                  | Description                                          |
 |-----------------------------|------------------------------------------------------|
-| Batterieleistung            | Aktuell: positiv = laden, negativ = entladen (W)     |
-| Ladezustand                 | SoC in Prozent (%)                                   |
-| Gesamte geladene Energie    | Kumuliert seit Inbetriebnahme (kWh)                  |
-| Gesamte entladene Energie   | Kumuliert seit Inbetriebnahme (kWh)                  |
-| Batterieladeleistung        | Aktuelle Ladeleistung (W)                            |
-| Batterieentladeleistung     | Aktuelle Entladeleistung (W)                         |
-| Maximale Ladeleistung       | Konfiguriertes Maximum (W)                           |
-| Maximale Entladeleistung    | Konfiguriertes Maximum (W)                           |
-| Tagesgesamtladung           | Heute geladene Energie (kWh)                         |
-| Tagesgesamtentladung        | Heute entladene Energie (kWh)                        |
-| Batteriestatus              | Betriebszustand als Text (z. B. Running, Standby)    |
+| Battery power               | Current: positive = charging, negative = discharging (W) |
+| State of charge             | SoC in percent (%)                                   |
+| Total charged energy        | Cumulative since commissioning (kWh)                 |
+| Total discharged energy     | Cumulative since commissioning (kWh)                 |
+| Battery charge power        | Current charge power (W)                             |
+| Battery discharge power     | Current discharge power (W)                          |
+| Max charge power            | Configured maximum (W)                               |
+| Max discharge power         | Configured maximum (W)                               |
+| Daily charged energy        | Energy charged today (kWh)                           |
+| Daily discharged energy     | Energy discharged today (kWh)                        |
+| Battery status              | Operating state as text (e.g. Running, Standby)      |
 
-#### Steuerbare Werte
+#### Controllable Values
 
-| Capability                   | Optionen                                                                                              |
-|------------------------------|-------------------------------------------------------------------------------------------------------|
-| Speicher-Betriebsmodus       | Adaptiv · Festes Laden/Entladen · Eigenverbrauch maximieren · TOU · Volleinspeisung · Drittanbieter  |
-| Erzwungenes Laden/Entladen   | Stopp · Laden · Entladen                                                                              |
-| Überschuss-PV-Energie (TOU)  | Ins Netz einspeisen · Batterie laden                                                                  |
-| Fernsteuerung Laden/Entladen | Lokale Steuerung · Max Eigenverbrauch · Volleinspeisung · TOU · KI · Drittanbieter                   |
+| Capability                    | Options                                                                                              |
+|-------------------------------|------------------------------------------------------------------------------------------------------|
+| Storage working mode          | Adaptive · Fixed charge/discharge · Maximise self-consumption · TOU · Full feed-in · Third party    |
+| Force charge/discharge        | Stop · Charge · Discharge                                                                            |
+| Excess PV energy (TOU)        | Feed into grid · Charge battery                                                                      |
+| Remote charge/discharge mode  | Local control · Max self-consumption · Full feed-in · TOU · AI · Third party                        |
 
 ---
 
-### Batterie LUNA 2000 (EMMA Modbus)
+### Battery LUNA2000 (EMMA Modbus)
 
-Liest Batteriedaten über das EMMA Energy Management Module (unit ID 0).
+Reads battery data via the EMMA Energy Management Module (unit ID 0).
 
-#### Lesbare Werte
+#### Readable Values
 
-| Capability              | Beschreibung                                         |
-|-------------------------|------------------------------------------------------|
-| Batterieleistung        | Aktuell: positiv = laden, negativ = entladen (W)     |
-| Ladezustand             | SoC in Prozent (%)                                   |
-| Backup-Ladestand        | Reservierter Notfall-SoC (%)                         |
-| Ladbare Kapazität       | Aktuell verfügbare Ladekapazität (kWh)               |
-| Entladbare Kapazität    | Aktuell verfügbare Entladekapazität (kWh)            |
-| Gesamte geladene Energie | Kumuliert seit Inbetriebnahme (kWh)                 |
-| Gesamte entladene Energie | Kumuliert seit Inbetriebnahme (kWh)                |
-| Tagesgesamtladung       | Heute geladene Energie (kWh)                         |
-| Tagesgesamtentladung    | Heute entladene Energie (kWh)                        |
+| Capability               | Description                                          |
+|--------------------------|------------------------------------------------------|
+| Battery power            | Current: positive = charging, negative = discharging (W) |
+| State of charge          | SoC in percent (%)                                   |
+| Backup SoC               | Reserved emergency SoC (%)                           |
+| Chargeable capacity      | Currently available charge capacity (kWh)            |
+| Dischargeable capacity   | Currently available discharge capacity (kWh)         |
+| Total charged energy     | Cumulative since commissioning (kWh)                 |
+| Total discharged energy  | Cumulative since commissioning (kWh)                 |
+| Daily charged energy     | Energy charged today (kWh)                           |
+| Daily discharged energy  | Energy discharged today (kWh)                        |
 
-#### Steuerbare Werte
+#### Controllable Values
 
-| Capability                  | Optionen / Bereich                                                          |
+| Capability                  | Options / Range                                                             |
 |-----------------------------|-----------------------------------------------------------------------------|
-| Speicher-Betriebsmodus      | Eigenverbrauch · Volleinspeisung · TOU · Drittanbieter                      |
-| Überschuss-PV-Energie (TOU) | Ins Netz einspeisen · Batterie laden                                        |
+| Storage working mode        | Self-consumption · Full feed-in · TOU · Third party                         |
+| Excess PV energy (TOU)      | Feed into grid · Charge battery                                             |
 
-#### Einstellung
+#### Settings
 
-| Einstellung                    | Beschreibung                                    |
-|--------------------------------|-------------------------------------------------|
-| Max. Ladeleistung aus Netz (kW)| Schreibt Register 40002 (0–50 kW, EMMA R/W)    |
-
----
-
-### Energiezähler (Modbus)
-
-Direkte Modbus TCP Verbindung zum DTSU666 Smart Meter über den SUN2000 / SDongle. Wird als P1-Zähler (kumulativ) registriert.
-
-| Capability             | Beschreibung                                              |
-|------------------------|-----------------------------------------------------------|
-| Netzwirkleistung       | Aktuell: positiv = Bezug, negativ = Einspeisung (W)       |
-| Netzbezug gesamt       | Kumulierter Gesamtbezug (kWh)                             |
-| Netzeinspeisung gesamt | Kumulierte Gesamteinspeisung (kWh)                        |
-| Spannung Phase A/B/C   | Phasenspannungen (V)                                      |
-| Strom Phase A/B/C      | Phasenströme (A)                                          |
-| Leistung Phase A/B/C   | Phasenleistungen (W)                                      |
+| Setting                        | Description                                      |
+|--------------------------------|--------------------------------------------------|
+| Max grid charging power (kW)   | Writes register 40002 (0–50 kW, EMMA R/W)        |
 
 ---
 
-### Energiezähler (EMMA Modbus)
+### Power Meter (Modbus)
 
-Liest Netzdaten über das EMMA Energy Management Module (unit ID 0). Wird als P1-Zähler (kumulativ) registriert.
+Direct Modbus TCP connection to the DTSU666 smart meter via SUN2000 / SDongle. Registered as a P1 meter (cumulative).
 
-| Capability             | Beschreibung                                              |
-|------------------------|-----------------------------------------------------------|
-| Netzwirkleistung       | Aktuell: positiv = Bezug, negativ = Einspeisung (W)       |
-| Netzbezug gesamt       | Kumulierter Gesamtbezug (kWh)                             |
-| Netzeinspeisung gesamt | Kumulierte Gesamteinspeisung (kWh)                        |
-| Netzbezug heute        | Heutiger Bezug aus dem Netz (kWh)                         |
-| Netzeinspeisung heute  | Heutige Einspeisung ins Netz (kWh)                        |
-| Hausverbrauch          | Aktueller Hausverbrauch / Lastleistung (W)                |
-| Hausverbrauch heute    | Heutiger Gesamtverbrauch (kWh)                            |
+| Capability              | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| Grid active power       | Current: positive = import, negative = export (W)         |
+| Total grid import       | Cumulative total energy imported (kWh)                    |
+| Total grid export       | Cumulative total energy exported (kWh)                    |
+| Phase A/B/C voltage     | Phase voltages (V)                                        |
+| Phase A/B/C current     | Phase currents (A)                                        |
+| Phase A/B/C power       | Phase power (W)                                           |
+
+---
+
+### Power Meter (EMMA Modbus)
+
+Reads grid data via the EMMA Energy Management Module (unit ID 0). Registered as a P1 meter (cumulative).
+
+| Capability              | Description                                               |
+|-------------------------|-----------------------------------------------------------|
+| Grid active power       | Current: positive = import, negative = export (W)         |
+| Total grid import       | Cumulative total energy imported (kWh)                    |
+| Total grid export       | Cumulative total energy exported (kWh)                    |
+| Grid import today       | Energy imported from grid today (kWh)                     |
+| Grid export today       | Energy exported to grid today (kWh)                       |
+| House consumption       | Current house load / consumption power (W)                |
+| House consumption today | Total consumption today (kWh)                             |
 
 ---
 
 ### Smart Charger (EMMA Modbus)
 
-Liest Ladestationsdaten über das EMMA Energy Management Module.
+Reads EV charger data via the EMMA Energy Management Module.
 
-| Capability        | Beschreibung                          |
-|-------------------|---------------------------------------|
-| Nennleistung      | Maximale Ladeleistung der Station (W) |
-| Modellname        | Bezeichnung des Ladegeräts            |
-| Spannung Phase A/B/C | Aktuelle Phasenspannungen (V)      |
-| Temperatur        | Innentemperatur des Ladegeräts (°C)   |
-| Gesamte Ladeenergie | Kumuliert seit Inbetriebnahme (kWh) |
+| Capability           | Description                              |
+|----------------------|------------------------------------------|
+| Rated power          | Maximum charging power of the station (W)|
+| Model name           | Charger product name                     |
+| Phase A/B/C voltage  | Current phase voltages (V)               |
+| Temperature          | Internal charger temperature (°C)        |
+| Total energy charged | Cumulative since commissioning (kWh)     |
 
 ---
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
 
 #### Kiosk
-- FusionSolar Kiosk-URL (in der FusionSolar App unter Teilen → Kiosk URL)
+- FusionSolar Kiosk URL (available in the FusionSolar app under Share → Kiosk URL)
 
 #### OpenAPI
-- FusionSolar-Konto mit aktivierter Northbound API
-- Benutzername und System Code (API-Passwort)
-- Regionaler Server: z. B. `https://eu5.fusionsolar.huawei.com`
+- FusionSolar account with Northbound API enabled
+- Username and System Code (API password)
+- Regional server, e.g. `https://eu5.fusionsolar.huawei.com`
 
 #### Modbus (SUN2000 / LUNA2000 / DTSU666)
-- SUN2000 Wechselrichter oder SDongle über LAN erreichbar
-- Modbus TCP aktiviert (Standard-Port: **502**, SDongle: **6607**)
-- Statische IP-Adresse empfohlen (DHCP-Reservierung im Router)
+- SUN2000 inverter or SDongle reachable over LAN
+- Modbus TCP enabled (default port: **502**, SDongle: **6607**)
+- Static IP address recommended (DHCP reservation in router)
 
 #### EMMA Modbus
-- SUN2000MA Energy Management Module über LAN erreichbar
-- Modbus TCP aktiviert (Standard-Port: **502**)
+- SUN2000MA Energy Management Module reachable over LAN
+- Modbus TCP enabled (default port: **502**)
 - Modbus Unit ID: **0**
-- Statische IP-Adresse empfohlen
+- Static IP address recommended
 
-### Einrichtung in Homey
+### Setup in Homey
 
-1. App aus dem Homey App Store installieren
-2. Gerät hinzufügen: **Geräte → + → Huawei FusionSolar Manager**
-3. Verbindungsart und Gerätetyp wählen, Verbindungsdaten eingeben
-4. Verbindungstest – bei Erfolg wird das Gerät angelegt
+1. Install the app from the Homey App Store
+2. Add a device: **Devices → + → Huawei FusionSolar Manager**
+3. Select connection type and device, enter connection details
+4. Connection test — on success the device is created
 
 ---
 
-## Geräteeinstellungen
+## Device Settings
 
 ### Kiosk
 
-| Einstellung              | Standard  | Beschreibung                                 |
-|--------------------------|-----------|----------------------------------------------|
-| Kiosk URL                | –         | Öffentliche Kiosk-URL der Anlage             |
-| Aktualisierungsintervall | 10 Min.   | Wie oft Daten abgerufen werden (min. 10 Min.)|
+| Setting           | Default  | Description                                   |
+|-------------------|----------|-----------------------------------------------|
+| Kiosk URL         | –        | Public Kiosk URL of the plant                 |
+| Update interval   | 10 min   | How often data is fetched (min. 10 min)       |
 
 ### OpenAPI
 
-| Einstellung              | Standard                   | Beschreibung                                  |
-|--------------------------|----------------------------|-----------------------------------------------|
-| Server URL               | eu5.fusionsolar.huawei.com | Regionaler FusionSolar API-Server             |
-| Benutzername             | –                          | FusionSolar API-Benutzername                  |
-| System Code              | –                          | API-Passwort                                  |
-| Anlagencode              | –                          | Wird beim Koppeln automatisch gesetzt         |
-| Aktualisierungsintervall | 10 Min.                    | Wie oft Daten abgerufen werden (min. 10 Min.) |
+| Setting           | Default                    | Description                                   |
+|-------------------|----------------------------|-----------------------------------------------|
+| Server URL        | eu5.fusionsolar.huawei.com | Regional FusionSolar API server               |
+| Username          | –                          | FusionSolar API username                      |
+| System Code       | –                          | API password                                  |
+| Plant code        | –                          | Set automatically during pairing              |
+| Update interval   | 10 min                     | How often data is fetched (min. 10 min)       |
 
-> Huawei begrenzt API-Anfragen. Ein Intervall unter 10 Minuten wird nicht empfohlen.
+> Huawei rate-limits API requests. An interval below 10 minutes is not recommended.
 
 ### Modbus (SUN2000 / LUNA2000 / DTSU666)
 
-| Einstellung                  | Standard | Beschreibung                              |
-|------------------------------|----------|-------------------------------------------|
-| IP-Adresse                   | –        | IP des SUN2000 / SDongle                  |
-| Modbus Port                  | 502      | SDongle verwendet typischerweise 6607     |
-| Modbus Geräte-ID             | 1        | Unit ID des Geräts (Standard: 1)          |
-| Aktualisierungsintervall (s) | 60       | Wie oft abgefragt wird (min. 10 s)        |
+| Setting              | Default | Description                                   |
+|----------------------|---------|-----------------------------------------------|
+| IP address           | –       | IP of the SUN2000 / SDongle                   |
+| Modbus port          | 502     | SDongle typically uses 6607                   |
+| Modbus unit ID       | 1       | Unit ID of the device (default: 1)            |
+| Update interval (s)  | 60      | How often data is polled (min. 10 s)          |
 
 ### EMMA Modbus
 
-| Einstellung                     | Standard | Beschreibung                                     |
-|---------------------------------|----------|--------------------------------------------------|
-| IP-Adresse                      | –        | IP des EMMA Energy Management Module             |
-| Modbus Port                     | 502      | Standard-Port des EMMA                           |
-| Modbus Geräte-ID                | 0        | EMMA verwendet Unit ID 0                         |
-| Aktualisierungsintervall (s)    | 60       | Wie oft abgefragt wird (min. 10 s)               |
-| Max. Ladeleistung aus Netz (kW) | 5        | Nur Batterie: schreibt EMMA-Register 40002       |
+| Setting                         | Default | Description                                      |
+|---------------------------------|---------|--------------------------------------------------|
+| IP address                      | –       | IP of the EMMA Energy Management Module          |
+| Modbus port                     | 502     | Default port of the EMMA                         |
+| Modbus unit ID                  | 0       | EMMA uses unit ID 0                              |
+| Update interval (s)             | 60      | How often data is polled (min. 10 s)             |
+| Max grid charging power (kW)    | 5       | Battery only: writes EMMA register 40002         |
 
 ---
 
-## Flow-Karten
+## Flow Cards
 
-### Auslöser (Triggers)
+### Triggers
 
-| Karte                                 | Gerät                          | Token          | Beschreibung                             |
-|---------------------------------------|--------------------------------|----------------|------------------------------------------|
-| Leistungsabgabe hat sich geändert     | Kiosk                          | `power` (W)    | Bei jeder Leistungsänderung              |
-| Tagesertrag aktualisiert              | Kiosk                          | `daily_energy` | Bei Aktualisierung des Tagesertrags      |
-| Leistungsabgabe geändert (Modbus)     | Inverter SUN 2000 Modbus/EMMA  | `power` (W)    | Bei jeder Leistungsänderung              |
-| Leistungsabgabe geändert (OpenAPI)    | Inverter SUN 2000 OpenAPI      | `power` (W)    | Bei jeder Leistungsänderung              |
-| Ladezustand der Batterie geändert     | LUNA2000 Modbus/EMMA           | `soc` (%)      | Bei jeder SoC-Änderung                  |
-| Batterie-Ladestatus hat sich geändert | LUNA2000 Modbus/EMMA           | `state`        | `charging` / `discharging` / `idle`     |
-| Ladezustand der Batterie geändert     | Batterie OpenAPI               | `soc` (%)      | Bei jeder SoC-Änderung                  |
-| Batterie-Ladestatus hat sich geändert | Batterie OpenAPI               | `state`        | `charging` / `discharging` / `idle`     |
-| Einspeisung ins Netz begonnen         | Energiezähler Modbus/EMMA      | `power` (W)    | Wenn Bezug auf Einspeisung wechselt     |
-| Netzbezug begonnen                    | Energiezähler Modbus/EMMA      | `power` (W)    | Wenn Einspeisung auf Bezug wechselt     |
+| Card                              | Device                          | Token          | Description                               |
+|-----------------------------------|---------------------------------|----------------|-------------------------------------------|
+| Power output changed              | Kiosk                           | `power` (W)    | Fires on every power change               |
+| Daily yield updated               | Kiosk                           | `daily_energy` | Fires when daily yield is updated         |
+| Power output changed (Modbus)     | Inverter SUN2000 Modbus/EMMA    | `power` (W)    | Fires on every power change               |
+| Power output changed (OpenAPI)    | Inverter SUN2000 OpenAPI        | `power` (W)    | Fires on every power change               |
+| Battery SoC changed               | LUNA2000 Modbus/EMMA            | `soc` (%)      | Fires on every SoC change                 |
+| Battery charging state changed    | LUNA2000 Modbus/EMMA            | `state`        | `charging` / `discharging` / `idle`      |
+| Battery SoC changed               | Battery OpenAPI                 | `soc` (%)      | Fires on every SoC change                 |
+| Battery charging state changed    | Battery OpenAPI                 | `state`        | `charging` / `discharging` / `idle`      |
+| Grid export started               | Power Meter Modbus/EMMA         | `power` (W)    | Fires when switching from import to export|
+| Grid import started               | Power Meter Modbus/EMMA         | `power` (W)    | Fires when switching from export to import|
 
-### Bedingungen (Conditions)
+### Conditions
 
-| Karte                          | Gerät                         | Beschreibung                                 |
-|--------------------------------|-------------------------------|----------------------------------------------|
-| Erzeugt gerade Strom           | Kiosk                         | Prüft ob die Anlage aktuell Strom erzeugt    |
-| Erzeugt gerade Strom (Modbus)  | Inverter SUN 2000 Modbus/EMMA | Prüft ob der Wechselrichter aktuell erzeugt  |
-
----
-
-## Energiedashboard
-
-Die App ist vollständig für das Homey Energiedashboard konfiguriert:
-
-| Gerät                          | Homey-Kategorie | Funktion                                                  |
-|--------------------------------|-----------------|-----------------------------------------------------------|
-| Kiosk                          | Solarpanel      | Gesamtertrag → Erzeugte Energie                           |
-| Inverter SUN 2000 OpenAPI      | Solarpanel      | Gesamtertrag Wechselrichter → Erzeugte Energie            |
-| Inverter SUN 2000 Modbus       | Solarpanel      | Gesamtertrag → Erzeugte Energie                           |
-| Inverter SUN 2000 EMMA Modbus  | Solarpanel      | Gesamtertrag → Erzeugte Energie                           |
-| Batterie LUNA 2000 OpenAPI     | Hausbatterie    | Lade- und Entladeleistung                                 |
-| Batterie LUNA 2000 Modbus      | Hausbatterie    | Geladene / entladene Energie + Lade-/Entladeleistung      |
-| Batterie LUNA 2000 EMMA Modbus | Hausbatterie    | Geladene / entladene Energie + Lade-/Entladeleistung      |
-| Energiezähler OpenAPI          | P1-Zähler       | Netzbezug (kumulativ) + Netzeinspeisung (kumulativ)       |
-| Energiezähler Modbus           | P1-Zähler       | Netzbezug (kumulativ) + Netzeinspeisung (kumulativ)       |
-| Energiezähler EMMA Modbus      | P1-Zähler       | Netzbezug (kumulativ) + Netzeinspeisung (kumulativ)       |
+| Card                           | Device                         | Description                                    |
+|--------------------------------|--------------------------------|------------------------------------------------|
+| Is currently producing         | Kiosk                          | Checks if the plant is currently generating    |
+| Is currently producing (Modbus)| Inverter SUN2000 Modbus/EMMA   | Checks if the inverter is currently generating |
 
 ---
 
-## Technischer Hintergrund
+## Energy Dashboard
 
-- **Kiosk:** HTTP-Abruf der öffentlichen FusionSolar Kiosk-API
-- **OpenAPI:** HTTPS-Verbindung zur Huawei FusionSolar Northbound API (xsrf-token Authentifizierung, automatisches Re-Login bei Session-Ablauf). Geräte derselben Anlage teilen eine gemeinsame Session (ein API-Aufruf pro Intervall für alle Geräte)
-- **Modbus (SUN2000/SDongle):** TCP-Verbindung über [`jsmodbus`](https://www.npmjs.com/package/jsmodbus) nach Huawei SUN2000 Modbus Interface Definition A. Alle Modbus-Geräte am selben Host teilen eine serialisierte Warteschlange (`withHostLock`) – keine gleichzeitigen Verbindungen
-- **EMMA Modbus:** TCP-Verbindung zum SUN2000MA Energy Management Module (unit ID 0). Alle drei EMMA-Gerätetypen (Inverter, Batterie, Zähler) lesen aus demselben EMMA-Registerbereich – kein SDongle, kein DTSU666 erforderlich. R/W-Zugriff auf ESS-Steuerregister (40000–40002) über FC06/FC16
+The app is fully configured for the Homey Energy Dashboard:
+
+| Device                          | Homey category  | Function                                                  |
+|---------------------------------|-----------------|-----------------------------------------------------------|
+| Kiosk                           | Solar panel     | Total yield → Generated energy                            |
+| Inverter SUN2000 OpenAPI        | Solar panel     | Inverter total yield → Generated energy                   |
+| Inverter SUN2000 Modbus         | Solar panel     | Total yield → Generated energy                            |
+| Inverter SUN2000 EMMA Modbus    | Solar panel     | Total yield → Generated energy                            |
+| Battery LUNA2000 OpenAPI        | Home battery    | Charge and discharge power                                |
+| Battery LUNA2000 Modbus         | Home battery    | Charged / discharged energy + charge/discharge power      |
+| Battery LUNA2000 EMMA Modbus    | Home battery    | Charged / discharged energy + charge/discharge power      |
+| Power Meter OpenAPI             | P1 meter        | Grid import (cumulative) + grid export (cumulative)       |
+| Power Meter Modbus              | P1 meter        | Grid import (cumulative) + grid export (cumulative)       |
+| Power Meter EMMA Modbus         | P1 meter        | Grid import (cumulative) + grid export (cumulative)       |
 
 ---
 
-## Lizenz
+## Technical Background
 
-MIT License – siehe [LICENSE](LICENSE)
+- **Kiosk:** HTTP polling of the public FusionSolar Kiosk API
+- **OpenAPI:** HTTPS connection to the Huawei FusionSolar Northbound API (xsrf-token authentication, automatic re-login on session expiry). Devices from the same plant share a common session (one API call per interval for all devices)
+- **Modbus (SUN2000/SDongle):** TCP connection via [`jsmodbus`](https://www.npmjs.com/package/jsmodbus) following the Huawei SUN2000 Modbus Interface Definition A. All Modbus devices on the same host share a serialised queue (`withHostLock`) — no concurrent connections
+- **EMMA Modbus:** TCP connection to the SUN2000MA Energy Management Module (unit ID 0). All three EMMA device types (inverter, battery, meter) read from the same EMMA register range — no SDongle or DTSU666 required. R/W access to ESS control registers (40000–40002) via FC06/FC16
 
 ---
 
-## KI-Entwicklung
+## License
 
-Diese App wurde vollständig mit Hilfe von **Claude (Anthropic AI)** entwickelt.
+MIT License – see [LICENSE](LICENSE)
+
+---
+
+## AI Development
+
+This app was developed entirely with the assistance of **Claude (Anthropic AI)**.
