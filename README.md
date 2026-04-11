@@ -2,7 +2,9 @@
 
 **App ID:** `com.huawei.fusionsolar`
 **SDK:** Homey SDK 3
-**Kompatibel mit:** Homey Pro (Early 2023), Homey Pro (2019), Homey Bridge (Firmware >= 12.3.0)
+**Mindest-Firmware:** Homey >= 12.4.5
+**Kompatibel mit:** Homey Pro (Early 2023)
+> ⚠️ **Homey Pro (Early 2019) wird nicht unterstützt.** Der Homey Pro 2019 ist durch Athom auf Homey OS 10.x limitiert und kann die erforderliche Firmware 12.4.5 nicht erreichen. Die App lässt sich zwar herunterladen, wird aber nicht installiert.
 
 ---
 
