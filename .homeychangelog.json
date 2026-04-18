@@ -73,5 +73,11 @@
   },
   "1.1.9": {
     "en": "new flow cards for Registers 47075 / 47077 — Max Charge / Max Discharge Power"
+  },
+  "1.1.10": {
+    "en": "Max grid charge power now reads and writes register 47242 (active set point, matches FusionSolar) instead of 47244 (hardware ceiling). The setting is only synced when \"Charge from grid\" is enabled to avoid the hardware maximum overwriting the configured value."
+  },
+  "1.1.11": {
+    "en": "fix issues with OpenAPI SUN2000 device and values"
   }
 }

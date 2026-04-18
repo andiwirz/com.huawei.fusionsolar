@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.9",
+  "version": "1.1.11",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -1503,8 +1503,8 @@
           "max": 100000,
           "step": 100,
           "hint": {
-            "en": "Maximum power when charging the battery from the grid (register 47244). Only effective when 'Charge from grid' is enabled.",
-            "de": "Maximale Leistung beim Laden der Batterie aus dem Netz (Register 47244). Nur wirksam wenn 'Batterie aus dem Netz laden' aktiviert ist."
+            "en": "Active grid charge power set point (register 47242). This is the value shown and set by FusionSolar. Requires 'Charge from grid' to be enabled — saving this setting will automatically enable it if currently off.",
+            "de": "Aktiver Sollwert für die Netzladeleistung (Register 47242). Dieser Wert wird auch von FusionSolar angezeigt und gesetzt. Erfordert, dass 'Batterie aus dem Netz laden' aktiviert ist — wird beim Speichern automatisch aktiviert falls nötig."
           }
         },
         {
@@ -2231,6 +2231,7 @@
         "meterPowerExportedCapability": "meter_power.inv_total"
       },
       "capabilities": [
+        "measure_power",
         "measure_power.mppt",
         "measure_power.active_power",
         "measure_temperature.invertor",
