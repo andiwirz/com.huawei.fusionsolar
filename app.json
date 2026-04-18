@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -1098,7 +1098,7 @@
         "lan"
       ],
       "energy": {
-        "meterPowerExportedCapability": "meter_power"
+        "meterPowerExportedCapability": "meter_power.pv_total"
       },
       "capabilities": [
         "measure_power",

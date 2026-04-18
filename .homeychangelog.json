@@ -67,5 +67,8 @@
   },
   "1.1.7": {
     "en": "fix new flowcards if already in state charging or discharging"
+  },
+  "1.1.8": {
+    "en": "sun2000_emma_modbus now points meterPowerExportedCapability to meter_power.pv_total (register 30348 — cumulative PV yield). Homey will derive the daily delta from that counter, which matches what the FusionSolar portal reports as daily PV yield."
   }
 }
