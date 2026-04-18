@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "compatibility": ">=12.4.5",
   "runtime": "nodejs",
   "sdk": 3,
@@ -4176,6 +4176,80 @@
             "placeholder": {
               "en": "e.g. 2500",
               "de": "z.B. 2500"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_max_charge_power",
+        "title": {
+          "en": "Set max charge power",
+          "de": "Maximale Ladeleistung setzen"
+        },
+        "titleFormatted": {
+          "en": "Set max charge power to [[power]] W",
+          "de": "Maximale Ladeleistung auf [[power]] W setzen"
+        },
+        "hint": {
+          "en": "Sets the maximum battery charge power (register 47075, UINT32). The value is also visible in device settings and synced back on the next control poll.",
+          "de": "Setzt die maximale Batterieladeleistung (Register 47075, UINT32). Der Wert ist auch in den Geräteeinstellungen sichtbar und wird beim nächsten Control-Poll zurückgelesen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Max Charge Power (W)",
+              "de": "Maximale Ladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 3500",
+              "de": "z.B. 3500"
+            }
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_max_discharge_power",
+        "title": {
+          "en": "Set max discharge power",
+          "de": "Maximale Entladeleistung setzen"
+        },
+        "titleFormatted": {
+          "en": "Set max discharge power to [[power]] W",
+          "de": "Maximale Entladeleistung auf [[power]] W setzen"
+        },
+        "hint": {
+          "en": "Sets the maximum battery discharge power (register 47077, UINT32). The value is also visible in device settings and synced back on the next control poll.",
+          "de": "Setzt die maximale Batterieentladeleistung (Register 47077, UINT32). Der Wert ist auch in den Geräteeinstellungen sichtbar und wird beim nächsten Control-Poll zurückgelesen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": {
+              "en": "Max Discharge Power (W)",
+              "de": "Maximale Entladeleistung (W)"
+            },
+            "min": 0,
+            "max": 100000,
+            "step": 100,
+            "placeholder": {
+              "en": "e.g. 3500",
+              "de": "z.B. 3500"
             }
           }
         ]
