@@ -404,6 +404,48 @@ class LUNA2000ModbusDevice extends Device {
       });
 
     this.homey.flow
+      .getActionCard('luna2000_set_max_charge_power')
+      .registerRunListener(async ({ device, power }) => {
+        const powerW = Math.round(Math.max(0, power));
+        this.log(`Set max charge power: ${powerW} W → reg 47075`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusU32(host(), port(), unitId(), 47075, powerW);
+          this.log('Max charge power written');
+          // Reflect immediately in settings so UI is in sync
+          this._updatingSettingFromModbus = true;
+          await this.setSettings({ max_charge_power: powerW }).catch(() => {});
+          this._updatingSettingFromModbus = false;
+        } catch (err) {
+          this.error('Set max charge power failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress = false;
+        }
+      });
+
+    this.homey.flow
+      .getActionCard('luna2000_set_max_discharge_power')
+      .registerRunListener(async ({ device, power }) => {
+        const powerW = Math.round(Math.max(0, power));
+        this.log(`Set max discharge power: ${powerW} W → reg 47077`);
+        this._writeInProgress = true;
+        try {
+          await writeModbusU32(host(), port(), unitId(), 47077, powerW);
+          this.log('Max discharge power written');
+          // Reflect immediately in settings so UI is in sync
+          this._updatingSettingFromModbus = true;
+          await this.setSettings({ max_discharge_power: powerW }).catch(() => {});
+          this._updatingSettingFromModbus = false;
+        } catch (err) {
+          this.error('Set max discharge power failed:', err.message);
+          throw err;
+        } finally {
+          this._writeInProgress = false;
+        }
+      });
+
+    this.homey.flow
       .getActionCard('luna2000_set_force_charge_soc')
       .registerRunListener(async ({ device, target_soc }) => {
         const socRaw = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
