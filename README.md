@@ -3,8 +3,7 @@
 **App ID:** `com.huawei.fusionsolar`
 **SDK:** Homey SDK 3
 **Minimum firmware:** Homey >= 12.4.5
-**Compatible with:** Homey Pro (Early 2023) and all newer Homey devices running firmware >= 12.4.5
-> ⚠️ **Homey Pro (Early 2019) is not supported.** The Homey Pro 2019 is capped by Athom at Homey OS 10.x and cannot reach the required firmware 12.4.5. The app may appear to download but will not install.
+**Compatible with:** Homey Pro (Early 2019) and all newer Homey devices running firmware >= 12.4.5
 
 ---
 
