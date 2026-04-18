@@ -55,7 +55,7 @@ const STORAGE_CONTROL_REGISTERS = {
   storageDischargeCutoffCapacity:   CONTROL_REGISTERS.storageDischargeCutoffCapacity,
   storageChargeFromGrid:            CONTROL_REGISTERS.storageChargeFromGrid,
   storageGridChargeCutoffSoc:       CONTROL_REGISTERS.storageGridChargeCutoffSoc,
-  storageMaxGridChargePower:        CONTROL_REGISTERS.storageMaxGridChargePower,
+  storageGridChargePower:           CONTROL_REGISTERS.storageGridChargePower,
   storageBackupPowerSoc:            CONTROL_REGISTERS.storageBackupPowerSoc,
 };
 
@@ -130,7 +130,6 @@ class LUNA2000ModbusDevice extends Device {
       const wattSettings = {
         max_charge_power:     { reg: 47075 },
         max_discharge_power:  { reg: 47077 },
-        max_grid_charge_power:{ reg: 47244 },
       };
       for (const [key, { reg }] of Object.entries(wattSettings)) {
         if (changedKeys.includes(key)) {
@@ -139,6 +138,25 @@ class LUNA2000ModbusDevice extends Device {
           writeModbusU32(address, port, modbusId, reg, raw)
             .catch((err) => this.error(`${key} write failed:`, err.message));
         }
+      }
+
+      // Register 47242 (active grid charge power set point) requires Charge from Grid
+      // (47087) to be enabled — otherwise the inverter ignores the write.
+      if (changedKeys.includes('max_grid_charge_power')) {
+        const raw = Math.round(parseFloat(newSettings.max_grid_charge_power) || 0);
+        this.log(`Write max_grid_charge_power: ${raw} W → reg 47242 (ensuring charge_from_grid enabled first)`);
+        const ensureEnabled = !this.getSetting('charge_from_grid')
+          ? writeModbusRegister(address, port, modbusId, 47087, 1)
+              .then(() => {
+                this._updatingSettingFromModbus = true;
+                return this.setSettings({ charge_from_grid: true })
+                  .catch(() => {})
+                  .finally(() => { this._updatingSettingFromModbus = false; });
+              })
+          : Promise.resolve();
+        ensureEnabled
+          .then(() => writeModbusU32(address, port, modbusId, 47242, raw))
+          .catch((err) => this.error('max_grid_charge_power write failed:', err.message));
       }
     }
   }
@@ -640,7 +658,6 @@ class LUNA2000ModbusDevice extends Device {
         ['storageDischargeCutoffCapacity', 'discharge_cutoff_capacity'],
         ['storageMaxChargePower',          'max_charge_power'],
         ['storageMaxDischargePower',       'max_discharge_power'],
-        ['storageMaxGridChargePower',      'max_grid_charge_power'],
         ['storageBackupPowerSoc',          'backup_power_soc'],
       ];
       for (const [key, settingId] of numericSync) {
@@ -649,6 +666,14 @@ class LUNA2000ModbusDevice extends Device {
           const current = parseFloat(this.getSetting(settingId));
           if (!Number.isFinite(current) || Math.abs(v - current) > 0.5) settingUpdates[settingId] = v;
         }
+      }
+
+      // Register 47242 (active grid charge power set point) only reflects a meaningful
+      // value when charge_from_grid is enabled — skip sync when it is disabled.
+      if (ctrl.storageChargeFromGrid === 1 && ctrl.storageGridChargePower !== null && ctrl.storageGridChargePower !== undefined) {
+        const v       = ctrl.storageGridChargePower;
+        const current = parseFloat(this.getSetting('max_grid_charge_power'));
+        if (!Number.isFinite(current) || Math.abs(v - current) > 0.5) settingUpdates.max_grid_charge_power = v;
       }
       if (Object.keys(settingUpdates).length > 0) {
         this._updatingSettingFromModbus = true;

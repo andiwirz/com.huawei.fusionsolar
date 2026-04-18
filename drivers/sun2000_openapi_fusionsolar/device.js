@@ -7,7 +7,8 @@ const DEV_TYPE_METER        = 17; // Grid meter (DTSU666)
 const DEV_TYPE_POWER_SENSOR = 47; // Power sensor
 
 const REQUIRED_CAPABILITIES = [
-  'measure_power.mppt',           // MPPT DC input power (W) — Solarleistung
+  'measure_power',                // AC active power (W) — primary for Homey Energy dashboard
+  'measure_power.mppt',           // MPPT DC input power (W)
   'measure_power.active_power',   // AC active power sum (W)
   'measure_temperature.invertor', // internal temperature (°C)
   'meter_power.inv_total',        // inverter total yield (kWh)
@@ -128,7 +129,8 @@ class FusionSolarInverterDevice extends Device {
     };
 
     const activePowerW = sumW('active_power');
-    await this._set('measure_power.active_power',   activePowerW);
+    await this._set('measure_power',              activePowerW);  // primary — used by Homey Energy dashboard
+    await this._set('measure_power.active_power', activePowerW);
     await this._set('measure_temperature.invertor', avg('temperature'));
 
     // Add extra capabilities dynamically on first successful fetch
