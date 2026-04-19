@@ -85,5 +85,8 @@
   },
   "1.1.13": {
     "en": "new driver: SDongle A (modbus)"
+  },
+  "1.1.14": {
+    "en": "README.md: Added SDongle A section and log errors on flow triggers"
   }
 }

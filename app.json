@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "compatibility": ">=12.4.5",
   "sdk": 3,
   "platforms": [
@@ -1354,6 +1354,9 @@
             "en": "Max Charge Power",
             "de": "Maximale Ladeleistung"
           },
+          "min": 0,
+          "max": 30000,
+          "step": 100,
           "insights": true
         },
         "measure_power.dischargesetting": {
@@ -1361,6 +1364,9 @@
             "en": "Max Discharge Power",
             "de": "Maximale Entladeleistung"
           },
+          "min": 0,
+          "max": 30000,
+          "step": 100,
           "insights": true
         },
         "meter_power.today_batt_input": {
@@ -2481,6 +2487,9 @@
             "en": "Max Charge Power",
             "de": "Maximale Ladeleistung"
           },
+          "min": 0,
+          "max": 30000,
+          "step": 100,
           "insights": true
         },
         "measure_power.dischargesetting": {
@@ -2488,6 +2497,9 @@
             "en": "Max Discharge Power",
             "de": "Maximale Entladeleistung"
           },
+          "min": 0,
+          "max": 30000,
+          "step": 100,
           "insights": true
         },
         "measure_battery.soh": {
