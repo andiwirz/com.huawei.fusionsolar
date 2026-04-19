@@ -277,20 +277,20 @@ class LUNA2000EmmaModbusDevice extends Device {
         await this.homey.flow
           .getDeviceTriggerCard('luna2000_soc_changed')
           .trigger(this, { soc })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger luna2000_soc_changed failed:', err.message));
       }
 
       if (this._prevChargingState !== null && chargingState !== this._prevChargingState) {
         this.homey.flow
           .getDeviceTriggerCard('luna2000_charging_state_changed')
           .trigger(this, { state: chargingState })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger luna2000_charging_state_changed failed:', err.message));
         if (chargingState === 'charging') {
           this.homey.flow.getDeviceTriggerCard('luna2000_charging_started')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger luna2000_charging_started failed:', err.message));
         } else if (chargingState === 'discharging') {
           this.homey.flow.getDeviceTriggerCard('luna2000_discharging_started')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger luna2000_discharging_started failed:', err.message));
         }
       }
       this._prevChargingState = chargingState;

@@ -116,15 +116,15 @@ class FusionSolarInverterDevice extends Device {
 
     const num  = (v) => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
     const avg  = (key) => {
-      const vals = maps.map((m) => num(m[key])).filter((v) => v !== null);
+      const vals = maps.map((m) => num(m?.[key])).filter((v) => v !== null);
       return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
     const sumW = (key) => {
-      const vals = maps.map((m) => num(m[key])).filter((v) => v !== null);
+      const vals = maps.map((m) => num(m?.[key])).filter((v) => v !== null);
       return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) * 1000) : null; // kW → W
     };
     const sumKwh = (key) => {
-      const vals = maps.map((m) => num(m[key])).filter((v) => v !== null);
+      const vals = maps.map((m) => num(m?.[key])).filter((v) => v !== null);
       return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
     };
 
@@ -169,7 +169,7 @@ class FusionSolarInverterDevice extends Device {
     await this.homey.flow
       .getDeviceTriggerCard('openapi_power_changed')
       .trigger(this, { power: powerW })
-      .catch(() => {});
+      .catch((err) => this.log('Flow trigger openapi_power_changed failed:', err.message));
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────

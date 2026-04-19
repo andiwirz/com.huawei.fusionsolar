@@ -123,10 +123,10 @@ class FusionSolarMeterDevice extends Device {
     if (this._prevExporting !== null && isExporting !== this._prevExporting) {
       if (isExporting) {
         this.homey.flow.getDeviceTriggerCard('dtsu666_grid_export_started')
-          .trigger(this, { power: Math.abs(power) }).catch(() => {});
+          .trigger(this, { power: Math.abs(power) }).catch((err) => this.log('Flow trigger dtsu666_grid_export_started failed:', err.message));
       } else {
         this.homey.flow.getDeviceTriggerCard('dtsu666_grid_import_started')
-          .trigger(this, { power }).catch(() => {});
+          .trigger(this, { power }).catch((err) => this.log('Flow trigger dtsu666_grid_import_started failed:', err.message));
       }
     }
     this._prevExporting = isExporting;

@@ -91,6 +91,21 @@ Connection via the Huawei FusionSolar Northbound API. Registered as a P1 meter (
 
 ---
 
+### SDongle A (Modbus)
+
+Direct Modbus TCP connection to the Huawei SDongle A (unit ID 100).
+
+| Capability              | Description                                                        |
+|-------------------------|--------------------------------------------------------------------|
+| House Consumption       | Current house load / consumption power (W)                         |
+| Solar Input Power       | Total PV input power (W)                                           |
+| Grid Power              | Current: positive = import, negative = export (W)                  |
+| Battery Power           | Current: positive = charging, negative = discharging (W)           |
+| Total Active Power      | Net system active power (W)                                        |
+| Connection Type         | SDongle connection type (N/A, WLAN, 4G, WLAN-FE)                  |
+
+---
+
 ### Inverter SUN2000 (Modbus)
 
 Direct Modbus TCP connection to the SUN2000 inverter or SDongle.
@@ -251,6 +266,12 @@ Reads EV charger data via the EMMA Energy Management Module.
 - Username and System Code (API password)
 - Regional server, e.g. `https://eu5.fusionsolar.huawei.com`
 
+#### SDongle A
+- SDongle A reachable over LAN
+- Modbus TCP enabled (default port: **502**, alternative: **6607**)
+- Modbus Unit ID: **100** (older firmware may use **0**)
+- Static IP address recommended
+
 #### Modbus (SUN2000 / LUNA2000 / DTSU666)
 - SUN2000 inverter or SDongle reachable over LAN
 - Modbus TCP enabled (default port: **502**, SDongle: **6607**)
@@ -299,6 +320,15 @@ Reads EV charger data via the EMMA Energy Management Module.
 | IP address           | –       | IP of the SUN2000 / SDongle                   |
 | Modbus port          | 502     | SDongle typically uses 6607                   |
 | Modbus unit ID       | 1       | Unit ID of the device (default: 1)            |
+| Update interval (s)  | 60      | How often data is polled (min. 10 s)          |
+
+### SDongle A Modbus
+
+| Setting              | Default | Description                                   |
+|----------------------|---------|-----------------------------------------------|
+| IP address           | –       | IP of the SDongle A                           |
+| Modbus port          | 502     | Alternative: 6607                             |
+| Modbus unit ID       | 100     | Older firmware may use 0                      |
 | Update interval (s)  | 60      | How often data is polled (min. 10 s)          |
 
 ### EMMA Modbus

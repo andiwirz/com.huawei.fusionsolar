@@ -300,7 +300,7 @@ class SUN2000ModbusDevice extends Device {
         await this._set('huawei_status', label);
         if (this._prevDeviceStatus !== null && label !== this._prevDeviceStatus) {
           this.homey.flow.getDeviceTriggerCard('sun2000_status_changed')
-            .trigger(this, { status: label }, { status: label }).catch(() => {});
+            .trigger(this, { status: label }, { status: label }).catch((err) => this.log('Flow trigger sun2000_status_changed failed:', err.message));
         }
         this._prevDeviceStatus = label;
       }
@@ -318,7 +318,7 @@ class SUN2000ModbusDevice extends Device {
         await this.homey.flow
           .getDeviceTriggerCard('modbus_power_changed')
           .trigger(this, { power: newPower })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger modbus_power_changed failed:', err.message));
       }
 
       this._failureCount = 0;

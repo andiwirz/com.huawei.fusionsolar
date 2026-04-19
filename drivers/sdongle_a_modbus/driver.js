@@ -29,7 +29,7 @@ class SdonglaAModbusDriver extends Driver {
       const data = await readModbusRegisters(address, port, modbusId, probeRegisters);
 
       if (!isSdonglaADataValid(data)) {
-        throw new Error(this.homey.__('modbus.pair.errors.sdonglaNotDetected'));
+        throw new Error(this.homey.__('modbus.pair.errors.sdongleANotDetected'));
       }
 
       this.log(`Pairing SDongle A at ${address}:${port} id=${modbusId}, gridPower=${data.gridPower}W, solar=${data.totalInputPower}W`);

@@ -140,7 +140,7 @@ class DTSU666ModbusDevice extends Device {
         await this._set('dtsu666_meter_status', meterLabel);
         if (this._prevMeterStatus !== null && meterLabel !== this._prevMeterStatus) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_meter_status_changed')
-            .trigger(this, { status: meterLabel }, { status: meterLabel }).catch(() => {});
+            .trigger(this, { status: meterLabel }, { status: meterLabel }).catch((err) => this.log('Flow trigger dtsu666_meter_status_changed failed:', err.message));
         }
         this._prevMeterStatus = meterLabel;
       }
@@ -165,10 +165,10 @@ class DTSU666ModbusDevice extends Device {
         const isExporting = gridPower < 0;
         if (isExporting && !this._prevExporting) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_grid_export_started')
-            .trigger(this, { power: Math.abs(gridPower) }).catch(() => {});
+            .trigger(this, { power: Math.abs(gridPower) }).catch((err) => this.log('Flow trigger dtsu666_grid_export_started failed:', err.message));
         } else if (!isExporting && this._prevExporting) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_grid_import_started')
-            .trigger(this, { power: gridPower }).catch(() => {});
+            .trigger(this, { power: gridPower }).catch((err) => this.log('Flow trigger dtsu666_grid_import_started failed:', err.message));
         }
       }
       if (gridPower !== null) this._prevExporting = gridPower < 0;

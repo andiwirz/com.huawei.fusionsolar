@@ -133,7 +133,7 @@ class SUN2000EmmaModbusDevice extends Device {
         await this.homey.flow
           .getDeviceTriggerCard('modbus_power_changed')
           .trigger(this, { power: newPower })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger modbus_power_changed failed:', err.message));
       }
 
       this._failureCount = 0;

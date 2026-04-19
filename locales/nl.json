@@ -10,19 +10,39 @@
     "noUrl": "Geen Kiosk URL geconfigureerd. Controleer de apparaatinstellingen.",
     "fetchFailed": "Ophalen van gegevens mislukt"
   },
+  "openapi": {
+    "pair": {
+      "errors": {
+        "noStations": "Geen installaties gevonden voor dit account."
+      }
+    },
+    "errors": {
+      "noStation": "Geen installatie geconfigureerd. Koppel het apparaat opnieuw.",
+      "noCredentials": "Inloggegevens niet geconfigureerd. Controleer de apparaatinstellingen.",
+      "noData": "Geen gegevens ontvangen van de API.",
+      "fetchFailed": "Ophalen van gegevens mislukt"
+    }
+  },
   "modbus": {
     "pair": {
       "defaultName": "SUN2000 Omvormer (Modbus)",
       "errors": {
         "noAddress": "Voer een IP-adres in.",
         "connectionFailed": "Verbinding mislukt",
-        "sdonglaNotDetected": "Geen SDongle A gedetecteerd. Controleer het IP-adres en Modbus-eenheid ID."
+        "batteryNotDetected": "Geen LUNA2000 batterij gedetecteerd. Controleer het IP-adres en Modbus-eenheid ID.",
+        "meterNotDetected": "Geen DTSU666 energiemeter gedetecteerd. Controleer het IP-adres en Modbus-eenheid ID.",
+        "inverterNotDetected": "Geen SUN2000 omvormer gedetecteerd via EMMA. Controleer het IP-adres en Modbus-eenheid ID.",
+        "sdongleANotDetected": "Geen SDongle A gedetecteerd. Controleer het IP-adres en Modbus-eenheid ID."
       }
     },
     "errors": {
       "noAddress": "Geen IP-adres geconfigureerd. Controleer de apparaatinstellingen.",
       "fetchFailed": "Modbus-uitlezing mislukt",
-      "sdonglaNotDetected": "SDongle A niet gedetecteerd."
+      "batteryNotDetected": "LUNA2000 batterij niet gedetecteerd.",
+      "meterNotDetected": "DTSU666 energiemeter niet gedetecteerd.",
+      "chargerNotDetected": "Smart Charger niet gedetecteerd.",
+      "emmaNotDetected": "EMMA-module niet gedetecteerd.",
+      "sdongleANotDetected": "SDongle A niet gedetecteerd."
     }
   }
 }

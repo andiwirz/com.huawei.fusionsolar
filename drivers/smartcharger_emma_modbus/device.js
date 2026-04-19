@@ -140,10 +140,10 @@ class SmartChargerModbusDevice extends Device {
       if (this._prevChargingState !== null && chargingState !== this._prevChargingState) {
         if (chargingState === 'charging') {
           this.homey.flow.getDeviceTriggerCard('smartcharger_charging_started')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_started failed:', err.message));
         } else {
           this.homey.flow.getDeviceTriggerCard('smartcharger_charging_stopped')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_stopped failed:', err.message));
         }
       }
       this._prevChargingState = chargingState;

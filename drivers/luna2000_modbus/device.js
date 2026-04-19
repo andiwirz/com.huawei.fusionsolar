@@ -578,7 +578,7 @@ class LUNA2000ModbusDevice extends Device {
         await this._set('luna2000_battery_status', statusLabel);
         if (this._prevBatteryStatus !== null && statusLabel !== this._prevBatteryStatus) {
           this.homey.flow.getDeviceTriggerCard('luna2000_battery_status_changed')
-            .trigger(this, { status: statusLabel }, { status: statusLabel }).catch(() => {});
+            .trigger(this, { status: statusLabel }, { status: statusLabel }).catch((err) => this.log('Flow trigger luna2000_battery_status_changed failed:', err.message));
         }
         this._prevBatteryStatus = statusLabel;
       }
@@ -596,20 +596,20 @@ class LUNA2000ModbusDevice extends Device {
         await this.homey.flow
           .getDeviceTriggerCard('luna2000_soc_changed')
           .trigger(this, { soc })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger luna2000_soc_changed failed:', err.message));
       }
 
       if (this._prevChargingState !== null && chargingState !== this._prevChargingState) {
         this.homey.flow
           .getDeviceTriggerCard('luna2000_charging_state_changed')
           .trigger(this, { state: chargingState })
-          .catch(() => {});
+          .catch((err) => this.log('Flow trigger luna2000_charging_state_changed failed:', err.message));
         if (chargingState === 'charging') {
           this.homey.flow.getDeviceTriggerCard('luna2000_charging_started')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger luna2000_charging_started failed:', err.message));
         } else if (chargingState === 'discharging') {
           this.homey.flow.getDeviceTriggerCard('luna2000_discharging_started')
-            .trigger(this, {}).catch(() => {});
+            .trigger(this, {}).catch((err) => this.log('Flow trigger luna2000_discharging_started failed:', err.message));
         }
       }
       this._prevChargingState = chargingState;

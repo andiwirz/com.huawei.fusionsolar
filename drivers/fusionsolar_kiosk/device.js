@@ -111,12 +111,12 @@ class FusionSolarKioskDevice extends Device {
       await this.homey.flow
         .getDeviceTriggerCard('power_changed')
         .trigger(this, { power: kpi.realTimePower })
-        .catch(() => {});
+        .catch((err) => this.log('Flow trigger power_changed failed:', err.message));
 
       await this.homey.flow
         .getDeviceTriggerCard('daily_energy_updated')
         .trigger(this, { daily_energy: kpi.dailyEnergy })
-        .catch(() => {});
+        .catch((err) => this.log('Flow trigger daily_energy_updated failed:', err.message));
 
       if (!this.getAvailable()) await this.setAvailable();
 

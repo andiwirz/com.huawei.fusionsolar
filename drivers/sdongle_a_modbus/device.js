@@ -113,7 +113,7 @@ class SdonglaAModbusDevice extends Device {
       if (!isSdonglaADataValid(data)) {
         this._failureCount += 1;
         if (this._failureCount >= 3) {
-          await this.setUnavailable(this.homey.__('modbus.errors.sdonglaNotDetected'));
+          await this.setUnavailable(this.homey.__('modbus.errors.sdongleANotDetected'));
         }
         this._fetchInProgress = false;
         return;

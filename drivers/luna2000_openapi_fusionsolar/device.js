@@ -136,7 +136,7 @@ class FusionSolarBatteryDevice extends Device {
       await this.homey.flow
         .getDeviceTriggerCard('openapi_battery_soc_changed')
         .trigger(this, { soc })
-        .catch(() => {});
+        .catch((err) => this.log('Flow trigger openapi_battery_soc_changed failed:', err.message));
     }
 
     const IDLE_THRESHOLD_W = 50;
@@ -149,7 +149,7 @@ class FusionSolarBatteryDevice extends Device {
       await this.homey.flow
         .getDeviceTriggerCard('openapi_battery_charging_state_changed')
         .trigger(this, { state: chargingState })
-        .catch(() => {});
+        .catch((err) => this.log('Flow trigger openapi_battery_charging_state_changed failed:', err.message));
     }
     this._prevChargingState = chargingState;
   }

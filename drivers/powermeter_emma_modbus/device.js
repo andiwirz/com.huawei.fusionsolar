@@ -154,10 +154,10 @@ class PowerMeterEmmaModbusDevice extends Device {
         const isExporting = gridPower < 0;
         if (isExporting && !this._prevExporting) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_grid_export_started')
-            .trigger(this, { power: Math.abs(gridPower) }).catch(() => {});
+            .trigger(this, { power: Math.abs(gridPower) }).catch((err) => this.log('Flow trigger dtsu666_grid_export_started failed:', err.message));
         } else if (!isExporting && this._prevExporting) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_grid_import_started')
-            .trigger(this, { power: gridPower }).catch(() => {});
+            .trigger(this, { power: gridPower }).catch((err) => this.log('Flow trigger dtsu666_grid_import_started failed:', err.message));
         }
       }
       if (gridPower !== null) this._prevExporting = gridPower < 0;

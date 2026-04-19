@@ -32,7 +32,7 @@
         "batteryNotDetected": "No LUNA2000 battery detected. Please check the IP address and Modbus unit ID.",
         "meterNotDetected": "No DTSU666 power meter detected. Please check the IP address and Modbus unit ID.",
         "inverterNotDetected": "No SUN2000 inverter detected via EMMA. Please check the IP address and Modbus unit ID.",
-        "sdonglaNotDetected": "No SDongle A detected. Please check the IP address and Modbus unit ID."
+        "sdongleANotDetected": "No SDongle A detected. Please check the IP address and Modbus unit ID."
       }
     },
     "errors": {
@@ -42,7 +42,7 @@
       "meterNotDetected": "DTSU666 power meter not detected.",
       "chargerNotDetected": "Smart Charger not detected.",
       "emmaNotDetected": "EMMA module not detected.",
-      "sdonglaNotDetected": "SDongle A not detected."
+      "sdongleANotDetected": "SDongle A not detected."
     }
   }
 }
