@@ -82,5 +82,8 @@
   },
   "1.1.12": {
     "en": "App failed to install on Homey Pro (Early 2019) with error incompatible_app_runtime_nodejs. Root cause was the \"runtime\": \"nodejs\" field in the app manifest, which is misinterpreted by the 2019 firmware as an unsupported runtime requirement. Removed the field — Node.js is the default runtime for SDK 3 apps and no explicit declaration is needed."
+  },
+  "1.1.13": {
+    "en": "new driver: SDongle A (modbus)"
   }
 }

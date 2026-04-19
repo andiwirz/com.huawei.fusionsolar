@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "compatibility": ">=12.4.5",
   "sdk": 3,
   "platforms": [
@@ -81,6 +81,18 @@
       "uiComponent": "sensor",
       "insights": false,
       "icon": "/assets/capabilities/dtsu666_meter_status.svg"
+    },
+    "sdongle_type": {
+      "type": "string",
+      "title": {
+        "en": "Connection Type",
+        "de": "Verbindungstyp"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": false,
+      "icon": "/assets/capabilities/sdongle_type.svg"
     },
     "smartcharger_rated_power": {
       "type": "number",
@@ -2741,6 +2753,140 @@
           "hint": {
             "en": "How often to fetch data. Huawei caches data for ~30 minutes.",
             "de": "Wie oft Daten abgerufen werden. Huawei cached Daten ~30 Minuten."
+          }
+        }
+      ]
+    },
+    {
+      "id": "sdongle_a_modbus",
+      "name": {
+        "en": "SDongle A (Modbus)",
+        "de": "SDongle A (Modbus)"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "capabilities": [
+        "measure_power",
+        "measure_power.solar",
+        "measure_power.grid_active_power",
+        "measure_power.battery",
+        "measure_power.active_power",
+        "sdongle_type"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "House Consumption",
+            "de": "Verbrauchsleistung"
+          },
+          "insights": true
+        },
+        "measure_power.solar": {
+          "title": {
+            "en": "Solar Input Power",
+            "de": "PV-Eingangsleistung"
+          },
+          "insights": true
+        },
+        "measure_power.grid_active_power": {
+          "title": {
+            "en": "Grid Power",
+            "de": "Netzleistung"
+          },
+          "insights": true
+        },
+        "measure_power.battery": {
+          "title": {
+            "en": "Battery Power",
+            "de": "Batterieleistung"
+          },
+          "insights": true
+        },
+        "measure_power.active_power": {
+          "title": {
+            "en": "Total Active Power",
+            "de": "Gesamte Wirkleistung"
+          },
+          "insights": true
+        }
+      },
+      "images": {
+        "small": "/drivers/sdongle_a_modbus/assets/images/small.png",
+        "large": "/drivers/sdongle_a_modbus/assets/images/large.png",
+        "xlarge": "/drivers/sdongle_a_modbus/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "start"
+        }
+      ],
+      "settings": [
+        {
+          "id": "address",
+          "type": "text",
+          "label": {
+            "en": "IP Address",
+            "de": "IP-Adresse"
+          },
+          "value": "",
+          "hint": {
+            "en": "IP address of the Huawei SDongle A.",
+            "de": "IP-Adresse des Huawei SDongle A."
+          },
+          "highlight": true
+        },
+        {
+          "id": "port",
+          "type": "number",
+          "label": {
+            "en": "Modbus Port",
+            "de": "Modbus Port"
+          },
+          "value": 502,
+          "min": 1,
+          "max": 65535,
+          "hint": {
+            "en": "Default 502. SDongle A alternatively uses 6607.",
+            "de": "Standard 502. SDongle A alternativ 6607."
+          }
+        },
+        {
+          "id": "modbus_id",
+          "type": "number",
+          "label": {
+            "en": "Modbus Unit ID",
+            "de": "Modbus Geräte-ID"
+          },
+          "value": 100,
+          "min": 0,
+          "max": 247,
+          "hint": {
+            "en": "Default: 100. Older firmware may use 0.",
+            "de": "Standard: 100. Ältere Firmware verwendet möglicherweise 0."
+          }
+        },
+        {
+          "id": "poll_interval",
+          "type": "number",
+          "label": {
+            "en": "Update Interval",
+            "de": "Aktualisierungsintervall"
+          },
+          "units": {
+            "en": "seconds",
+            "de": "Sekunden"
+          },
+          "value": 60,
+          "min": 10,
+          "max": 300,
+          "hint": {
+            "en": "How often to read data from the SDongle A.",
+            "de": "Wie oft Daten vom SDongle A abgerufen werden."
           }
         }
       ]
