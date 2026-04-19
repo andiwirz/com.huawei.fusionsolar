@@ -15,12 +15,14 @@
       "defaultName": "SUN2000 Omvormer (Modbus)",
       "errors": {
         "noAddress": "Voer een IP-adres in.",
-        "connectionFailed": "Verbinding mislukt"
+        "connectionFailed": "Verbinding mislukt",
+        "sdonglaNotDetected": "Geen SDongle A gedetecteerd. Controleer het IP-adres en Modbus-eenheid ID."
       }
     },
     "errors": {
       "noAddress": "Geen IP-adres geconfigureerd. Controleer de apparaatinstellingen.",
-      "fetchFailed": "Modbus-uitlezing mislukt"
+      "fetchFailed": "Modbus-uitlezing mislukt",
+      "sdonglaNotDetected": "SDongle A niet gedetecteerd."
     }
   }
 }
