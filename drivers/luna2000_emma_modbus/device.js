@@ -292,6 +292,8 @@ class LUNA2000EmmaModbusDevice extends Device {
           this.homey.flow.getDeviceTriggerCard('luna2000_discharging_started')
             .trigger(this, {}).catch((err) => this.log('Flow trigger luna2000_discharging_started failed:', err.message));
         }
+        this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${this.homey.__(`modbus.battery.state.${chargingState}`)}` })
+          .catch((err) => this.log('Timeline notification failed:', err.message));
       }
       this._prevChargingState = chargingState;
 

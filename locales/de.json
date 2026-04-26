@@ -43,6 +43,13 @@
       "chargerNotDetected": "Smart Charger nicht erkannt.",
       "emmaNotDetected": "EMMA Modul nicht erkannt.",
       "sdongleANotDetected": "SDongle A nicht erkannt."
+    },
+    "battery": {
+      "state": {
+        "charging": "Lädt",
+        "discharging": "Entlädt",
+        "idle": "Bereit"
+      }
     }
   }
 }

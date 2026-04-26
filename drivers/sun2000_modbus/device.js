@@ -301,6 +301,8 @@ class SUN2000ModbusDevice extends Device {
         if (this._prevDeviceStatus !== null && label !== this._prevDeviceStatus) {
           this.homey.flow.getDeviceTriggerCard('sun2000_status_changed')
             .trigger(this, { status: label }, { status: label }).catch((err) => this.log('Flow trigger sun2000_status_changed failed:', err.message));
+          this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${label}` })
+            .catch((err) => this.log('Timeline notification failed:', err.message));
         }
         this._prevDeviceStatus = label;
       }

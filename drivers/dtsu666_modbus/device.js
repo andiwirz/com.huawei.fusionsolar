@@ -141,6 +141,8 @@ class DTSU666ModbusDevice extends Device {
         if (this._prevMeterStatus !== null && meterLabel !== this._prevMeterStatus) {
           this.homey.flow.getDeviceTriggerCard('dtsu666_meter_status_changed')
             .trigger(this, { status: meterLabel }, { status: meterLabel }).catch((err) => this.log('Flow trigger dtsu666_meter_status_changed failed:', err.message));
+          this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${meterLabel}` })
+            .catch((err) => this.log('Timeline notification failed:', err.message));
         }
         this._prevMeterStatus = meterLabel;
       }
