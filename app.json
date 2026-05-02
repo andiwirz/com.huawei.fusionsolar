@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "compatibility": ">=12.4.5",
   "sdk": 3,
   "platforms": [
@@ -4534,6 +4534,74 @@
       }
     ],
     "conditions": [
+      {
+        "id": "sun2000_power_above_for",
+        "title": {
+          "en": "Solar power is !{{above|not above}} value for duration",
+          "de": "Solarleistung !{{länger als|nicht länger als}} X Minuten über Wert"
+        },
+        "titleFormatted": {
+          "en": "Solar power is !{{above|not above}} [[power]] W for [[duration]] min",
+          "de": "Solarleistung !{{länger als|nicht länger als}} [[duration]] Min über [[power]] W"
+        },
+        "hint": {
+          "en": "True when solar power has been continuously above the specified wattage for at least the given number of minutes.",
+          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer überschreitet."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=sun2000_modbus||driver_id=sun2000_emma_modbus||driver_id=sun2000_openapi_fusionsolar"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": { "en": "Power (W)", "de": "Leistung (W)" },
+            "placeholder": { "en": "e.g. 1000", "de": "z.B. 1000" }
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "title": { "en": "Duration (min)", "de": "Dauer (Min)" },
+            "placeholder": { "en": "e.g. 10", "de": "z.B. 10" }
+          }
+        ]
+      },
+      {
+        "id": "sun2000_power_below_for",
+        "title": {
+          "en": "Solar power is !{{below|not below}} value for duration",
+          "de": "Solarleistung !{{länger als|nicht länger als}} X Minuten unter Wert"
+        },
+        "titleFormatted": {
+          "en": "Solar power is !{{below|not below}} [[power]] W for [[duration]] min",
+          "de": "Solarleistung !{{länger als|nicht länger als}} [[duration]] Min unter [[power]] W"
+        },
+        "hint": {
+          "en": "True when solar power has been continuously below the specified wattage for at least the given number of minutes.",
+          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer unterschreitet."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=sun2000_modbus||driver_id=sun2000_emma_modbus||driver_id=sun2000_openapi_fusionsolar"
+          },
+          {
+            "type": "number",
+            "name": "power",
+            "title": { "en": "Power (W)", "de": "Leistung (W)" },
+            "placeholder": { "en": "e.g. 100", "de": "z.B. 100" }
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "title": { "en": "Duration (min)", "de": "Dauer (Min)" },
+            "placeholder": { "en": "e.g. 10", "de": "z.B. 10" }
+          }
+        ]
+      },
       {
         "id": "luna2000_is_charging",
         "title": {

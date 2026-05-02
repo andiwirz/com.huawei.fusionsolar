@@ -91,5 +91,8 @@
   },
   "1.1.15": {
     "en": "Timeline notifications on status changes for LUNA2000 (battery status), SUN2000 (inverter status) and DTSU666 (meter status)"
+  },
+  "1.1.16": {
+    "en": "New flow triggers for all SUN2000 devices: solar power above/below a value for a specified duration (minutes)"
   }
 }

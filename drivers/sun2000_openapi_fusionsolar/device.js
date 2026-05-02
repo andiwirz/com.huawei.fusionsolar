@@ -83,7 +83,9 @@ class FusionSolarInverterDevice extends Device {
 
   async onInit() {
     this.log(`Inverter device initialised: ${this.getName()}`);
+    this._powerHistory = [];
     await this._ensureCapabilities();
+    this._registerPowerThresholdListeners();
     this.homey.app.getCoordinator().register(this);
   }
 
@@ -166,10 +168,35 @@ class FusionSolarInverterDevice extends Device {
     }
 
     const powerW = activePowerW ?? 0;
+    this._trackPower(powerW);
     await this.homey.flow
       .getDeviceTriggerCard('openapi_power_changed')
       .trigger(this, { power: powerW })
       .catch((err) => this.log('Flow trigger openapi_power_changed failed:', err.message));
+  }
+
+  // ─── Power threshold triggers ──────────────────────────────────────────────
+
+  _registerPowerThresholdListeners() {
+    const makeListener = (above) => (args) => {
+      const durationMs = (args.duration || 1) * 60000;
+      const cutoff     = Date.now() - durationMs;
+      const history    = args.device._powerHistory || [];
+      const recent     = history.filter((e) => e.t >= cutoff);
+      const hasOlder   = history.some((e) => e.t < cutoff);
+      if (!hasOlder || recent.length === 0) return false;
+      return above ? recent.every((e) => e.p > args.power)
+                   : recent.every((e) => e.p < args.power);
+    };
+    this.homey.flow.getConditionCard('sun2000_power_above_for').registerRunListener(makeListener(true));
+    this.homey.flow.getConditionCard('sun2000_power_below_for').registerRunListener(makeListener(false));
+  }
+
+  _trackPower(power) {
+    const now = Date.now();
+    this._powerHistory.push({ t: now, p: power });
+    const cutoff = now - 7200000; // keep 2 hours
+    this._powerHistory = this._powerHistory.filter((e) => e.t >= cutoff);
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
