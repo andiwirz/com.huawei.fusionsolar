@@ -42,29 +42,47 @@ module.exports = {
     const pmEmma      = getDevice(homey, 'powermeter_emma_modbus');
     const luna        = getDevice(homey, 'luna2000_modbus');
     const lunaEmma    = getDevice(homey, 'luna2000_emma_modbus');
+    // FusionSolar OpenAPI: local sources first, cloud after. The grid counters live under
+    // different capability names there — meter_power is the import total and
+    // meter_power.exported the export total — so each device is read by its own name
+    // rather than assuming one shape.
+    const sunOa       = getDevice(homey, 'sun2000_openapi_fusionsolar');
+    const pmOa        = getDevice(homey, 'powermeter_openapi_fusionsolar');
+    const lunaOa      = getDevice(homey, 'luna2000_openapi_fusionsolar');
 
     // PV today
     const pvTodayKwh = cap(sun2000, 'meter_power.daily', null)
                     ?? cap(sun2000emma, 'meter_power.pv_daily', null)
-                    ?? cap(sun2000emma, 'meter_power.daily', null);
+                    ?? cap(sun2000emma, 'meter_power.daily', null)
+                    ?? cap(sunOa, 'meter_power.inv_daily', null);
 
     // Grid export today: prefer sun2000 cumulative delta, fall back to EMMA inverter or EMMA meter
+    //
+    // The order here is load-bearing beyond this file: app.js takes its midnight snapshot
+    // from the SAME chain, and a baseline read from one meter against a live value from
+    // another gives a nonsense delta. Change one, change both.
     const rawExport = cap(sun2000, 'meter_power.grid_export', null)
-                   ?? cap(sun2000emma, 'meter_power.grid_export', null);
+                   ?? cap(sun2000emma, 'meter_power.grid_export', null)
+                   ?? cap(pmOa, 'meter_power.exported', null)
+                   ?? cap(sunOa, 'meter_power.exported', null);
     let gridExportKwh = dailyDelta(homey, rawExport, 'eb_grid_export_baseline')
                      ?? cap(pmEmma, 'meter_power.exported_today', null);
 
     // Grid import today: prefer sun2000 cumulative delta, fall back to EMMA inverter or EMMA meter
     const rawImport = cap(sun2000, 'meter_power.grid_import', null)
-                   ?? cap(sun2000emma, 'meter_power.grid_import', null);
+                   ?? cap(sun2000emma, 'meter_power.grid_import', null)
+                   ?? cap(pmOa, 'meter_power', null)
+                   ?? cap(sunOa, 'meter_power', null);
     let gridImportKwh = dailyDelta(homey, rawImport, 'eb_grid_import_baseline')
                      ?? cap(pmEmma, 'meter_power.imported_today', null);
 
     // Battery today
     const battChargedKwh    = cap(luna, 'meter_power.today_batt_input',  null)
-                           ?? cap(lunaEmma, 'meter_power.today_batt_input',  null);
+                           ?? cap(lunaEmma, 'meter_power.today_batt_input',  null)
+                           ?? cap(lunaOa, 'meter_power.today_batt_input',  null);
     const battDischargedKwh = cap(luna, 'meter_power.today_batt_output', null)
-                           ?? cap(lunaEmma, 'meter_power.today_batt_output', null);
+                           ?? cap(lunaEmma, 'meter_power.today_batt_output', null)
+                           ?? cap(lunaOa, 'meter_power.today_batt_output', null);
 
     // Self-consumption: PV energy used on-site (not exported)
     let selfConsumptionPct = null;

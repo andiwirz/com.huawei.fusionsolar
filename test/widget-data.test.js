@@ -203,3 +203,57 @@ test('a chain falls through an unreachable device to a reachable one', () => {
   assert.strictEqual(getPowerData(homey).pvPower, 3100,
     'the unreachable inverter still won the chain, hiding the one that is answering');
 });
+
+// ─── FusionSolar OpenAPI plants ─────────────────────────────────────────────
+//
+// A plant reached only through the FusionSolar cloud — no Modbus, no EMMA gateway. The
+// three OpenAPI drivers were named in none of the chains above, so getPowerData returned
+// nothing but nulls and the solar-flow and traffic-light widgets drew em dashes throughout.
+// Asserted on the returned numbers rather than on the lookups: keeping the getDevice call
+// and dropping the device from the chain leaves the widget just as blind.
+
+// A plant that owns exactly the drivers listed. Anything else throws, as a real Homey does
+// for a driver with nothing paired.
+function plantWith(table) {
+  return {
+    drivers: {
+      getDriver(id) {
+        if (!(id in table)) throw new Error('no such driver: ' + id);
+        const values = table[id];
+        return { getDevices: () => [{ getCapabilityValue: (c) => (c in values ? values[c] : null) }] };
+      },
+    },
+  };
+}
+
+test('a FusionSolar OpenAPI plant gets real figures, not dashes', () => {
+  const d = getPowerData(plantWith({
+    sun2000_openapi_fusionsolar:    { measure_power: 3753 },   // PV, since 1.2.200 the MPPT figure
+    powermeter_openapi_fusionsolar: { measure_power: 74 },     // grid, positive = import
+    luna2000_openapi_fusionsolar:   { measure_power: -510, measure_battery: 47 },
+  }));
+  assert.strictEqual(d.pvPower, 3753, 'the OpenAPI inverter is not in the PV chain');
+  assert.strictEqual(d.gridPower, 74, 'the OpenAPI meter is not in the grid chain');
+  assert.strictEqual(d.batteryPower, -510, 'the OpenAPI battery is not in the power chain');
+  assert.strictEqual(d.batterySoc, 47, 'the OpenAPI battery is not in the state-of-charge chain');
+  // 3753 PV + 74 imported − (−510 discharging) = 4337 W of house load.
+  assert.strictEqual(d.housePower, 4337, 'the house balance cannot be derived for this plant');
+});
+
+// The grid meter on the Modbus side had the same gap, for a narrower reason: the SUN2000
+// mirrors the meter's reading, so only a plant with the meter and no Modbus inverter went
+// without.
+test('a plant with only a DTSU666 still reports grid power', () => {
+  const d = getPowerData(plantWith({ dtsu666_modbus: { measure_power: 1520 } }));
+  assert.strictEqual(d.gridPower, 1520, 'the DTSU666 is not in the grid chain');
+});
+
+// Local sources stay ahead of the cloud: Modbus is seconds old, the API minutes at best.
+test('a local reading still wins over the cloud', () => {
+  const d = getPowerData(plantWith({
+    sun2000_modbus:              { measure_power: 4000 },
+    sun2000_openapi_fusionsolar: { measure_power: 3753 },
+  }));
+  assert.strictEqual(d.pvPower, 4000,
+    'the cloud figure overtook the local one, which is minutes fresher');
+});

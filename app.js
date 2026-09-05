@@ -229,7 +229,7 @@ class FusionSolarApp extends App {
 
       const totalMin = Math.round(DELAYS_MS.reduce((a, b) => a + b, 0) / 60000);
       this.log(result.reason === 'no-source'
-        ? 'No baseline for today: no SUN2000 Modbus or EMMA device is paired, so there are no cumulative grid counters to snapshot'
+        ? 'No baseline for today: no inverter or grid meter is paired that carries cumulative grid counters, so there is nothing to snapshot'
         : `No baseline for today: the grid counters were still unread after ${totalMin} min — the energy-balance widget's daily delta will be off until tomorrow`);
     }, DELAYS_MS[attempt]);
   }
@@ -250,17 +250,29 @@ class FusionSolarApp extends App {
       const today = this._todayStr();
       const sun2000     = this._getDevice('sun2000_modbus');
       const sun2000emma = this._getDevice('sun2000_emma_modbus');
-      if (!sun2000 && !sun2000emma) return { written, reason: 'no-source' };
+      const pmOa        = this._getDevice('powermeter_openapi_fusionsolar');
+      const sunOa       = this._getDevice('sun2000_openapi_fusionsolar');
+      if (!sun2000 && !sun2000emma && !pmOa && !sunOa) return { written, reason: 'no-source' };
 
       // Cumulative grid counters — MUST use the same source priority as the
-      // energy-balance widget's rawExport/rawImport (sun2000 → sun2000emma),
-      // otherwise baseline and live value come from different meters and the
-      // daily delta is wrong. The EMMA power meter needs no baseline: it has
-      // native daily counters the widget falls back to directly.
+      // energy-balance widget's rawExport/rawImport (sun2000 → sun2000emma →
+      // powermeter OpenAPI → sun2000 OpenAPI), otherwise baseline and live value
+      // come from different meters and the daily delta is wrong. The EMMA power
+      // meter needs no baseline: it has native daily counters the widget falls
+      // back to directly.
+      //
+      // The OpenAPI pair names these counters differently — meter_power is the import
+      // total and meter_power.exported the export total — so each is read by its own
+      // name. Reading meter_power from the OpenAPI inverter as an EXPORT figure would
+      // silently baseline the import counter against the export one.
       const gridExport = this._cap(sun2000, 'meter_power.grid_export')
-                      ?? this._cap(sun2000emma, 'meter_power.grid_export');
+                      ?? this._cap(sun2000emma, 'meter_power.grid_export')
+                      ?? this._cap(pmOa, 'meter_power.exported')
+                      ?? this._cap(sunOa, 'meter_power.exported');
       const gridImport = this._cap(sun2000, 'meter_power.grid_import')
-                      ?? this._cap(sun2000emma, 'meter_power.grid_import');
+                      ?? this._cap(sun2000emma, 'meter_power.grid_import')
+                      ?? this._cap(pmOa, 'meter_power')
+                      ?? this._cap(sunOa, 'meter_power');
 
       if (gridExport !== null) {
         this.homey.settings.set('eb_grid_export_baseline', { date: today, baseline: gridExport });

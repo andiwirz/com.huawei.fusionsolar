@@ -117,15 +117,25 @@ test('_ensureTodayBaseline — nothing is announced before the attempt', () => {
   assert.strictEqual(app.timers.length, 0, 'a completed baseline must not schedule a retry');
 });
 
+// All four sources absent, not just the two Modbus ones: the chain grew to include the
+// FusionSolar OpenAPI meter and inverter, and a test that leaves those out would be
+// checking a plant that still has somewhere to read from.
 test('_ensureTodayBaseline — with no source device it says so once and does not retry', () => {
-  const app = makeApp({ devices: { sun2000_modbus: null, sun2000_emma_modbus: null } });
+  const app = makeApp({
+    devices: {
+      sun2000_modbus: null,
+      sun2000_emma_modbus: null,
+      powermeter_openapi_fusionsolar: null,
+      sun2000_openapi_fusionsolar: null,
+    },
+  });
   app._ensureTodayBaseline();
   fire(app);
 
   assert.strictEqual(app.timers.length, 0, 'retrying cannot make a missing device appear');
   const line = app.logs.find((l) => l.includes('No baseline for today'));
   assert.ok(line, 'the outcome is not reported at all');
-  assert.match(line, /no SUN2000 Modbus or EMMA device is paired/,
+  assert.match(line, /no inverter or grid meter is paired/,
     'the reason given is not the real one');
   assert.ok(!/writing initial baseline/.test(line), 'it still claims to be writing something');
 });
