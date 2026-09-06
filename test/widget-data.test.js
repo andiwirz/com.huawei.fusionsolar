@@ -168,20 +168,63 @@ test('an unreachable device contributes no live reading', () => {
   assert.strictEqual(cap(live, 'measure_power'), 2300, 'a reachable device still reports');
 });
 
-// Running totals are the deliberate exception: "charged 8.4 kWh today" stays true about
-// today when the battery goes quiet, while "discharging at 2.3 kW" stops being true the
+// Lifetime totals are the deliberate exception: 1107.62 kWh lifetime stays the best known
+// answer while the device is quiet, whereas "discharging at 2.3 kW" stops being true the
 // moment the readings stop.
-test('running totals survive an unreachable device', () => {
+test('lifetime totals survive an unreachable device', () => {
   const dead = fakeDevice({
     'meter_power': 1107.62,
-    'meter_power.today_batt_input': 8.4,
+    'meter_power.exported': 913.4,
+    'meter_power.charged': 2698.81,
     'measure_power': 2300,
   }, { available: false });
   assert.strictEqual(cap(dead, 'meter_power'), 1107.62,
     'the lifetime total was withheld, which throws away a figure that is not stale');
-  assert.strictEqual(cap(dead, 'meter_power.today_batt_input'), 8.4);
+  assert.strictEqual(cap(dead, 'meter_power.exported'), 913.4);
+  assert.strictEqual(cap(dead, 'meter_power.charged'), 2698.81);
   assert.strictEqual(cap(dead, 'measure_power'), null,
     'the live reading came through alongside the totals');
+});
+
+// A counter that resets at midnight is not a running total in that sense. Once a device has
+// been offline across one, its last value describes a different day — and the widget draws
+// it in the place today's figure belongs. Reported in #28: a battery that answers the
+// FusionSolar API only intermittently kept contributing a charged-today figure while
+// unavailable.
+test("a day-scoped total does not survive, because it stops meaning today", () => {
+  // Held in its own object, not read back off the stand-in: fakeDevice does not expose the
+  // values it was given, so a loop over the device would iterate nothing and pass empty.
+  const DAY_VALUES = {
+    'meter_power.today_batt_input': 8.4,
+    'meter_power.today_batt_output': 4.3,
+    'meter_power.daily': 23.4,
+    'meter_power.pv_daily': 23.4,
+    'meter_power.inv_daily': 19.5,
+    'meter_power.consumption_today': 26.6,
+    'meter_power.exported_today': 0.1,
+    'meter_power.imported_today': 7.3,
+  };
+  const ids = Object.keys(DAY_VALUES);
+  assert.strictEqual(ids.length, 8, 'the fixture lost entries, so this test checks less than it reads');
+
+  const dead = fakeDevice(DAY_VALUES, { available: false });
+  const live = fakeDevice(DAY_VALUES, { available: true });
+  for (const id of ids) {
+    assert.strictEqual(cap(dead, id), null, `${id} was drawn as today's figure`);
+    assert.strictEqual(cap(live, id), DAY_VALUES[id],
+      `${id} is withheld from a device Homey can reach, which blanks a healthy widget`);
+  }
+});
+
+// The same capability from a device Homey can reach is a current reading, and withholding
+// it would blank half the energy-balance widget on every healthy installation.
+test('a day-scoped total from a reachable device comes through', () => {
+  const live = fakeDevice({
+    'meter_power.today_batt_input': 8.4,
+    'meter_power.daily': 23.4,
+  }, { available: true });
+  assert.strictEqual(cap(live, 'meter_power.today_batt_input'), 8.4);
+  assert.strictEqual(cap(live, 'meter_power.daily'), 23.4);
 });
 
 // The fallback chains get better as a side effect: an unreachable first choice no longer
