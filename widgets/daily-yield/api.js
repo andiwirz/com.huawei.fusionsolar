@@ -22,8 +22,12 @@ module.exports = {
     const sunOa       = getDevice(homey, 'sun2000_openapi_fusionsolar');
     const kiosk       = getDevice(homey, 'fusionsolar_kiosk');
 
+    // meter_power.pv_daily is the station's PV production; inv_daily is the inverter's AC
+    // output, which on a hybrid excludes everything that went into the battery. See #28 and
+    // the arithmetic in the OpenAPI inverter driver. inv_daily remains the fallback.
     const dailyKwh        = cap(sun2000,     'meter_power.daily', null)
                          ?? cap(sun2000emma, 'meter_power.daily', null)
+                         ?? cap(sunOa,       'meter_power.pv_daily', null)
                          ?? cap(sunOa,       'meter_power.inv_daily', null)
                          ?? cap(kiosk,       'meter_power.daily', null);
     const totalKwh        = cap(sun2000,     'meter_power', null)

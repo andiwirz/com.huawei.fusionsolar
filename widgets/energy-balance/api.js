@@ -51,10 +51,16 @@ module.exports = {
     const pmOa        = getDevice(homey, 'powermeter_openapi_fusionsolar');
     const lunaOa      = getDevice(homey, 'luna2000_openapi_fusionsolar');
 
-    // PV today
+    // PV today. On the OpenAPI inverter the station figure comes first: meter_power.daily
+    // holds the PV production, meter_power.inv_daily only the inverter's AC output, and on
+    // a hybrid the difference is whatever went into the battery — the gap reported in #28.
+    // inv_daily stays behind it for a plant whose station summary carries no daily figure.
+    // The EMMA inverter names the same quantity meter_power.pv_daily, which is why the
+    // OpenAPI one now uses that name too.
     const pvTodayKwh = cap(sun2000, 'meter_power.daily', null)
                     ?? cap(sun2000emma, 'meter_power.pv_daily', null)
                     ?? cap(sun2000emma, 'meter_power.daily', null)
+                    ?? cap(sunOa, 'meter_power.pv_daily', null)
                     ?? cap(sunOa, 'meter_power.inv_daily', null);
 
     // Grid export today: prefer sun2000 cumulative delta, fall back to EMMA inverter or EMMA meter

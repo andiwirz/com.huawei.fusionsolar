@@ -120,8 +120,30 @@ class FusionSolarInverterDevice extends Device {
   getDevTypes() { return [DEV_TYPE_INVERTER, DEV_TYPE_RESIDENTIAL_INVERTER, DEV_TYPE_METER, DEV_TYPE_POWER_SENSOR]; }
 
   async onPollData({ stationKpi, kpiByType }) {
-    // Station-level KPI
-    // stationKpi retained for future use
+    // Today's PV production, from the station summary rather than from the inverter.
+    //
+    // The inverter's own day_cap is its AC output, and on a hybrid the battery hangs on the
+    // DC bus in front of that — so everything charged into the battery never crosses the
+    // meter day_cap counts and is missing from it. Reported in issue #28: FusionSolar said
+    // 2.03 kWh produced while day_cap said 1.43 kWh, at a moment when 1.94 kW of 2.45 kW of
+    // PV was going into the battery.
+    //
+    // A capture from a plant that runs Modbus and cloud side by side settles which figure
+    // is which, to a hundredth of a kWh:
+    //
+    //   day_cap 24.79 + charge_cap 13.12 - discharge_cap 4.53 = 33.38   day_power 33.37
+    //
+    // and the same capture's house total falls out of it:
+    //
+    //   33.37 - 8.59 (battery, net) - 4.53 (exported) = 20.25           day_use_energy 20.30
+    //
+    // So day_power is the generation and day_cap is what the inverter delivered. This is
+    // read before the inverter block below, which returns early when a station reports no
+    // inverter device: the station figure does not depend on one.
+    //
+    // Zero is a real reading here — it is what the counter says at midnight and all night —
+    // so only null counts as absent.
+    await this._setOptional('meter_power.pv_daily', stationKpi?.dailyEnergy ?? null);
 
 
     // Inverter device KPI (type 1 = string inverter, type 38 = residential inverter)
@@ -266,6 +288,14 @@ class FusionSolarInverterDevice extends Device {
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
+
+  // Adds a capability the first time a usable value arrives, then writes it. A plant whose
+  // API never sends the field keeps a tile without a permanently empty row.
+  async _setOptional(capability, value) {
+    if (value === null || value === undefined) return;
+    if (!this.hasCapability(capability)) await this.addCapability(capability).catch(() => {});
+    await this._set(capability, value);
+  }
 
   async _ensureCapabilities() {
     for (const cap of DEPRECATED_CAPABILITIES) {
