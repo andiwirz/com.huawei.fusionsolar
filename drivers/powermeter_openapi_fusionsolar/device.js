@@ -20,8 +20,11 @@ const DEV_TYPE_POWER_SENSOR = 47; // Power sensor
 //             sensor branch maps those the other way round. Verified against one owner's
 //             FusionSolar lifetime totals (issue #25): active_cap 5298.26 kWh against a
 //             portal import of 5.31 MWh, reverse_active_cap 912.84 kWh against an export
-//             of 917.61 kWh. Whether the power sensor's opposite mapping is right for its
-//             own hardware is untested here, so it is left exactly as it was.
+//             of 917.61 kWh. The power sensor's opposite mapping has since been measured
+//             too, on a plant carrying this device and a Modbus DTSU666 side by side: its
+//             reverse_active_cap read 23167.8 kWh against the DTSU666's identical import
+//             total. Both mappings are right — the two device types simply disagree, and
+//             the sign of active_power follows the same split (see the type 47 branch).
 const DEV_TYPE_EMMA         = 23070;
 
 const REQUIRED_CAPABILITIES = [
@@ -101,6 +104,10 @@ class FusionSolarMeterDevice extends Device {
       const vals = maps.map((m) => num(m[key])).filter((v) => v !== null);
       return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
     };
+    // Huawei's power sensor and grid meter count feed-in as positive; this device's
+    // measure_power counts import as positive. EMMA is not affected — it has its own
+    // branch and, as the header note explains, its own convention.
+    const negate = (v) => (v === null ? null : -v);
 
     // EMMA (type 23070) — checked first: where one exists it IS the grid connection point,
     // and such an installation carries no type 17 or 47 to fall back to anyway.
@@ -146,8 +153,21 @@ class FusionSolarMeterDevice extends Device {
     // Power sensor (type 47) — preferred, full data set
     const psMaps = kpiByType[DEV_TYPE_POWER_SENSOR] || [];
     if (psMaps.length) {
-      // active_power: positive = import, negative = export
-      const activePower = sumW(psMaps, 'active_power');
+      // Negated. The comment here used to claim active_power was positive on import; the
+      // two lines below already said otherwise, mapping active_cap to the EXPORT total.
+      //
+      // Measured 2026-09-06 on a plant carrying this device and a Modbus DTSU666 at once:
+      // within the same minute the DTSU666 read -4631 W ("Export") and this device +4650 W
+      // ("Import"), while the SDongle put 7031 W of PV against 2402 W of house load — the
+      // house was exporting. The cumulative counters agreed to the decimal (23167.8 kWh of
+      // import on both), which is what pins the fault to the sign alone rather than to the
+      // import/export assignment.
+      //
+      // Left uncorrected it inverted the grid figure for every cloud-only plant: Homey
+      // Energy reads this device's measure_power as the whole home's draw (energy
+      // .cumulative is true), the widgets derive house load as pv + grid, and the EMS reads
+      // surplus as max(0, -grid) — so an exporting house showed no surplus at all.
+      const activePower = negate(sumW(psMaps, 'active_power'));
       await this._set('measure_power', activePower);
       if (activePower !== null) {
         const gridWatts = Math.round(Math.abs(activePower));
@@ -169,9 +189,9 @@ class FusionSolarMeterDevice extends Device {
       await this._set('measure_current.meter_i', avg(psMaps, 'meter_i'));
       await this._set('measure_current.b_i',     avg(psMaps, 'b_i'));
       await this._set('measure_current.c_i',     avg(psMaps, 'c_i'));
-      await this._set('measure_power.phase1',    sumW(psMaps, 'active_power_a'));
-      await this._set('measure_power.phase2',    sumW(psMaps, 'active_power_b'));
-      await this._set('measure_power.phase3',    sumW(psMaps, 'active_power_c'));
+      await this._set('measure_power.phase1',    negate(sumW(psMaps, 'active_power_a')));
+      await this._set('measure_power.phase2',    negate(sumW(psMaps, 'active_power_b')));
+      await this._set('measure_power.phase3',    negate(sumW(psMaps, 'active_power_c')));
       await this._set('measure_frequency',       avg(psMaps, 'grid_frequency'));
 
       return;
@@ -180,7 +200,11 @@ class FusionSolarMeterDevice extends Device {
     // Grid meter (type 17) — fallback: active_power only
     const meterMaps = kpiByType[DEV_TYPE_METER] || [];
     if (meterMaps.length) {
-      const activePower = sumW(meterMaps, 'active_power');
+      // Negated on the same grounds as type 47, though nobody here owns a type 17 to
+      // measure: the SUN2000 driver already reads both types through one mapping for the
+      // energy counters, so a type 17 that disagreed about direction would have been
+      // reporting its lifetime totals backwards all along.
+      const activePower = negate(sumW(meterMaps, 'active_power'));
       await this._set('measure_power', activePower);
       if (activePower !== null) {
         const gridWatts = Math.round(Math.abs(activePower));

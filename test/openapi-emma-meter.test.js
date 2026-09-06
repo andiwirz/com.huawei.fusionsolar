@@ -116,12 +116,16 @@ test('no frequency capability is added — EMMA does not report one', async () =
   assert.ok(d.caps.has('measure_power.phase1'), 'the phases it does report were added');
 });
 
-// The power sensor keeps its own unit and its own direction. Its mapping is untested
-// against real hardware here, and an installation using it works today — harmonising the
-// two by hand is exactly the change these tests exist to catch.
-test('the power-sensor branch is left exactly as it was', async () => {
+// The power sensor keeps its own unit and its own counter direction. Only the SIGN of
+// active_power has since been brought into line with EMMA's, and only because it was
+// finally measured against a Modbus DTSU666 on one house — see openapi-grid-sign.test.js
+// for that capture. The unit and the swapped counters remain genuinely different between
+// the two device types, and harmonising those by hand is what this still guards.
+test('the power-sensor branch keeps its own unit and its own counter direction', async () => {
   const d = await poll({ 47: [{ active_power: -1319, active_cap: 10, reverse_active_cap: 20 }] });
-  assert.strictEqual(d.values['measure_power'], -1319, 'still read as watts');
+  assert.strictEqual(d.values['measure_power'], 1319,
+    'read in kW like EMMA this would be 1319000 W — the magnitude is the unit, the sign is '
+    + 'the 1.2.212 fix');
   assert.strictEqual(d.values['meter_power'], 20, 'still reverse_active_cap');
   assert.strictEqual(d.values['meter_power.exported'], 10, 'still active_cap');
 });

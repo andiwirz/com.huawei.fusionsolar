@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.211",
+  "version": "1.2.212",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4399,8 +4399,8 @@
         "measure_current.pv1",
         "measure_current.pv2",
         "measure_power.grid_active_power",
-        "meter_power.exported",
-        "meter_power"
+        "meter_power.grid_export",
+        "meter_power.grid_import"
       ],
       "capabilitiesOptions": {
         "measure_power.grid_active_power": {
@@ -4411,7 +4411,7 @@
           },
           "insights": true
         },
-        "meter_power": {
+        "meter_power.grid_import": {
           "title": {
             "en": "Grid Import",
             "de": "Netzbezug gesamt",
@@ -4419,7 +4419,7 @@
           },
           "insights": true
         },
-        "meter_power.exported": {
+        "meter_power.grid_export": {
           "title": {
             "en": "Grid Export",
             "de": "Netzeinspeisung gesamt",
@@ -4721,6 +4721,21 @@
             "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
             "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
             "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+          }
+        },
+        {
+          "id": "enable_timeline_notifications",
+          "type": "checkbox",
+          "label": {
+            "en": "Timeline notifications",
+            "de": "Timeline-Benachrichtigungen",
+            "nl": "Tijdlijnmeldingen"
+          },
+          "value": true,
+          "hint": {
+            "en": "Show a timeline notification when the inverter status changes.",
+            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Inverterstatus ändert.",
+            "nl": "Toont een tijdlijnmelding wanneer de inverterstatus verandert."
           }
         }
       ]
@@ -5067,6 +5082,21 @@
             "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
             "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
             "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+          }
+        },
+        {
+          "id": "enable_timeline_notifications",
+          "type": "checkbox",
+          "label": {
+            "en": "Timeline notifications",
+            "de": "Timeline-Benachrichtigungen",
+            "nl": "Tijdlijnmeldingen"
+          },
+          "value": true,
+          "hint": {
+            "en": "Show a timeline notification when the battery status changes.",
+            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
+            "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
           }
         }
       ]

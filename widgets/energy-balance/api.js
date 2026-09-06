@@ -43,9 +43,10 @@ module.exports = {
     const luna        = getDevice(homey, 'luna2000_modbus');
     const lunaEmma    = getDevice(homey, 'luna2000_emma_modbus');
     // FusionSolar OpenAPI: local sources first, cloud after. The grid counters live under
-    // different capability names there — meter_power is the import total and
-    // meter_power.exported the export total — so each device is read by its own name
-    // rather than assuming one shape.
+    // their own names on the meter — meter_power is the import total and
+    // meter_power.exported the export total, as on the DTSU666 — while the OpenAPI
+    // inverter carries the grid_import / grid_export pair its Modbus twin uses. Each
+    // device is read by its own name rather than assuming one shape.
     const sunOa       = getDevice(homey, 'sun2000_openapi_fusionsolar');
     const pmOa        = getDevice(homey, 'powermeter_openapi_fusionsolar');
     const lunaOa      = getDevice(homey, 'luna2000_openapi_fusionsolar');
@@ -64,7 +65,7 @@ module.exports = {
     const rawExport = cap(sun2000, 'meter_power.grid_export', null)
                    ?? cap(sun2000emma, 'meter_power.grid_export', null)
                    ?? cap(pmOa, 'meter_power.exported', null)
-                   ?? cap(sunOa, 'meter_power.exported', null);
+                   ?? cap(sunOa, 'meter_power.grid_export', null);
     let gridExportKwh = dailyDelta(homey, rawExport, 'eb_grid_export_baseline')
                      ?? cap(pmEmma, 'meter_power.exported_today', null);
 
@@ -72,7 +73,7 @@ module.exports = {
     const rawImport = cap(sun2000, 'meter_power.grid_import', null)
                    ?? cap(sun2000emma, 'meter_power.grid_import', null)
                    ?? cap(pmOa, 'meter_power', null)
-                   ?? cap(sunOa, 'meter_power', null);
+                   ?? cap(sunOa, 'meter_power.grid_import', null);
     let gridImportKwh = dailyDelta(homey, rawImport, 'eb_grid_import_baseline')
                      ?? cap(pmEmma, 'meter_power.imported_today', null);
 

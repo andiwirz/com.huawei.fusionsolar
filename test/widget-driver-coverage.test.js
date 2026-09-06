@@ -69,9 +69,13 @@ test('the FusionSolar OpenAPI drivers are in the chains', () => {
   }
 });
 
-// The OpenAPI inverter's plain meter_power is the GRID IMPORT total, while the Modbus one's
-// is production. Reading the OpenAPI device the way the Modbus one is read would draw a
-// house's grid consumption as its solar yield — a wrong number, not a missing one.
+// The OpenAPI inverter's plain meter_power WAS the GRID IMPORT total, while the Modbus
+// one's is production. Reading the OpenAPI device the way the Modbus one is read would
+// draw a house's grid consumption as its solar yield — a wrong number, not a missing one.
+//
+// 1.2.212 removed the trap at its source: that counter is now meter_power.grid_import, the
+// name its Modbus twin uses, and the driver has no plain meter_power left to confuse. The
+// assertion stays because it costs nothing and the confusion cost a release to find.
 test('the OpenAPI inverter yield is read from its own counters, not from meter_power', () => {
   const src = fs.readFileSync(path.join(ROOT, 'widgets', 'daily-yield', 'api.js'), 'utf8');
   assert.match(src, /cap\(sunOa,\s+'meter_power\.inv_daily'/,

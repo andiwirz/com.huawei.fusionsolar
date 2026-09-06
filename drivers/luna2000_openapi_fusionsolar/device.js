@@ -18,7 +18,6 @@ const EXTRA_CAPABILITIES = [
   'measure_power.dischargesetting', // max discharge power (W)
   'meter_power.today_batt_input',   // charged today (kWh)
   'meter_power.today_batt_output',  // discharged today (kWh)
-  'measure_battery.soh',            // battery state of health (%)
   'openapi_battery_status',         // running state string
   'openapi_battery_mode',           // charge/discharge mode string
   'measure_voltage.battery',        // battery bus voltage (V)
@@ -66,6 +65,7 @@ class FusionSolarBatteryDevice extends Device {
     this._prevSoc            = null;
     this._prevChargingState  = null;
     this._prevBatteryMode    = null;
+    this._prevBatteryStatus  = null;
     await this._ensureCapabilities();
     this._registerConditionListeners();
     this.homey.app.getCoordinator().register(this);
@@ -140,7 +140,24 @@ class FusionSolarBatteryDevice extends Device {
     await this._set('meter_power.today_batt_input',   sumKwh('charge_cap'));
     await this._set('meter_power.today_batt_output',  sumKwh('discharge_cap'));
 
-    await this._set('measure_battery.soh',            avg('battery_soh'));
+    // Huawei sends battery_soh as 0 on plants that publish no state of health, and 0 %
+    // health reads as a battery at the end of its life rather than as a figure nobody
+    // sent. The power meter driver already refuses to add EMMA's missing frequency for
+    // the same reason: a row that can never be filled is worse than no row.
+    //
+    // A plant that once reported a real value keeps it if the field later goes quiet —
+    // that is how _set treats every other missing field — so the capability is only
+    // dropped while it has never held anything usable. Nothing here can flap.
+    const soh = avg('battery_soh');
+    if (soh !== null && soh > 0) {
+      if (!this.hasCapability('measure_battery.soh')) {
+        await this.addCapability('measure_battery.soh').catch(() => {});
+      }
+      await this._set('measure_battery.soh', soh);
+    } else if (this.hasCapability('measure_battery.soh')
+               && !(this.getCapabilityValue('measure_battery.soh') > 0)) {
+      await this.removeCapability('measure_battery.soh').catch(() => {});
+    }
     await this._set('measure_voltage.battery',       avg('busbar_u'));
     await this._set('meter_power.charged',           sumKwh('total_charged_energy'));
     await this._set('meter_power.discharged',        sumKwh('total_discharged_energy'));
@@ -152,7 +169,17 @@ class FusionSolarBatteryDevice extends Device {
 
     const battStatusVal = num(maps[0].battery_status);
     if (battStatusVal !== null) {
-      await this._set('openapi_battery_status', BATTERY_STATUS_MAP[battStatusVal] ?? `State ${battStatusVal}`);
+      const statusLabel = BATTERY_STATUS_MAP[battStatusVal] ?? `State ${battStatusVal}`;
+      await this._set('openapi_battery_status', statusLabel);
+      // Announced the way luna2000_modbus announces its unit status. The first reading
+      // after a restart is not a change, so nothing is posted until the battery actually
+      // moves between Running, Standby, Faulty and the rest.
+      if (this._prevBatteryStatus !== null && statusLabel !== this._prevBatteryStatus
+          && this.getSetting('enable_timeline_notifications') !== false) {
+        this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${statusLabel}` })
+          .catch((err) => this.log('Timeline notification failed:', err.message));
+      }
+      this._prevBatteryStatus = statusLabel;
     }
 
     // battery_state_string — same logic as luna2000_modbus

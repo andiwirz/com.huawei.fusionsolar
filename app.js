@@ -261,18 +261,19 @@ class FusionSolarApp extends App {
       // meter needs no baseline: it has native daily counters the widget falls
       // back to directly.
       //
-      // The OpenAPI pair names these counters differently — meter_power is the import
-      // total and meter_power.exported the export total — so each is read by its own
-      // name. Reading meter_power from the OpenAPI inverter as an EXPORT figure would
+      // The OpenAPI METER still names these meter_power / meter_power.exported, the way
+      // the DTSU666 does; the OpenAPI INVERTER was renamed in 1.2.212 to the grid_import /
+      // grid_export pair its Modbus twin uses. Each device is therefore read by its own
+      // name — reading a plain meter_power off the inverter as an EXPORT figure would
       // silently baseline the import counter against the export one.
       const gridExport = this._cap(sun2000, 'meter_power.grid_export')
                       ?? this._cap(sun2000emma, 'meter_power.grid_export')
                       ?? this._cap(pmOa, 'meter_power.exported')
-                      ?? this._cap(sunOa, 'meter_power.exported');
+                      ?? this._cap(sunOa, 'meter_power.grid_export');
       const gridImport = this._cap(sun2000, 'meter_power.grid_import')
                       ?? this._cap(sun2000emma, 'meter_power.grid_import')
                       ?? this._cap(pmOa, 'meter_power')
-                      ?? this._cap(sunOa, 'meter_power');
+                      ?? this._cap(sunOa, 'meter_power.grid_import');
 
       if (gridExport !== null) {
         this.homey.settings.set('eb_grid_export_baseline', { date: today, baseline: gridExport });

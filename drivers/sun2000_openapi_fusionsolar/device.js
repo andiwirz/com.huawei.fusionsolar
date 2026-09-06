@@ -16,8 +16,10 @@ const REQUIRED_CAPABILITIES = [
   'meter_power.inv_total',        // inverter total yield (kWh)
   'meter_power.inv_daily',        // inverter daily yield (kWh)
   'measure_power.grid_active_power', // grid active power (W) — Netzwirkleistung
-  'meter_power',                     // grid accumulated import energy (kWh) — Netzimport
-  'meter_power.exported',            // grid accumulated export energy (kWh) — Netzexport
+  // Named exactly as sun2000_modbus names them, so the two inverters are read the same way
+  // everywhere. See DEPRECATED_CAPABILITIES for what they used to be called and why.
+  'meter_power.grid_import',         // grid accumulated import energy (kWh) — Netzimport
+  'meter_power.grid_export',         // grid accumulated export energy (kWh) — Netzexport
 ];
 
 const EXTRA_CAPABILITIES = [
@@ -46,6 +48,14 @@ const DEPRECATED_CAPABILITIES = [
   'measure_current.b_i',
   'measure_current.c_i',
   'openapi_active_power_control',
+  // Renamed to meter_power.grid_import / meter_power.grid_export in 1.2.212. This driver's
+  // class is solarpanel, and on a solarpanel Homey reads plain meter_power as generated
+  // energy — while here it held the grid IMPORT total: tens of MWh of household
+  // consumption filed under the name reserved for yield. Only energy
+  // .meterPowerExportedCapability pointing at meter_power.inv_total kept it out of the
+  // Energy figures, one manifest line standing between a counter and the wrong meaning.
+  'meter_power',
+  'meter_power.exported',
 ];
 
 // OpenAPI inverter_state values (different from Modbus register 32089!)
@@ -83,6 +93,7 @@ class FusionSolarInverterDevice extends Device {
   async onInit() {
     this.log(`Inverter device initialised: ${this.getName()}`);
     this._powerHistory = [];
+    this._prevDeviceStatus = null;
     await this._ensureCapabilities();
     this._registerPowerThresholdListeners();
     this.homey.app.getCoordinator().register(this);
@@ -187,7 +198,17 @@ class FusionSolarInverterDevice extends Device {
     const stateVal = maps[0]?.inverter_state;
     if (stateVal !== undefined && stateVal !== null) {
       const stateNum = parseInt(stateVal, 10);
-      await this._set('huawei_status', INVERTER_STATE_MAP[stateNum] ?? `State ${stateNum}`);
+      const label = INVERTER_STATE_MAP[stateNum] ?? `State ${stateNum}`;
+      await this._set('huawei_status', label);
+      // Announced the way sun2000_modbus announces it. The first reading after a restart
+      // is not a change, so _prevDeviceStatus starting at null keeps the timeline quiet
+      // until the inverter actually does something different.
+      if (this._prevDeviceStatus !== null && label !== this._prevDeviceStatus
+          && this.getSetting('enable_timeline_notifications') !== false) {
+        this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${label}` })
+          .catch((err) => this.log('Timeline notification failed:', err.message));
+      }
+      this._prevDeviceStatus = label;
     }
 
     // Grid import/export — from power sensor (type 47) or grid meter (type 17)
@@ -203,9 +224,13 @@ class FusionSolarInverterDevice extends Device {
         const vals = gridMaps.map((m) => { const n = parseFloat(m[key]); return Number.isFinite(n) ? n : null; }).filter((v) => v !== null);
         return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
       };
-      await this._set('measure_power.grid_active_power', sumWGrid('active_power'));
-      await this._set('meter_power',          sumKwhGrid('reverse_active_cap'));
-      await this._set('meter_power.exported', sumKwhGrid('active_cap'));
+      // Same negation, same reason, same measurement as the power meter driver: Huawei
+      // counts feed-in as positive here, Homey counts import as positive. This device
+      // mirrors the meter's reading, so it carried the identical fault.
+      const negateW = (v) => (v === null ? null : -v);
+      await this._set('measure_power.grid_active_power', negateW(sumWGrid('active_power')));
+      await this._set('meter_power.grid_import', sumKwhGrid('reverse_active_cap'));
+      await this._set('meter_power.grid_export', sumKwhGrid('active_cap'));
     }
 
     const powerW = activePowerW ?? 0;
