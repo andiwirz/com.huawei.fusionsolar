@@ -80,13 +80,21 @@ test("today's PV production is the station figure, not the inverter's AC output"
     'the AC figure disappeared instead of moving aside');
 });
 
-// The whole reason the two must not be confused: the gap is the battery, and on a day of
-// heavy charging it is a third of the production.
-test('the gap between the two counters is exactly the net battery charge', () => {
+// On this plant the gap between the two counters is the net battery charge, to a hundredth
+// of a kWh — which is what first showed that day_cap excludes what the battery absorbs.
+//
+// It is not a law, and this test does not claim it is one. A later capture from the plant
+// in #28 does not close the same way: there day_power − day_cap was 8.17 kWh while the
+// station's own house and export figures leave room for only 3.73, and its battery reported
+// nothing that day, so neither side can be checked. What the change rests on is narrower
+// and firmer: day_power is the figure FusionSolar shows as production, confirmed by that
+// owner at 23.37 kWh against 23.4 in the widget. This fixture stays as the reason the two
+// counters were ever told apart.
+test("on this plant the gap between the two counters is the net battery charge", () => {
   const netCharge = 13.12 - 4.53;
   assert.ok(Math.abs((INVERTER.day_cap + netCharge) - STATION.dailyEnergy) <= 0.02,
     `${INVERTER.day_cap} + ${netCharge} is not ${STATION.dailyEnergy} — the fixture no longer `
-    + 'shows the relationship this change rests on');
+    + 'shows the relationship that first told the two counters apart');
 });
 
 test('a station that reports no daily figure gets no row and keeps the AC counter', async () => {
@@ -160,14 +168,62 @@ test('the daily-yield widget uses the same order', () => {
   assert.match(c, /cap\(kiosk,\s+'meter_power\.daily'/, 'the kiosk fallback was dropped');
 });
 
-// Lifetime is deliberately untouched: on the reporting plant the inverter's lifetime counter
-// and the plant's differ by far more than the battery accounts for, and nothing here can say
-// why. Changing it on a guess would replace a known gap with an unknown one.
-test('the lifetime total is left on the inverter counter', () => {
+// Lifetime was deliberately left on the inverter counter when this file was written,
+// because the gap between it and the plant's was unexplained and swapping on a guess would
+// have replaced a known gap with an unknown one. The reporter then explained it: the plant
+// record was created in July 2025 when the battery went in, the inverter has run since
+// 2022, and the plant's yearly breakdown adds up to its total exactly (2.44 + 5.23 = 7.67
+// MWh). Two true counters over two different periods — so the pairing was the fault, not
+// either number, and today and total now come from the same summary.
+test('today and the lifetime total come from the same period', async () => {
+  const d = await poll(fakeInverter());
+  assert.strictEqual(d.values['meter_power.pv_total'], 46019.45,
+    "the station's lifetime production is not published");
+  assert.strictEqual(d.values['meter_power.inv_daily'], 24.79, 'the AC daily figure was dropped');
+  assert.strictEqual(d.values['meter_power.inv_total'], 47413.21,
+    "the inverter's own lifetime counter was dropped rather than moved aside");
+
   const c = chain(read('widgets', 'daily-yield', 'api.js'), 'const totalKwh');
-  assert.match(c, /cap\(sunOa,\s+'meter_power\.inv_total'/);
-  assert.doesNotMatch(c, /pv_total|totalEnergy/,
-    'the lifetime figure was switched to a counter whose disagreement is unexplained');
+  before(c, "sunOa,       'meter_power.pv_total'", "sunOa,       'meter_power.inv_total'",
+    'the widget still pairs a station day with an inverter lifetime');
+});
+
+// Homey reads the energy block's target from the capabilities array, not from whatever the
+// driver happens to write, so a runtime-added capability there is a reference to nothing.
+test("Homey Energy is pointed at the generation figure, and can actually read it", () => {
+  const app = require(path.join('..', 'app.json'));
+  const oa   = app.drivers.find((d) => d.id === 'sun2000_openapi_fusionsolar');
+  const emma = app.drivers.find((d) => d.id === 'sun2000_emma_modbus');
+  assert.strictEqual(oa.energy.meterPowerExportedCapability, 'meter_power.pv_total',
+    "Homey's Solar panels figure is the inverter's AC output again");
+  assert.strictEqual(oa.energy.meterPowerExportedCapability,
+    emma.energy.meterPowerExportedCapability,
+    'the EMMA and OpenAPI inverters disagree about what solar generation is');
+  assert.ok(oa.capabilities.includes('meter_power.pv_total'),
+    'the energy block points at a capability the manifest does not declare');
+  assert.ok(oa.capabilities.includes('meter_power.inv_total'),
+    "the inverter's own lifetime counter was removed from the device");
+});
+
+// A station that reports no lifetime figure must not lose its total altogether.
+test('the inverter counter is still the fallback where no station total exists', async () => {
+  const d = await poll(fakeInverter(), { station: { dailyEnergy: 33.37, totalEnergy: null } });
+  assert.ok(!('meter_power.pv_total' in d.values));
+  assert.strictEqual(d.values['meter_power.inv_total'], 47413.21);
+  const c = chain(read('widgets', 'daily-yield', 'api.js'), 'const totalKwh');
+  assert.match(c, /cap\(sunOa,\s+'meter_power\.inv_total'/, 'the fallback was removed');
+});
+
+// The same split on the EMMA inverter: its meter_power is the AC yield and its
+// meter_power.pv_total the PV production. energy-balance already preferred the PV figures;
+// the yield widget did not, so two widgets could disagree about one house.
+test('both widgets ask the EMMA inverter for its PV figures first', () => {
+  const dy = chain(read('widgets', 'daily-yield', 'api.js'), 'const dailyKwh');
+  before(dy, "sun2000emma, 'meter_power.pv_daily'", "sun2000emma, 'meter_power.daily'",
+    'the yield widget reads the AC counter while energy-balance reads the PV one');
+  const tot = chain(read('widgets', 'daily-yield', 'api.js'), 'const totalKwh');
+  before(tot, "sun2000emma, 'meter_power.pv_total'", "sun2000emma, 'meter_power'",
+    'the same mismatch one line down, on the lifetime figure');
 });
 
 test('the manifest titles the new capability the way the EMMA inverter titles it', () => {

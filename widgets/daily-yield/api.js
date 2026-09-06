@@ -26,12 +26,20 @@ module.exports = {
     // output, which on a hybrid excludes everything that went into the battery. See #28 and
     // the arithmetic in the OpenAPI inverter driver. inv_daily remains the fallback.
     const dailyKwh        = cap(sun2000,     'meter_power.daily', null)
+                         ?? cap(sun2000emma, 'meter_power.pv_daily', null)
                          ?? cap(sun2000emma, 'meter_power.daily', null)
                          ?? cap(sunOa,       'meter_power.pv_daily', null)
                          ?? cap(sunOa,       'meter_power.inv_daily', null)
                          ?? cap(kiosk,       'meter_power.daily', null);
+    // Total from the same source as today's figure above, wherever there is one. The
+    // OpenAPI pair used to mix periods — a station daily figure beside the inverter's own
+    // lifetime counter — and the EMMA pair mixed quantities the same way, since its
+    // meter_power is the inverter yield and meter_power.pv_total the PV production. Both
+    // inverters' own counters stay as fallbacks and stay on their devices.
     const totalKwh        = cap(sun2000,     'meter_power', null)
+                         ?? cap(sun2000emma, 'meter_power.pv_total', null)
                          ?? cap(sun2000emma, 'meter_power', null)
+                         ?? cap(sunOa,       'meter_power.pv_total', null)
                          ?? cap(sunOa,       'meter_power.inv_total', null)
                          ?? cap(kiosk,       'meter_power', null);
     const optimizerTotal  = cap(sun2000, 'optimizer_total_count', null);

@@ -16,6 +16,7 @@ const REQUIRED_CAPABILITIES = [
   'measure_temperature.invertor', // internal temperature (°C)
   'meter_power.inv_total',        // inverter total yield (kWh)
   'meter_power.inv_daily',        // inverter daily yield (kWh)
+  'meter_power.pv_total',         // station lifetime PV production (kWh) — Homey Energy reads this
   'measure_power.grid_active_power', // grid active power (W) — Netzwirkleistung
   // Named exactly as sun2000_modbus names them, so the two inverters are read the same way
   // everywhere. See DEPRECATED_CAPABILITIES for what they used to be called and why.
@@ -148,6 +149,24 @@ class FusionSolarInverterDevice extends Device {
     // Zero is a real reading here — it is what the counter says at midnight and all night —
     // so only null counts as absent.
     await this._setOptional('meter_power.pv_daily', stationKpi?.dailyEnergy ?? null);
+
+    // The lifetime figure that daily one is a slice of, from the same summary, so today and
+    // total finally cover the same period. They did not before: the yield widget paired a
+    // station daily figure with the inverter's own lifetime counter. On the plant in #28
+    // those read 7.67 MWh and 35.1 MWh — a plant record created in July 2025 against an
+    // inverter running since 2022, confirmed by its owner against the yearly breakdown
+    // (2.44 + 5.23 = 7.67). Both counters were right; only standing them side by side was
+    // wrong, because nothing relates a lifetime to a day drawn from a different lifetime.
+    //
+    // This is also what energy.meterPowerExportedCapability points at, which is how Homey's
+    // own Energy page stops showing the AC yield as solar generation. sun2000_emma_modbus
+    // has pointed at its meter_power.pv_total for the same reason; the two drivers simply
+    // disagreed until now.
+    //
+    // meter_power.inv_total keeps the inverter's own lifetime yield, under its own name.
+    // It is the genuine figure for the hardware and the only one that survives a plant
+    // record being recreated — which is exactly what happened on that plant in 2025.
+    await this._setOptional('meter_power.pv_total', stationKpi?.totalEnergy ?? null);
 
 
     // Inverter device KPI (type 1 = string inverter, type 38 = residential inverter)

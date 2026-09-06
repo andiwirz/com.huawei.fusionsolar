@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.215",
+  "version": "1.2.216",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4387,7 +4387,7 @@
       ],
       "connectivity": [],
       "energy": {
-        "meterPowerExportedCapability": "meter_power.inv_total"
+        "meterPowerExportedCapability": "meter_power.pv_total"
       },
       "capabilities": [
         "measure_power",
@@ -4396,6 +4396,7 @@
         "measure_temperature.invertor",
         "meter_power.inv_total",
         "meter_power.inv_daily",
+        "meter_power.pv_total",
         "measure_voltage.pv1",
         "measure_voltage.pv2",
         "measure_current.pv1",
@@ -4405,6 +4406,14 @@
         "meter_power.grid_import"
       ],
       "capabilitiesOptions": {
+        "meter_power.pv_total": {
+          "title": {
+            "en": "Total PV Energy",
+            "de": "PV Gesamtertrag",
+            "nl": "Totale PV-opbrengst"
+          },
+          "insights": true
+        },
         "meter_power.pv_daily": {
           "title": {
             "en": "PV Energy Today",

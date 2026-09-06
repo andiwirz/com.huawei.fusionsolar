@@ -97,3 +97,44 @@ test('battery power keeps the sign convention the field data confirmed', () => {
   assert.match(src, /_set\('measure_power',\s+battPowerW\)/,
     'measure_power is no longer the raw battery power, so its sign may have been flipped');
 });
+
+// Declaring a capability in the manifest is not the same as putting it on a device that was
+// paired before the declaration existed. Every driver here keeps its own list for that —
+// REQUIRED_CAPABILITIES, added on init, or EXTRA_CAPABILITIES, added on the first successful
+// fetch — and a capability in neither reaches existing installations only if Homey happens
+// to sync the manifest change. An energy block pointing at such a capability reads nothing
+// on exactly the devices that have been running longest.
+test('every energy-block capability is one its driver adds to already-paired devices', () => {
+  const FIELDS = [
+    'meterPowerImportedCapability', 'meterPowerExportedCapability',
+    'cumulativeImportedCapability', 'cumulativeExportedCapability',
+  ];
+  const listNames = ['REQUIRED_CAPABILITIES', 'EXTRA_CAPABILITIES'];
+
+  for (const d of APP.drivers) {
+    const targets = FIELDS.map((f) => (d.energy || {})[f]).filter(Boolean);
+    if (!targets.length) continue;
+
+    const file = path.join(__dirname, '..', 'drivers', d.id, 'device.js');
+    if (!fs.existsSync(file)) continue;
+    const src = fs.readFileSync(file, 'utf8');
+
+    // Only drivers that use this pattern at all; the rest manage capabilities differently.
+    const ensured = new Set();
+    let found = false;
+    for (const name of listNames) {
+      const from = src.indexOf(`const ${name} = [`);
+      if (from === -1) continue;
+      found = true;
+      const body = src.slice(from, src.indexOf('];', from));
+      for (const m of body.matchAll(/'([^']+)'/g)) ensured.add(m[1]);
+    }
+    if (!found) continue;
+
+    for (const cap of targets) {
+      assert.ok(ensured.has(cap),
+        `${d.id}.energy names "${cap}", but the driver never adds it to an existing device — `
+        + `put it in ${listNames.join(' or ')}`);
+    }
+  }
+});
