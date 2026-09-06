@@ -52,15 +52,30 @@ Connection via the Huawei FusionSolar Northbound API. Provides inverter, grid an
 | Solar power             | DC input power from PV strings (W)                                |
 | Active power            | AC output power (W)                                               |
 | Heat sink temperature   | Internal inverter temperature (°C)                                |
-| Total yield             | Cumulative total yield (kWh)                                      |
-| Daily yield             | Today's energy yield (kWh)                                        |
+| PV energy today         | Plant PV production today (kWh) — used by the widgets             |
+| Total PV energy         | Cumulative plant PV production (kWh) — used by Homey Energy       |
+| Total yield             | The inverter's own cumulative AC yield (kWh)                      |
+| Daily yield             | The inverter's own AC yield today (kWh)                           |
 | PV1 / PV2 voltage       | DC voltage of PV strings (V)                                      |
 | PV1 / PV2 current       | DC current of PV strings (A)                                      |
 | Grid active power       | Current: positive = import, negative = export (W)                 |
 | Total grid export       | Cumulative total energy exported to grid (kWh)                    |
 | Total grid import       | Cumulative total energy imported from grid (kWh)                  |
 
-> Grid values are sourced from the plant's Power Sensor (type 47) or Grid Meter (type 17).
+> **Production and yield are two different figures on a hybrid system.** The inverter's own
+> counters measure its AC output, and the battery sits on the DC bus in front of that — so
+> everything charged into the battery never crosses the point they measure. On one reported
+> installation, FusionSolar showed 2.03 kWh generated while the inverter's daily yield read
+> 1.43 kWh, with most of the PV going into the battery at that moment. The PV figures come
+> from the plant summary instead and match what FusionSolar displays; the inverter's own
+> counters remain available under their own names.
+>
+> The two also cover different periods where a FusionSolar plant record was created later
+> than the inverter was commissioned. One installation reads 7.67 MWh of plant production
+> against 35.1 MWh of inverter lifetime yield — both correct, four years apart.
+
+> Grid values are sourced from the plant's EMMA (type 23070) where one is present, otherwise
+> from its Power Sensor (type 47) or Grid Meter (type 17).
 
 ---
 
@@ -78,8 +93,18 @@ Connection via the Huawei FusionSolar Northbound API.
 | Max discharge power      | Configured maximum (W)                               |
 | Daily charged energy     | Energy charged today (kWh)                           |
 | Daily discharged energy  | Energy discharged today (kWh)                        |
-| State of health          | SoH in percent (%)                                   |
+| Total charged / discharged | Cumulative lifetime energy (kWh)                   |
+| Battery voltage          | DC bus voltage (V)                                   |
+| State of health          | SoH in percent (%) — see note                        |
+| Battery modules          | Number of modules reported by the plant              |
+| Battery Unit 1 / 2 installed | Whether each unit is fitted                      |
 | Battery status           | Operating state as text (e.g. Running, Standby)      |
+| Working mode             | Charge/discharge mode as text (read-only)            |
+
+> **State of health** is read from the per-module list the API returns, not from the flat
+> `battery_soh` field — that field reads 0 on plants that publish no health figure, and a
+> 0 % row states a scrap battery where none was reported. Where the modules do report, the
+> row shows their average; where nothing reports, there is no row at all.
 
 ---
 
@@ -95,6 +120,16 @@ Connection via the Huawei FusionSolar Northbound API. Registered as a P1 meter (
 | Phase A/B/C voltage     | Phase voltages (V) — dynamic                              |
 | Phase A/B/C current     | Phase currents (A) — dynamic                              |
 | Phase A/B/C power       | Phase power (W) — dynamic                                 |
+| Grid frequency          | Mains frequency (Hz) — power sensor only                  |
+| Meter status            | Normal / Offline, with an optional timeline notification  |
+| House consumption today | Plant-wide consumption today (kWh)                        |
+| Grid state indicator    | Text summary, e.g. "1319 W Export"                        |
+
+> Reads an EMMA (type 23070) where the plant has one, otherwise a Power Sensor (type 47) or
+> Grid Meter (type 17). The three differ in ways that fail silently if merged: EMMA reports
+> power in kilowatts and the power sensor in watts, their lifetime counters run the opposite
+> way round, and Huawei counts feed-in as positive on the power sensor and grid meter while
+> EMMA already matches Homey's direction. Each is read on its own terms.
 
 ---
 
@@ -569,6 +604,7 @@ The opposite direction is reported honestly too. What the EMS actually fires to 
 | System Code       | –                               | API password                                  |
 | Station Code      | –                               | Set automatically during pairing              |
 | Update interval   | 5 min                           | How often data is fetched (min. 1 min)        |
+| Timeline notifications | On                         | Announce inverter, battery or meter status changes (SUN2000, LUNA2000 and Power Meter) |
 
 > **Rate limiting:** Huawei may return HTTP 407 if polling too frequently. The default of 5 minutes is recommended. Values below 5 minutes may cause temporary data gaps.
 
@@ -652,7 +688,7 @@ These registers derate the inverter AC output directly and work without a DTSU66
 | Grid import started                      | Power Meter Modbus/EMMA         | `power` (W)                                          | Fires when switching from export to import                               |
 | Inverter status changed                  | Inverter SUN2000 Modbus         | `status`                                             | Fires when the inverter operating state changes (timeline notification)  |
 | Battery status changed                   | LUNA2000 Modbus                 | `status`                                             | Fires when the battery state changes (timeline notification)             |
-| Meter status changed                     | Power Meter DTSU666 Modbus      | `status`                                             | Fires when the meter state changes (timeline notification)               |
+| Meter status changed                     | Power Meter DTSU666 Modbus / OpenAPI | `status`                                        | Fires when the meter state changes (timeline notification)               |
 | Charging session started                 | Smart Charger (OCPP)            | `amps`, `phases`, `phase_label`, `message`           | Fires when a vehicle starts charging (power confirmed > 100 W)          |
 | Charging session stopped                 | Smart Charger (OCPP)            | `energy_wh`, `energy_formatted`, `duration`, `amps`, `phases`, `message` | Fires when a vehicle stops charging (StopTransaction received) |
 | Car plugged in, waiting                  | Smart Charger (OCPP)            | –                                                    | Fires when a car connects but auto-start is off or session is blocked    |
@@ -683,7 +719,7 @@ These registers derate the inverter AC output directly and work without a DTSU66
 | Max charge power is above threshold       | LUNA2000 Modbus                 | True when register 47075 (max charge power) is above the given W value. Use "NOT below 1 W" to check if the limit has already been zeroed. |
 | Max charge power is below threshold       | LUNA2000 Modbus                 | True when register 47075 (max charge power) is below the given W value. Threshold 1 checks whether the limit is already set to 0. |
 | Grid is exporting                         | Power Meter Modbus/EMMA/OpenAPI | True when the meter reports negative active power (surplus fed to grid)             |
-| Meter status is                           | Power Meter DTSU666 Modbus      | Checks the current meter online/offline status                                      |
+| Meter status is                           | Power Meter DTSU666 Modbus / OpenAPI | Checks the current meter online/offline status                                 |
 
 ### Actions
 
@@ -744,7 +780,7 @@ The app is fully configured for the Homey Energy Dashboard:
 | Device                          | Homey category        | Function                                                  |
 |---------------------------------|-----------------------|-----------------------------------------------------------|
 | Kiosk                           | Solar panel           | Total yield → Generated energy                            |
-| Inverter SUN2000 OpenAPI        | Solar panel           | Inverter total yield → Generated energy                   |
+| Inverter SUN2000 OpenAPI        | Solar panel           | Plant PV production → Generated energy                     |
 | Inverter SUN2000 Modbus         | Solar panel           | Total yield → Generated energy                            |
 | Inverter SUN2000 EMMA Modbus    | Solar panel           | Total yield → Generated energy                            |
 | iSitePower-M Solar              | Solar panel           | Total yield → Generated energy                            |
@@ -759,6 +795,12 @@ The app is fully configured for the Homey Energy Dashboard:
 | iSitePower-M Home               | Energy consumer       | Total home consumption (cumulative kWh)                   |
 
 All LUNA2000 and iSitePower-M Battery variants are declared with `"batteries": ["INTERNAL"]` so Homey correctly identifies them as built-in home batteries in the Energy Dashboard.
+
+> **Do not pair the Kiosk and an OpenAPI inverter into Energy at the same time.** Both are
+> solar-panel devices reporting the same plant production, so Homey would count it twice.
+> Exclude one of them under *Advanced settings → Exclude from Energy*. The same applies to
+> running the Modbus and OpenAPI devices for one installation side by side: two inverters,
+> two batteries and two cumulative meters all describing one house.
 
 ---
 
@@ -827,10 +869,13 @@ Daily energy totals shown as relative bars, plus self-consumption and self-suffi
 
 | Bar               | Source                                                                        |
 |-------------------|-------------------------------------------------------------------------------|
-| PV today          | `sun2000_modbus` → `meter_power.daily` (register 32114, resets at midnight)  |
+| PV today          | `sun2000_modbus` → `meter_power.daily` (register 32114, resets at midnight); on a cloud-only plant the FusionSolar plant summary |
 | Grid export today | `sun2000_modbus` → cumulative delta from midnight baseline                    |
 | Grid import today | `sun2000_modbus` → cumulative delta from midnight baseline                    |
-| House consumption | Calculated: self-consumed PV + grid import                                    |
+| House consumption | The plant summary's own daily total where there is one, otherwise calculated: self-consumed PV + grid import |
+
+Local sources come first everywhere: a Modbus or EMMA reading is seconds old and the cloud
+minutes at best, so the cloud is consulted only where nothing closer answers.
 
 > **Midnight baseline:** the app records the cumulative grid export/import counter at 00:00:05 each night. Daily values are derived as `current − baseline`. If the app was not running at midnight the baseline is written on the next start — retried after 1, 5 and 15 minutes, because ten seconds after start is a guess at how long an inverter needs for its first reading, and losing that race used to cost the whole day its baseline in silence. If the counters are still unread after that, the log says so instead. Installations with no SUN2000 Modbus or EMMA device have no cumulative counters to snapshot at all, and the log says that too rather than repeating that it is writing one. A hint is shown in the widget until the baseline is available.
 
@@ -863,7 +908,10 @@ Detailed battery state at a glance.
 At-a-glance summary of today's solar production.
 
 - **Today's yield** — large display in kWh (auto-scales to MWh above 1 000 kWh)
-- **Lifetime total** — cumulative yield since commissioning
+- **Lifetime total** — cumulative production. Both figures come from the same source and
+  cover the same period; on a cloud plant that is the FusionSolar plant record, which may
+  start later than the inverter itself. The inverter's own lifetime counter stays on the
+  device under its own name.
 - **Optimizer count** — online / total (shown only when optimizers are detected)
 - **CO₂ saved** — calculated from today's yield × emission factor
 - Updates every **10 seconds**
