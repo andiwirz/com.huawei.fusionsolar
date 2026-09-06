@@ -7,6 +7,7 @@ const DEV_TYPE_INVERTER             = 1;
 const DEV_TYPE_RESIDENTIAL_INVERTER = 38;
 const DEV_TYPE_METER                = 17; // Grid meter (DTSU666)
 const DEV_TYPE_POWER_SENSOR         = 47; // Power sensor
+const DEV_TYPE_EMMA                 = 23070; // EMMA-A02 energy manager
 
 const REQUIRED_CAPABILITIES = [
   'measure_power',                // PV generation (W) — the solar figure for Homey Energy
@@ -117,7 +118,10 @@ class FusionSolarInverterDevice extends Device {
 
   // ─── Coordinator interface ─────────────────────────────────────────────────
 
-  getDevTypes() { return [DEV_TYPE_INVERTER, DEV_TYPE_RESIDENTIAL_INVERTER, DEV_TYPE_METER, DEV_TYPE_POWER_SENSOR]; }
+  getDevTypes() {
+    return [DEV_TYPE_INVERTER, DEV_TYPE_RESIDENTIAL_INVERTER,
+      DEV_TYPE_METER, DEV_TYPE_POWER_SENSOR, DEV_TYPE_EMMA];
+  }
 
   async onPollData({ stationKpi, kpiByType }) {
     // Today's PV production, from the station summary rather than from the inverter.
@@ -233,26 +237,50 @@ class FusionSolarInverterDevice extends Device {
       this._prevDeviceStatus = label;
     }
 
-    // Grid import/export — from power sensor (type 47) or grid meter (type 17)
-    const gridMaps = (kpiByType[DEV_TYPE_POWER_SENSOR] || []).length
-      ? kpiByType[DEV_TYPE_POWER_SENSOR]
-      : (kpiByType[DEV_TYPE_METER] || []);
-    if (gridMaps.length) {
-      const sumWGrid   = (key) => {
-        const vals = gridMaps.map((m) => { const n = parseFloat(m[key]); return Number.isFinite(n) ? n : null; }).filter((v) => v !== null);
-        return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0)) : null;
-      };
-      const sumKwhGrid = (key) => {
-        const vals = gridMaps.map((m) => { const n = parseFloat(m[key]); return Number.isFinite(n) ? n : null; }).filter((v) => v !== null);
-        return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
-      };
-      // Same negation, same reason, same measurement as the power meter driver: Huawei
-      // counts feed-in as positive here, Homey counts import as positive. This device
-      // mirrors the meter's reading, so it carried the identical fault.
-      const negateW = (v) => (v === null ? null : -v);
-      await this._set('measure_power.grid_active_power', negateW(sumWGrid('active_power')));
-      await this._set('meter_power.grid_import', sumKwhGrid('reverse_active_cap'));
-      await this._set('meter_power.grid_export', sumKwhGrid('active_cap'));
+    // Grid import/export, mirrored from whichever device measures the grid connection.
+    //
+    // EMMA (23070) was missing from getDevTypes altogether, so on a plant where an EMMA is
+    // the connection point the coordinator never fetched that type for this device and all
+    // three capabilities stayed null for good. Reported in #28 with a Developer Tools
+    // capture that showed it plainly: the meter device full of readings, the inverter's
+    // three grid rows empty. Nothing filled in behind them either — an EMMA plant carries
+    // no type 17 or 47 to fall back on.
+    //
+    // It gets its own branch rather than being folded into the one below, because it
+    // differs in all three ways that matter here, and each of the three fails silently:
+    //
+    //   Unit       EMMA reports active_power in kW, the power sensor in watts.
+    //   Direction  EMMA's active_cap is the IMPORT total; the power sensor's is the export.
+    //   Sign       EMMA already counts import as positive; the other two count feed-in as
+    //              positive and are negated.
+    //
+    // drivers/powermeter_openapi_fusionsolar/device.js carries the measurement behind each
+    // of those. This is deliberately the same split, made the same way — see the test that
+    // holds the two drivers to the same answer.
+    const gridSum = (source, key, scale) => {
+      const vals = source
+        .map((m) => { const n = parseFloat(m[key]); return Number.isFinite(n) ? n : null; })
+        .filter((v) => v !== null);
+      if (!vals.length) return null;
+      const sum = vals.reduce((a, b) => a + b, 0);
+      return scale === undefined ? sum : Math.round(sum * scale);
+    };
+
+    const emmaMaps = kpiByType[DEV_TYPE_EMMA] || [];
+    if (emmaMaps.length) {
+      await this._set('measure_power.grid_active_power', gridSum(emmaMaps, 'active_power', 1000));
+      await this._set('meter_power.grid_import',  gridSum(emmaMaps, 'active_cap'));
+      await this._set('meter_power.grid_export',  gridSum(emmaMaps, 'reverse_active_cap'));
+    } else {
+      const gridMaps = (kpiByType[DEV_TYPE_POWER_SENSOR] || []).length
+        ? kpiByType[DEV_TYPE_POWER_SENSOR]
+        : (kpiByType[DEV_TYPE_METER] || []);
+      if (gridMaps.length) {
+        const watts = gridSum(gridMaps, 'active_power', 1);
+        await this._set('measure_power.grid_active_power', watts === null ? null : -watts);
+        await this._set('meter_power.grid_import',  gridSum(gridMaps, 'reverse_active_cap'));
+        await this._set('meter_power.grid_export',  gridSum(gridMaps, 'active_cap'));
+      }
     }
 
     const powerW = activePowerW ?? 0;
