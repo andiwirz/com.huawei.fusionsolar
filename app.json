@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.212",
+  "version": "1.2.213",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4767,6 +4767,30 @@
         "meter_power.discharged"
       ],
       "capabilitiesOptions": {
+        "measure_battery_modules": {
+          "title": {
+            "en": "Battery Modules",
+            "de": "Batteriemodule",
+            "nl": "Batterijmodules"
+          },
+          "uiComponent": null
+        },
+        "luna2000_unit1_installed": {
+          "title": {
+            "en": "Battery Unit 1 installed",
+            "de": "Batterie-Unit 1 installiert",
+            "nl": "Batterij-unit 1 aanwezig"
+          },
+          "uiComponent": null
+        },
+        "luna2000_unit2_installed": {
+          "title": {
+            "en": "Battery Unit 2 installed",
+            "de": "Batterie-Unit 2 installiert",
+            "nl": "Batterij-unit 2 aanwezig"
+          },
+          "uiComponent": null
+        },
         "measure_power": {
           "title": {
             "en": "Battery Power",
@@ -5124,6 +5148,14 @@
         "meter_power.exported"
       ],
       "capabilitiesOptions": {
+        "meter_power.consumption_today": {
+          "title": {
+            "en": "House Consumption Today",
+            "de": "Hausverbrauch heute",
+            "nl": "Huisverbruik vandaag"
+          },
+          "insights": true
+        },
         "measure_power": {
           "title": {
             "en": "Grid Active Power",
@@ -5427,6 +5459,21 @@
             "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
             "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
             "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+          }
+        },
+        {
+          "id": "enable_timeline_notifications",
+          "type": "checkbox",
+          "label": {
+            "en": "Timeline notifications",
+            "de": "Timeline-Benachrichtigungen",
+            "nl": "Tijdlijnmeldingen"
+          },
+          "value": true,
+          "hint": {
+            "en": "Show a timeline notification when the meter status changes.",
+            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Zählerstatus ändert.",
+            "nl": "Toont een tijdlijnmelding wanneer de meterstatus verandert."
           }
         }
       ]
@@ -7459,7 +7506,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=dtsu666_modbus"
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_openapi_fusionsolar"
           },
           {
             "type": "dropdown",
@@ -12712,7 +12759,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=dtsu666_modbus"
+            "filter": "driver_id=dtsu666_modbus||driver_id=powermeter_openapi_fusionsolar"
           },
           {
             "type": "dropdown",

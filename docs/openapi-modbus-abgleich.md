@@ -25,9 +25,29 @@ Zählern (`active_cap`/`reverse_active_cap` vertauscht), es gibt keine EMMA-Mess
 Vorzeichen auf Verdacht zu drehen macht aus einer richtigen Anzeige eine falsche. Ein Test
 hält den Zweig jetzt fest, damit die Negation nicht versehentlich hineinläuft.
 
+**Stand nach 1.2.213** — drei Felder, die in Abschnitt 4 fehlten, weil sie erst beim
+Durchgehen eines vollständigen API-Mitschnitts aufgefallen sind. Alle drei kamen in jeder
+Antwort an und wurden von niemandem gelesen:
+
+| Feld | Wird jetzt | Gegenstück |
+|---|---|---|
+| `battery_unit_info[].soh` | `measure_battery.soh` — **95 %**, gemittelt über die Module; `battery_soh` daneben steht auf 0 | Modbus hat gar keinen SoH |
+| `battery_unit_info` (Länge) | `measure_battery_modules`, `luna2000_unit1_installed`, `luna2000_unit2_installed` | Register 47000/47089, 47750–47755 |
+| `meter_status` (Typ 47 + 17) | `dtsu666_meter_status` — dieselbe Capability wie Modbus, damit die zwei Flow-Karten beide Zähler bedienen; dazu Timeline-Schalter | `dtsu666_meter_status` |
+| `stationKpi.day_use_energy` | `meter_power.consumption_today` am Zähler, vom Energiebilanz-Widget vor der eigenen Rechnung benutzt | EMMA-Zähler hat dasselbe |
+
+Damit ist die Begründung hinfällig, mit der 1.2.212 dem Zähler den Timeline-Schalter
+verweigert hat („nichts zu melden") — `meter_status` war die ganze Zeit da.
+
+Tests: `test/openapi-unread-fields.test.js`. Mutationsprobe 20/21; der überlebende Mutant
+ist äquivalent (`parseFloat("95.0%")` hört beim Prozentzeichen von selbst auf, das
+`.replace('%','')` ist Absicherung, keine Bedingung).
+
 Alles Übrige aus Abschnitt 4 und 7 steht weiterhin offen — insbesondere B2/B3/B6 (der
 Ertrag auf die blanke `meter_power`, mit der Migration und dem Insights-Verlust), C1/C2,
-D1, A3 und A4.
+D1, A3 und A4. Ungenutzt bleiben ausserdem `rated_capacity`, `mppt_1_cap`/`mppt_2_cap`
+(Lebensdauer-Ertrag je String), die AC-Phasenwerte des Wechselrichters, `power_factor`,
+`reactive_power` und die Anlagenerträge in Geld.
 
 ---
 

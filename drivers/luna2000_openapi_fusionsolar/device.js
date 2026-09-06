@@ -66,6 +66,7 @@ class FusionSolarBatteryDevice extends Device {
     this._prevChargingState  = null;
     this._prevBatteryMode    = null;
     this._prevBatteryStatus  = null;
+    this._prevUnitInfo       = null;
     await this._ensureCapabilities();
     this._registerConditionListeners();
     this.homey.app.getCoordinator().register(this);
@@ -140,6 +141,39 @@ class FusionSolarBatteryDevice extends Device {
     await this._set('meter_power.today_batt_input',   sumKwh('charge_cap'));
     await this._set('meter_power.today_batt_output',  sumKwh('discharge_cap'));
 
+    // battery_unit_info is a nested object rather than a number, so it survives none of
+    // the numeric helpers above and had never been read:
+    //
+    //   "battery_soh": 0,
+    //   "battery_unit_info": { "unit1": [ { "sn": "LS21C7410010", "soh": "95.0%" },
+    //                                     { "sn": "UB2210010034", "soh": "95.0%" },
+    //                                     { "sn": "UB2210010566", "soh": "95.0%" } ],
+    //                          "unit2": [], "unit3": [], "unit4": [] }
+    //
+    // The flat battery_soh is 0 on this plant while the modules underneath report 95 %.
+    // So the health figure exists; it is simply not in the field named after it. The
+    // module list also gives the three things the Modbus driver reads from registers
+    // 47000/47089 and 47750-47755, which is why they carry the Modbus capability names.
+    const units = ['unit1', 'unit2', 'unit3', 'unit4'];
+    const unitInfo = maps.map((m) => m.battery_unit_info).filter((u) => u && typeof u === 'object');
+    const modulesIn = (key) => unitInfo.reduce(
+      (n, u) => n + (Array.isArray(u[key]) ? u[key].length : 0), 0);
+    const moduleSohs = unitInfo.flatMap(
+      (u) => units.flatMap((k) => (Array.isArray(u[k]) ? u[k] : [])),
+    ).map((mod) => num(String(mod?.soh ?? '').replace('%', ''))).filter((v) => v !== null && v > 0);
+
+    if (unitInfo.length) {
+      const total = units.reduce((n, k) => n + modulesIn(k), 0);
+      await this._setOptional('measure_battery_modules', total > 0 ? total : null);
+      await this._setOptional('luna2000_unit1_installed', modulesIn('unit1') > 0);
+      await this._setOptional('luna2000_unit2_installed', modulesIn('unit2') > 0);
+    }
+
+    // Averaged across the modules, the way every other multi-source figure in this driver
+    // is averaged. The pack's health is what the capability means; a single weak module
+    // moves the average, which is visible, rather than being hidden behind a pack-level
+    // number Huawei does not send.
+    //
     // Huawei sends battery_soh as 0 on plants that publish no state of health, and 0 %
     // health reads as a battery at the end of its life rather than as a figure nobody
     // sent. The power meter driver already refuses to add EMMA's missing frequency for
@@ -148,7 +182,9 @@ class FusionSolarBatteryDevice extends Device {
     // A plant that once reported a real value keeps it if the field later goes quiet —
     // that is how _set treats every other missing field — so the capability is only
     // dropped while it has never held anything usable. Nothing here can flap.
-    const soh = avg('battery_soh');
+    const soh = moduleSohs.length
+      ? Math.round((moduleSohs.reduce((a, b) => a + b, 0) / moduleSohs.length) * 10) / 10
+      : avg('battery_soh');
     if (soh !== null && soh > 0) {
       if (!this.hasCapability('measure_battery.soh')) {
         await this.addCapability('measure_battery.soh').catch(() => {});
@@ -243,6 +279,14 @@ class FusionSolarBatteryDevice extends Device {
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
+
+  // Adds a capability the first time a usable value arrives, then writes it. A plant
+  // whose API never sends the field keeps a tile without a permanently empty row.
+  async _setOptional(capability, value) {
+    if (value === null || value === undefined) return;
+    if (!this.hasCapability(capability)) await this.addCapability(capability).catch(() => {});
+    await this._set(capability, value);
+  }
 
   async _ensureCapabilities() {
     for (const cap of DEPRECATED_CAPABILITIES) {

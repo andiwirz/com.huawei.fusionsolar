@@ -104,8 +104,13 @@ module.exports = {
       }
     }
 
-    // House consumption today: prefer direct meter value, fall back to calculation
-    let houseConsumptionKwh = cap(pmEmma, 'meter_power.consumption_today', null);
+    // House consumption today: prefer a directly reported total, fall back to calculation.
+    // The FusionSolar station KPI carries one (day_use_energy) and the OpenAPI meter now
+    // publishes it, which matters most on a cloud-only plant: there the calculation below
+    // rests on a grid delta against a midnight baseline, and Huawei has already done the
+    // same sum against its own records.
+    let houseConsumptionKwh = cap(pmEmma, 'meter_power.consumption_today', null)
+                           ?? cap(pmOa,   'meter_power.consumption_today', null);
     if (houseConsumptionKwh === null && selfConsumedKwh !== null && gridImportKwh !== null) {
       houseConsumptionKwh = selfConsumedKwh + gridImportKwh;
     }

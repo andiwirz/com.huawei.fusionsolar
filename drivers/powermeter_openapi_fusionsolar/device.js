@@ -27,6 +27,15 @@ const DEV_TYPE_POWER_SENSOR = 47; // Power sensor
 //             the sign of active_power follows the same split (see the type 47 branch).
 const DEV_TYPE_EMMA         = 23070;
 
+// Same values and the same two words as drivers/dtsu666_modbus/device.js. The capability
+// is that driver's too — dtsu666_meter_status — so the status card and the condition card
+// work on this device without a second pair, exactly as the export/import triggers already
+// do. An unknown code is shown as a code rather than guessed at.
+const METER_STATUS_MAP = {
+  0: 'Offline',
+  1: 'Normal',
+};
+
 const REQUIRED_CAPABILITIES = [
   'measure_power',        // grid active power (W): positive = import, negative = export
   'meter_power',          // grid accumulated imported energy (kWh)
@@ -65,6 +74,7 @@ class FusionSolarMeterDevice extends Device {
   async onInit() {
     this.log(`Meter device initialised: ${this.getName()}`);
     this._prevExporting = null;
+    this._prevMeterStatus = null;
     await this._ensureCapabilities();
     this._registerConditions();
     this.homey.app.getCoordinator().register(this);
@@ -90,7 +100,7 @@ class FusionSolarMeterDevice extends Device {
 
   getDevTypes() { return [DEV_TYPE_METER, DEV_TYPE_POWER_SENSOR, DEV_TYPE_EMMA]; }
 
-  async onPollData({ kpiByType }) {
+  async onPollData({ stationKpi, kpiByType }) {
     const num    = (v) => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
     const avg    = (maps, key) => {
       const vals = maps.map((m) => num(m[key])).filter((v) => v !== null);
@@ -108,6 +118,45 @@ class FusionSolarMeterDevice extends Device {
     // measure_power counts import as positive. EMMA is not affected — it has its own
     // branch and, as the header note explains, its own convention.
     const negate = (v) => (v === null ? null : -v);
+
+    // Adds a capability the first time a usable value for it arrives, and writes it.
+    // Two things fall out of doing it in this order. A plant whose API never sends the
+    // field keeps a tile without an empty row — the same reasoning that leaves EMMA
+    // without a frequency. And the write cannot be dropped for want of the capability,
+    // which is what happens to powermeter_state_string on a device's very first poll:
+    // it is written above and only created by the EXTRA_CAPABILITIES loop below it.
+    const setOptional = async (cap, value) => {
+      if (value === null || value === undefined) return;
+      if (!this.hasCapability(cap)) await this.addCapability(cap).catch(() => {});
+      await this._set(cap, value);
+    };
+
+    // House consumption today, from the station KPI rather than from any single meter.
+    // It is the one figure a cloud-only plant cannot derive: with no local inverter the
+    // energy-balance widget has to compute the house from self-consumption plus import,
+    // and Huawei has already done that sum. Zero is a real reading here — it is what the
+    // counter says just after midnight — so only null is treated as absent.
+    await setOptional('meter_power.consumption_today', stationKpi?.dayUseEnergy ?? null);
+
+    // Meter status. The Modbus meter has shown this since it was written; here the field
+    // arrived in every response and nothing read it. The device had a capability for it
+    // once (openapi_meter_status, still stripped by DEPRECATED_CAPABILITIES) — this uses
+    // the Modbus one instead, so the two meters answer the same flow cards.
+    const meterStatusRaw = num((kpiByType[DEV_TYPE_POWER_SENSOR] || kpiByType[DEV_TYPE_METER] || [])[0]?.meter_status);
+    if (meterStatusRaw !== null) {
+      const label = METER_STATUS_MAP[meterStatusRaw] ?? `Status ${meterStatusRaw}`;
+      await setOptional('dtsu666_meter_status', label);
+      if (this._prevMeterStatus !== null && label !== this._prevMeterStatus) {
+        this.homey.flow.getDeviceTriggerCard('dtsu666_meter_status_changed')
+          .trigger(this, { status: label }, { status: label })
+          .catch((err) => this.log('Flow trigger dtsu666_meter_status_changed failed:', err.message));
+        if (this.getSetting('enable_timeline_notifications') !== false) {
+          this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${label}` })
+            .catch((err) => this.log('Timeline notification failed:', err.message));
+        }
+      }
+      this._prevMeterStatus = label;
+    }
 
     // EMMA (type 23070) — checked first: where one exists it IS the grid connection point,
     // and such an installation carries no type 17 or 47 to fall back to anyway.
