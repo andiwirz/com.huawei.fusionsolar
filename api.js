@@ -2209,7 +2209,7 @@ module.exports = {
         const kpiResults = await Promise.allSettled(
           kpiEntries.map(([typeId, ids]) =>
             openapiGetDevRealKpi(baseUrl, token, ids, Number(typeId))
-              .then(({ devices: kpiDevices }) => ({ typeId, kpiDevices, ok: true }))
+              .then(({ devices: kpiDevices, failCode, failMessage }) => ({ typeId, kpiDevices, failCode, failMessage, ok: true }))
               .catch((err) => ({ typeId, error: err.message, ok: false })),
           ),
         );
@@ -2217,7 +2217,15 @@ module.exports = {
           const r = settled.status === 'fulfilled' ? settled.value : { typeId: '?', ok: false, error: settled.reason?.message };
           if (r.ok) {
             stationResult.kpiByType[r.typeId] = r.kpiDevices;
-            result.steps.push({ step: `getDevRealKpi(type=${r.typeId})`, ok: true, data: `${r.kpiDevices.length} device(s)` });
+            // An empty answer carries its reason into the report. "0 device(s)" on its own
+            // cannot distinguish a refusal from an outage, which cost issue #28 several
+            // rounds of guessing about a battery FusionSolar was showing at the same moment.
+            const why = r.kpiDevices.length === 0
+              ? (r.failCode
+                ? ` — failCode ${r.failCode}: ${r.failMessage}`
+                : ' — no failure code returned; the API answered successfully with an empty list')
+              : '';
+            result.steps.push({ step: `getDevRealKpi(type=${r.typeId})`, ok: true, data: `${r.kpiDevices.length} device(s)${why}` });
           } else {
             stationResult.kpiByType[r.typeId] = { error: r.error };
             result.steps.push({ step: `getDevRealKpi(type=${r.typeId})`, ok: false, data: r.error });
