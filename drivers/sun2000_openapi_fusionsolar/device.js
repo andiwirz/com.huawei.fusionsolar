@@ -9,6 +9,16 @@ const DEV_TYPE_METER                = 17; // Grid meter (DTSU666)
 const DEV_TYPE_POWER_SENSOR         = 47; // Power sensor
 const DEV_TYPE_EMMA                 = 23070; // EMMA-A02 energy manager
 
+// How the PV generation meter moves — see _writePvMeter.
+const PV_PRESENT_W              = 10;               // above this the panels are producing
+const PV_GATE_MAX_GAP_MS        = 60 * 60 * 1000;   // longer since the last look is an outage, not a night
+const PV_MAX_PLAUSIBLE_KW       = 1000;             // faster than this is a counter swap, not a sunny day
+// The plausibility window never shrinks below one poll interval. The cloud updates its
+// counter on its own schedule, so a step can arrive on a poll seconds after the last one
+// and still be minutes of real production; judged against seconds it would read as a swap.
+const PV_BOUND_MIN_WINDOW_MS    = 5 * 60 * 1000;
+const PV_COUNTER_STALL_WARN_MS  = 3 * 60 * 60 * 1000; // daylight with a counter that never moves
+
 const REQUIRED_CAPABILITIES = [
   'measure_power',                // PV generation (W) — the solar figure for Homey Energy
   'measure_power.mppt',           // MPPT DC input power (W)
@@ -16,7 +26,7 @@ const REQUIRED_CAPABILITIES = [
   'measure_temperature.invertor', // internal temperature (°C)
   'meter_power.inv_total',        // inverter total yield (kWh)
   'meter_power.inv_daily',        // inverter daily yield (kWh)
-  'meter_power.pv_total',         // station lifetime PV production (kWh) — Homey Energy reads this
+  'meter_power.pv_total',         // PV generation meter (kWh) — Homey Energy reads this; see _writePvMeter
   'measure_power.grid_active_power', // grid active power (W) — Netzwirkleistung
   // Named exactly as sun2000_modbus names them, so the two inverters are read the same way
   // everywhere. See DEPRECATED_CAPABILITIES for what they used to be called and why.
@@ -166,20 +176,16 @@ class FusionSolarInverterDevice extends Device {
     // meter_power.inv_total keeps the inverter's own lifetime yield, under its own name.
     // It is the genuine figure for the hardware and the only one that survives a plant
     // record being recreated — which is exactly what happened on that plant in 2025.
-    // _setCumulative, not _setOptional: this is what energy.meterPowerExportedCapability
-    // points at, so Homey reads it as generation. Issue #34 measured it dipping by exactly one
-    // day's production every night and Homey booking the recovery as solar. The capability is
-    // declared in the manifest rather than created on arrival, so nothing is lost by not
-    // going through _setOptional here.
-    await this._setCumulative('meter_power.pv_total', stationKpi?.totalEnergy ?? null);
-
+    //
+    // Since 1.2.262 the station total only seeds that meter; what moves it afterwards is the
+    // inverter's own DC counter. Issue #34 showed in five nights of field log why the station
+    // total cannot drive it — see _writePvMeter.
 
     // Inverter device KPI (type 1 = string inverter, type 38 = residential inverter)
     const maps = [
       ...(kpiByType[DEV_TYPE_INVERTER] || []),
       ...(kpiByType[DEV_TYPE_RESIDENTIAL_INVERTER] || []),
     ];
-    if (!maps.length) return;
 
     const num  = (v) => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
     const avg  = (key) => {
@@ -194,6 +200,19 @@ class FusionSolarInverterDevice extends Device {
       const vals = maps.map((m) => num(m?.[key])).filter((v) => v !== null);
       return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
     };
+
+    // Before the early return: a station that reports no inverter device still has a
+    // station total, and the meter falls back to it.
+    const mpptTotal = sumKwh('mppt_total_cap');
+    await this._writePvMeter({
+      stationTotal: stationKpi?.totalEnergy ?? null,
+      // Zero is not a lifetime DC counter, it is a field the inverter does not fill — and
+      // treating it as one would freeze Homey's solar figure for good.
+      mpptTotal:    mpptTotal !== null && mpptTotal > 0 ? mpptTotal : null,
+      mpptPowerW:   sumW('mppt_power'),
+    });
+
+    if (!maps.length) return;
 
     const activePowerW = sumW('active_power');
     const mpptPowerW   = sumW('mppt_power');
@@ -340,6 +359,141 @@ class FusionSolarInverterDevice extends Device {
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
+
+  /**
+   * meter_power.pv_total — the generation meter Homey Energy reads.
+   *
+   * Until 1.2.262 this was the station's lifetime total, and the field log for issue #34
+   * showed in five nights why that cannot work. FusionSolar's production figure is a balance,
+   * not a meter — inverter AC yield + battery charge − battery discharge; the fixture in
+   * test/openapi-pv-daily.test.js closes to 0.01 kWh. So it sinks every evening as the
+   * battery discharges, dips by a whole day at the nightly rollover, and is re-settled after
+   * midnight, sometimes above the evening figure. Homey books every rise as generation and
+   * ignores every fall. A high-water guard hides the falls, not a false rise: 1.73 kWh at
+   * 00:04 on 3 October, and its re-anchor once landed inside the dip and passed on 14.19.
+   *
+   * So the meter now advances with the inverter's own DC counter, mppt_total_cap: energy the
+   * MPPT trackers actually harvested, the battery's share included. It is anchored at the
+   * value Homey last saw, so changing what drives it is not itself a step Homey could book.
+   *
+   * Three guards, because "a hardware counter does not move in the dark" is physics, not yet
+   * something measured on every plant:
+   *   · it only counts while the panels are producing — movement in the dark is absorbed and
+   *     logged, which also settles, plant by plant, whether it ever happens;
+   *   · it never counts backwards, and re-bases instead;
+   *   · a step faster than any plant can produce is a counter swap, and re-bases too.
+   * After an outage — more than an hour since the last look — the darkness gate is lifted:
+   * it is a lifetime counter, so what it gained meanwhile is real, counted late rather than
+   * lost.
+   *
+   * An inverter that has never reported mppt_total_cap keeps the 1.2.261 behaviour: the
+   * station total through _setCumulative.
+   */
+  async _writePvMeter({ stationTotal, mpptTotal, mpptPowerW, now = Date.now() }) {
+    const CAP  = 'meter_power.pv_total';
+    const num  = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v));
+    const save = (k, v) => this.setStoreValue(k, v).catch(() => {});
+    const r2   = (v) => Math.round(v * 100) / 100;
+
+    // Nothing from either source and nothing remembered yet: nothing to write, and no reason
+    // to open the store for it. A plant whose summary lacks a lifetime figure and whose
+    // inverter lacks the DC counter is left exactly as 1.2.261 left it.
+    if (stationTotal == null && mpptTotal == null && !this._pvMeter) return undefined;
+
+    if (!this._pvMeter) {
+      this._pvMeter = {
+        value:  num(this.getStoreValue('pvmeter.value')),
+        prev:   num(this.getStoreValue('pvmeter.mppt')),
+        prevAt: num(this.getStoreValue('pvmeter.mppt_at')),
+        source: this.getStoreValue('pvmeter.source') || null,
+        // Memory only, deliberately: after a restart nobody knows what happened meanwhile,
+        // so the next look counts as an outage rather than as another minute of the night.
+        lastSampleAt: null,
+        powerSeen:    false,
+        stallMs:      0,
+        stallWarned:  false,
+      };
+    }
+    const st = this._pvMeter;
+
+    const pvNow     = mpptPowerW !== null && mpptPowerW !== undefined && mpptPowerW > PV_PRESENT_W;
+    // This poll or the one before: at dusk the counter's last step lands on a poll that
+    // already reads 0 W, and that step is still the day's production.
+    const pvPresent = pvNow || st.powerSeen;
+    const gapMs     = st.lastSampleAt === null ? Infinity : now - st.lastSampleAt;
+    st.powerSeen    = pvNow;
+    st.lastSampleAt = now;
+
+    if (mpptTotal === null || mpptTotal === undefined) {
+      // Once the DC counter has been seen, a poll without it is just a missed poll: it is a
+      // lifetime total and catches up next time. Falling back here would add the station's
+      // movement on top of the counter's, and count the same sunshine twice.
+      if (st.source === 'mppt') return;
+      await this._setCumulative(CAP, stationTotal, now);
+      const shown = num(this.getCapabilityValue(CAP));
+      if (shown !== null && shown !== st.value) {
+        st.value = shown;
+        await save('pvmeter.value', shown);
+      }
+      return;
+    }
+
+    if (st.source !== 'mppt') {
+      if (st.value === null) {
+        st.value = num(this.getStoreValue(`cumulative_high.${CAP}`))
+                ?? num(this.getCapabilityValue(CAP))
+                ?? num(stationTotal)
+                ?? mpptTotal;
+      }
+      st.source = 'mppt';
+      st.prev   = mpptTotal;
+      st.prevAt = now;
+      await save('pvmeter.source', 'mppt');
+      await save('pvmeter.value', st.value);
+      await save('pvmeter.mppt', mpptTotal);
+      await save('pvmeter.mppt_at', now);
+      this.log(`${CAP}: now advancing with the inverter's own PV counter (mppt_total_cap ${mpptTotal}), `
+        + `continuing from ${st.value}`);
+      return this._setCumulative(CAP, r2(st.value), now);
+    }
+
+    if (mpptTotal !== st.prev) {
+      const d   = mpptTotal - st.prev;
+      const hrs = st.prevAt === null
+        ? Infinity
+        : Math.max(now - st.prevAt, PV_BOUND_MIN_WINDOW_MS) / 3_600_000;
+      const sd  = `${d >= 0 ? '+' : ''}${d.toFixed(2)}`;
+      if (d < 0) {
+        this.log(`${CAP}: inverter PV counter went backwards (${st.prev} → ${mpptTotal}) — re-basing, nothing counted`);
+      } else if (d > hrs * PV_MAX_PLAUSIBLE_KW) {
+        this.log(`${CAP}: inverter PV counter jumped ${sd} kWh in ${hrs.toFixed(2)} h — more than any plant `
+          + `produces, so a counter swap; re-basing, nothing counted`);
+      } else if (gapMs <= PV_GATE_MAX_GAP_MS && !pvPresent) {
+        this.log(`${CAP}: inverter PV counter moved ${sd} kWh while the panels were dark — not counted as generation`);
+      } else {
+        st.value += d;
+        await save('pvmeter.value', st.value);
+      }
+      st.prev   = mpptTotal;
+      st.prevAt = now;
+      st.stallMs = 0;
+      await save('pvmeter.mppt', mpptTotal);
+      await save('pvmeter.mppt_at', now);
+    } else if (pvPresent && Number.isFinite(gapMs)) {
+      // Daylight and a counter that does not move means Homey Energy is shown no solar at
+      // all. Said once, loudly, rather than guessed around: switching sources automatically
+      // would risk counting the same sunshine twice.
+      st.stallMs += Math.min(gapMs, PV_GATE_MAX_GAP_MS);
+      if (!st.stallWarned && st.stallMs >= PV_COUNTER_STALL_WARN_MS) {
+        st.stallWarned = true;
+        this.log(`${CAP}: the inverter reports PV power but its PV counter (mppt_total_cap ${mpptTotal}) `
+          + `has not moved in ${Math.round(st.stallMs / 3_600_000)} h of daylight — Homey Energy will show no `
+          + `solar until it does. Please report this with a Log ID.`);
+      }
+    }
+
+    return this._setCumulative(CAP, r2(st.value), now);
+  }
 
   // Adds a capability the first time a usable value arrives, then writes it. A plant whose
   // API never sends the field keeps a tile without a permanently empty row.

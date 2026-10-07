@@ -54,7 +54,7 @@ Connection via the Huawei FusionSolar Northbound API. Provides inverter, grid an
 | Active power            | AC output power (W)                                               |
 | Heat sink temperature   | Internal inverter temperature (°C)                                |
 | PV energy today         | Plant PV production today (kWh) — used by the widgets             |
-| Total PV energy         | Cumulative plant PV production (kWh) — used by Homey Energy       |
+| Total PV energy         | PV generation meter (kWh) — used by Homey Energy; see the note below |
 | Total yield             | The inverter's own cumulative AC yield (kWh)                      |
 | Daily yield             | The inverter's own AC yield today (kWh)                           |
 | PV1 / PV2 voltage       | DC voltage of PV strings (V)                                      |
@@ -72,6 +72,17 @@ Connection via the Huawei FusionSolar Northbound API. Provides inverter, grid an
 > output where the DC figure is missing — so a reading never disappears, but on a hybrid
 > inverter the fallback can include battery discharge. Most installations show the same number
 > twice; the ones that do not are the ones the fallback was written for.
+
+> **What Homey Energy reads as solar.** *Total PV energy* is seeded from the plant's lifetime
+> total and from then on advances only with the inverter's own DC counter (`mppt_total_cap`),
+> and only while the panels are producing. The plant total itself is not a meter: FusionSolar
+> computes it as inverter yield plus battery charge minus battery discharge, so it sinks every
+> evening, dips by a whole day at the nightly rollover and is re-settled after midnight —
+> sometimes above where it stood. Homey counts every rise as generation and ignores every fall,
+> which produced phantom solar before sunrise (issue #34). Expect the daily figure in Homey
+> Energy to run a few per cent above FusionSolar's: it is the energy the panels delivered on
+> the DC side, before conversion losses. Inverters that do not report the DC counter keep the
+> guarded plant total.
 
 > Grid frequency, inverter efficiency and inverter status are added on the first successful
 > poll rather than at pairing, and **PV energy today** appears the first time the plant summary

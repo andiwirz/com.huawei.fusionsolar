@@ -109,9 +109,13 @@ test('a lower reading that persists is eventually believed', async () => {
   await dev._setCumulative(CAP, 120, T0 + HOUR);
   assert.strictEqual(dev.getCapabilityValue(CAP), 8170, 'believed the drop immediately');
 
-  await dev._setCumulative(CAP, 125, T0 + 7 * HOUR);
+  // Six hours is no longer enough — that was 1.2.261, and the night of 30 September is why.
+  await dev._setCumulative(CAP, 122, T0 + 7 * HOUR);
+  assert.strictEqual(dev.getCapabilityValue(CAP), 8170, 'still re-anchoring after six hours');
 
-  assert.strictEqual(dev.getCapabilityValue(CAP), 125, 'still frozen after seven hours');
+  await dev._setCumulative(CAP, 125, T0 + 25 * HOUR);
+
+  assert.strictEqual(dev.getCapabilityValue(CAP), 125, 'still frozen after a full day');
   assert.ok(dev.logs.some((l) => l.includes('re-anchoring')), 'the step down was silent');
 });
 
@@ -120,13 +124,13 @@ test('the clock for that runs from the first low reading, not the last', async (
   // poll. Restarting the clock on each would mean never re-anchoring at all.
   const dev = makeDevice();
   await dev._setCumulative(CAP, 8170, T0);
-  // First low reading at T0 + 1 h, so the six hours are up at T0 + 7 h — regardless of the
-  // five further, different low readings in between.
-  for (let h = 1; h <= 6; h++) await dev._setCumulative(CAP, 100 + h, T0 + h * HOUR);
+  // First low reading at T0 + 1 h, so the day is up at T0 + 25 h — regardless of the
+  // twenty-three further, different low readings in between.
+  for (let h = 1; h <= 24; h++) await dev._setCumulative(CAP, 100 + h, T0 + h * HOUR);
   assert.strictEqual(dev.getCapabilityValue(CAP), 8170, 're-anchored early');
 
-  await dev._setCumulative(CAP, 107, T0 + 7 * HOUR);
-  assert.strictEqual(dev.getCapabilityValue(CAP), 107,
+  await dev._setCumulative(CAP, 125, T0 + 25 * HOUR);
+  assert.strictEqual(dev.getCapabilityValue(CAP), 125,
     'the clock restarted on each new low reading, so it would never re-anchor');
 });
 
@@ -136,9 +140,33 @@ test('a dip that heals resets the patience, so two dips never add up to a re-anc
   await dev._setCumulative(CAP, 8149, T0 + 4 * HOUR);      // dip one
   await dev._setCumulative(CAP, 8170, T0 + 4.5 * HOUR);    // healed
   await dev._setCumulative(CAP, 8149, T0 + 24 * HOUR);     // dip two, next night
-  await dev._setCumulative(CAP, 8149, T0 + 27 * HOUR);     // still inside its own six hours
+  // 23 h into dip two, 43 h after dip one: only the healed-and-restarted clock keeps this
+  // below a day.
+  await dev._setCumulative(CAP, 8149, T0 + 47 * HOUR);
 
   assert.strictEqual(dev.getCapabilityValue(CAP), 8170, 'the two dips were counted together');
+});
+
+test('the night of 30 September, replayed from the field log, hands Homey nothing', async () => {
+  // e985ff15, Jamesquare78, times local. In 1.2.261 the evening sag at 19:28 started the
+  // six-hour clock, it ran out at 01:28 inside the rollover dip, the guard re-anchored on
+  // 8207.27 and fifteen minutes later passed the recovery to 8221.46 — 14.19 kWh of solar at
+  // a quarter to two in the morning.
+  const dev = makeDevice();
+  const at = (hh, mm, dayOffset = 0) => T0 + dayOffset * 24 * HOUR + hh * HOUR + mm * 60_000;
+
+  await dev._setCumulative(CAP, 8221.97, at(19, 0));            // evening, written
+  const evening = dev.getCapabilityValue(CAP);
+  await dev._setCumulative(CAP, 8221.91, at(19, 28));           // the sag starts the clock
+  await dev._setCumulative(CAP, 8207.27, at(1, 28, 1));         // six hours later: mid-dip
+  await dev._setCumulative(CAP, 8207.26, at(1, 38, 1));
+  await dev._setCumulative(CAP, 8221.46, at(1, 43, 1));         // recovered
+  await dev._setCumulative(CAP, 8221.45, at(1, 48, 1));
+
+  const written = Object.values(dev.values);
+  assert.ok(!written.includes(8207.27), 're-anchored on the bottom of the dip');
+  assert.strictEqual(dev.getCapabilityValue(CAP) - evening, 0,
+    `Homey would have booked ${(dev.getCapabilityValue(CAP) - evening).toFixed(2)} kWh at night`);
 });
 
 // ── across a restart ────────────────────────────────────────────────────────────
@@ -200,9 +228,16 @@ test('the drivers reading the station total use the guard, not the bare _set', a
   const path = require('path');
   const read = (p) => fs.readFileSync(path.join(__dirname, '..', 'drivers', p, 'device.js'), 'utf8');
 
+  // Since 1.2.262 the OpenAPI inverter does not hand the station total to Homey at all; it
+  // goes through _writePvMeter, which writes the generation meter through _setCumulative.
+  // test/pv-meter.test.js covers what that meter does — here only that nothing bypasses it.
   const inverter = read('sun2000_openapi_fusionsolar');
-  assert.ok(/_setCumulative\('meter_power\.pv_total'/.test(inverter),
-    'the OpenAPI inverter writes the capability Homey Energy reads without the guard');
+  assert.ok(/await this\._writePvMeter\(/.test(inverter),
+    'the OpenAPI inverter no longer goes through its generation meter');
+  assert.ok(!/_set(Optional|Cumulative)?\('meter_power\.pv_total'/.test(inverter),
+    'something writes meter_power.pv_total directly, around the generation meter');
+  assert.ok(/this\._setCumulative\(CAP,/.test(inverter),
+    'the generation meter writes without the guard');
 
   const solar = read('isitepower_solar_openapi_fusionsolar');
   assert.ok(/_setCumulative\('meter_power'/.test(solar),

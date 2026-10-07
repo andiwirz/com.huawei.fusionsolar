@@ -59,6 +59,7 @@ function fakeInverter() {
   d.getName = () => 'Inverter';
   d.getSetting = () => true;
   d.hasCapability = (c) => d.caps.has(c);
+  d.getCapabilityValue = (c) => (c in d.values ? d.values[c] : null);
   d.addCapability = async (c) => { d.caps.add(c); };
   d._set = async (c, v) => { if (v !== null && v !== undefined && d.caps.has(c)) d.values[c] = v; };
   d._setOptional = InverterDevice.prototype._setOptional.bind(d);
