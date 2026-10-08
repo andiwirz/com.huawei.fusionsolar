@@ -9,6 +9,7 @@ const {
   isBatteryAbsent,
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { pendingModeWrites, syncModeSettings, applyModeWrites } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const modbusPolling = require('../../lib/modbus-polling');
 const enumLabel     = require('../../lib/enum-label');
@@ -138,6 +139,9 @@ const SETTING_LABEL = {
   max_charge_power:          'Max charge power',
   max_discharge_power:       'Max discharge power',
   max_grid_charge_power:     'Max grid charge power',
+  mode_storage_working:      'Storage working mode',
+  mode_excess_pv_tou:        'Excess PV energy (Time of Use)',
+  mode_remote_dispatch:      'Remote charge/discharge mode',
 };
 
 // Maps writable enum capability → Modbus register address (47xxx)
@@ -146,6 +150,14 @@ const CONTROL_WRITE_MAP = {
   storage_force_charge_discharge:       47100,
   storage_excess_pv_energy_use_in_tou:  47299,
   remote_charge_discharge_control_mode: 47589,
+};
+
+// Changed from the "Change battery mode" dropdowns in the device settings, not from the tile —
+// see lib/mode-settings.js and issue #35. ids are the values each register takes, as strings.
+const MODE_SETTINGS = {
+  mode_storage_working: { cap: 'storage_working_mode_settings',        reg: 47086, ids: ['0', '1', '2', '3', '4', '5', '6'] },
+  mode_excess_pv_tou:   { cap: 'storage_excess_pv_energy_use_in_tou',  reg: 47299, ids: ['0', '1'] },
+  mode_remote_dispatch: { cap: 'remote_charge_discharge_control_mode', reg: 47589, ids: ['0', '1', '2', '3', '4', '5'] },
 };
 
 class LUNA2000ModbusDevice extends Device {
@@ -170,7 +182,8 @@ class LUNA2000ModbusDevice extends Device {
     this._pendingForceMode          = null;  // set after a force charge/discharge write; cleared once poll confirms
     this._lastPollStart             = 0;
     await this._ensureCapabilities();
-    this._registerControlListeners();
+    // No capability listeners for the battery modes — see "Why the battery modes cannot be
+    // changed from the device tile" further down.
     this._registerFlowActions();
     this._registerConditions();
     await this._startPolling();
@@ -181,6 +194,10 @@ class LUNA2000ModbusDevice extends Device {
   }
 
   async onSettings({ oldSettings, newSettings, changedKeys }) {
+    // Before anything else is written: a mode dropdown that cannot be written rejects the
+    // whole save, so nothing is half-applied. See lib/mode-settings.js.
+    const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
+
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
       await this._stopPolling();
       await this._startPolling();
@@ -251,6 +268,13 @@ class LUNA2000ModbusDevice extends Device {
           .catch((err) => this._revertSetting('max_grid_charge_power', oldSettings, err));
       }
     }
+
+    // Not awaited, like every other write here: Homey stores the settings when this returns.
+    applyModeWrites(this, modeWrites, (w) => {
+      return writeModbusRegister(newSettings.address, parseInt(newSettings.port, 10) || 502,
+        parseIntSafe(newSettings.modbus_id, 1), w.reg, parseInt(w.value, 10));
+    }, (w, err) => this._revertSetting(w.key, oldSettings, err))
+      .catch((err) => this.error('Mode write failed:', err.message));
   }
 
   async onUninit() {
@@ -282,37 +306,20 @@ class LUNA2000ModbusDevice extends Device {
     }
   }
 
-  _registerControlListeners() {
-    const host   = () => this.getSetting('address');
-    const port   = () => parseInt(this.getSetting('port'), 10) || 502;
-    const unitId = () => parseIntSafe(this.getSetting('modbus_id'), 1);
-
-    for (const [cap, regAddress] of Object.entries(CONTROL_WRITE_MAP)) {
-      this.registerCapabilityListener(cap, (value) => {
-        if (this._updatingFromModbus) return; // ignore updates triggered by poll reads
-
-        const previousValue = this.getCapabilityValue(cap);
-        this.log(`Write start  [${cap} → reg ${regAddress}] value=${value}`);
-        this._writeInProgress = true;
-
-        // Fire-and-forget: return immediately so Homey never shows a UI timeout.
-        // On failure the capability is reverted to its previous value.
-        writeModbusRegister(host(), port(), unitId(), regAddress, parseInt(value, 10))
-          .then(() => {
-            this.log(`Write OK     [${cap} → reg ${regAddress}]`);
-          })
-          .catch(async (err) => {
-            this.error(`Write failed [${cap} → reg ${regAddress}]:`, err.message);
-            this._updatingFromModbus = true;
-            await this._set(cap, previousValue).catch(() => {});
-            this._updatingFromModbus = false;
-          })
-          .finally(() => {
-            this._writeInProgress = false;
-          });
-      });
-    }
-  }
+  // ─── Why the battery modes cannot be changed from the device tile ────────────
+  //
+  // Until 1.2.266 the four modes — storage working mode, force charge/discharge, excess PV
+  // and remote charge/discharge mode — were scroll-wheel pickers, and a listener here wrote
+  // whatever a wheel landed on straight into the battery. Issue #35 showed the same wheel on
+  // the inverter writing its top entry merely because the device was opened; these wheels
+  // carry Adaptive, Stop, Feed to Grid and Local Control on top, and the reporter had found
+  // his remote mode on Local Control after reopening this tile.
+  //
+  // So the tile shows the modes as text (setable: false, uiComponent: sensor) and nothing is
+  // registered here. Three of them are changed in the device settings instead, from
+  // dropdowns that list every value and write only on Save — see onSettings and
+  // lib/mode-settings.js. Force charge/discharge has no dropdown on purpose: it is a command,
+  // not a setting, and stays with the flow cards. CONTROL_WRITE_MAP stays for those cards.
 
   // ─── Flow actions ──────────────────────────────────────────────────────────
 
@@ -350,8 +357,10 @@ class LUNA2000ModbusDevice extends Device {
 
     if (this.getSetting('enable_timeline_notifications') === false) return;
     const label = SETTING_LABEL[settingId] || settingId;
+    // A mode reads as its name, not as the register value behind the dropdown.
+    const shown = MODE_SETTINGS[settingId] ? this._enumLabel(MODE_SETTINGS[settingId].cap, previous) : previous;
     this.homey.notifications.createNotification({
-      excerpt: `${this.getName()}: ${label} could not be written (${err.message}) — put back to ${previous}.`,
+      excerpt: `${this.getName()}: ${label} could not be written (${err.message}) — put back to ${shown}.`,
     }).catch((e) => this.log('Timeline notification failed:', e.message));
   }
 
@@ -1458,6 +1467,14 @@ class LUNA2000ModbusDevice extends Device {
           .catch((err) => this.log('setSettings info rows failed:', err.message));
         this._updatingSettingFromModbus = false;
       }
+
+      // The "Change battery mode" dropdowns, each only from the half of the split read that
+      // carried its register — see lib/mode-settings.js.
+      await syncModeSettings(this, MODE_SETTINGS, {
+        mode_storage_working: ctrl.storageWorkingMode,
+        mode_excess_pv_tou:   ctrl.storageExcessPvEnergyUseInTou,
+        mode_remote_dispatch: ctrl.remoteChargeDischargeControlMode,
+      });
 
       // onSettings refuses to write to the inverter until it has seen the registers it
       // would be overwriting. Gated on the working mode rather than on "the call did not

@@ -64,6 +64,10 @@
         "present": "Energiebeheersysteem aanwezig",
         "absent": "Energiebeheersysteem niet toegevoegd"
       }
+    },
+    "modes": {
+      "notReadYet": "Deze modus kan worden gewijzigd zodra de app de huidige waarde van het apparaat heeft gelezen. Probeer het over een minuut opnieuw.",
+      "invalid": "Die waarde kan niet naar dit apparaat worden geschreven."
     }
   },
   "settings": {

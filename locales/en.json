@@ -64,6 +64,10 @@
         "present": "Energy Management device added",
         "absent": "Energy Management device not added"
       }
+    },
+    "modes": {
+      "notReadYet": "This mode can be changed once the app has read its current value from the device. Please try again in a minute.",
+      "invalid": "That value cannot be written to this device."
     }
   },
   "settings": {

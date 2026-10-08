@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.265",
+  "version": "1.2.266",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -801,8 +801,8 @@
         "nl": "Werkingsmodus opslag"
       },
       "getable": true,
-      "setable": true,
-      "uiComponent": "picker",
+      "setable": false,
+      "uiComponent": "sensor",
       "insights": false,
       "values": [
         {
@@ -871,8 +871,8 @@
         "nl": "Geforceerd laden/ontladen"
       },
       "getable": true,
-      "setable": true,
-      "uiComponent": "picker",
+      "setable": false,
+      "uiComponent": "sensor",
       "insights": false,
       "values": [
         {
@@ -909,8 +909,8 @@
         "nl": "Overschot PV-energie (TOU)"
       },
       "getable": true,
-      "setable": true,
-      "uiComponent": "picker",
+      "setable": false,
+      "uiComponent": "sensor",
       "insights": false,
       "values": [
         {
@@ -939,8 +939,8 @@
         "nl": "Afstandsbediening laden/ontladen"
       },
       "getable": true,
-      "setable": true,
-      "uiComponent": "picker",
+      "setable": false,
+      "uiComponent": "sensor",
       "insights": false,
       "values": [
         {
@@ -3271,6 +3271,63 @@
           },
           "children": [
             {
+              "id": "mode_active_power_control",
+              "type": "dropdown",
+              "label": {
+                "en": "Active power control mode",
+                "de": "Wirkleistungs-Steuermodus",
+                "nl": "Regelmodus werkzaam vermogen"
+              },
+              "value": "0",
+              "hint": {
+                "en": "How the inverter limits what it feeds into the grid (register 47415). The \"Limited by Power\" modes need a power meter, and use the limits set below. If your house connection depends on a feed-in limit, check this after every change. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Wie der Wechselrichter begrenzt, was er ins Netz einspeist (Register 47415). Die Modi „Leistungsbegrenzt“ brauchen einen Stromzähler und verwenden die Grenzen weiter unten. Hängt dein Hausanschluss an einer Einspeisegrenze, prüfe ihn nach jeder Änderung. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Hoe de omvormer begrenst wat hij aan het net levert (register 47415). De modi „Vermogensbegrensd” hebben een energiemeter nodig en gebruiken de limieten hieronder. Hangt je aansluiting af van een terugleverlimiet, controleer dit dan na elke wijziging. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Unlimited",
+                    "de": "Unbegrenzt",
+                    "nl": "Onbeperkt"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "DI Active Scheduling",
+                    "de": "DI Aktive Planung",
+                    "nl": "DI Actieve planning"
+                  }
+                },
+                {
+                  "id": "5",
+                  "label": {
+                    "en": "Zero Power Grid Connection",
+                    "de": "Nulleinspeisung",
+                    "nl": "Nul-invoeding"
+                  }
+                },
+                {
+                  "id": "6",
+                  "label": {
+                    "en": "Limited by Power (kW)",
+                    "de": "Leistungsbegrenzt (kW)",
+                    "nl": "Vermogensbegrensd (kW)"
+                  }
+                },
+                {
+                  "id": "7",
+                  "label": {
+                    "en": "Limited by Power (%)",
+                    "de": "Leistungsbegrenzt (%)",
+                    "nl": "Vermogensbegrensd (%)"
+                  }
+                }
+              ]
+            },
+            {
               "id": "max_feed_in_power",
               "type": "number",
               "label": {
@@ -4050,6 +4107,187 @@
         {
           "type": "group",
           "label": {
+            "en": "Change battery mode",
+            "de": "Batteriemodus ändern",
+            "nl": "Batterijmodus wijzigen"
+          },
+          "children": [
+            {
+              "id": "mode_storage_working",
+              "type": "dropdown",
+              "label": {
+                "en": "Storage working mode",
+                "de": "Speicher-Betriebsmodus",
+                "nl": "Bedrijfsmodus opslag"
+              },
+              "value": "2",
+              "hint": {
+                "en": "What the inverter does with the battery on its own. What each mode means is explained under \"What the battery modes do\". Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. Was jeder Modus bedeutet, steht unter „Was die Batteriemodi bewirken“. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wat de omvormer uit zichzelf met de batterij doet. Wat elke modus betekent, staat onder „Wat de batterijmodi doen”. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Adaptive",
+                    "de": "Adaptiv",
+                    "nl": "Adaptief"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "Fixed Charge/Discharge",
+                    "de": "Festes Laden/Entladen",
+                    "nl": "Vast laden/ontladen"
+                  }
+                },
+                {
+                  "id": "2",
+                  "label": {
+                    "en": "Maximise Self-Consumption",
+                    "de": "Eigenverbrauch maximieren",
+                    "nl": "Eigenverbruik maximaliseren"
+                  }
+                },
+                {
+                  "id": "3",
+                  "label": {
+                    "en": "Time of Use (LG)",
+                    "de": "Zeitabhängige Nutzung (LG)",
+                    "nl": "Time of Use (LG)"
+                  }
+                },
+                {
+                  "id": "4",
+                  "label": {
+                    "en": "Fully Fed to Grid",
+                    "de": "Volleinspeisung",
+                    "nl": "Volledig terugleveren"
+                  }
+                },
+                {
+                  "id": "5",
+                  "label": {
+                    "en": "Time of Use (LUNA2000)",
+                    "de": "Zeitabhängige Nutzung (LUNA2000)",
+                    "nl": "Time of Use (LUNA2000)"
+                  }
+                },
+                {
+                  "id": "6",
+                  "label": {
+                    "en": "Third-party Scheduling",
+                    "de": "Drittanbieter-Steuerung",
+                    "nl": "Derden-sturing"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "mode_excess_pv_tou",
+              "type": "dropdown",
+              "label": {
+                "en": "Excess PV energy (Time of Use)",
+                "de": "PV-Überschuss (Zeitabhängige Nutzung)",
+                "nl": "PV-overschot (Time of Use)"
+              },
+              "value": "0",
+              "hint": {
+                "en": "Where surplus solar goes while the working mode is Time of Use: into the grid, or into the battery. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung“ ist: ins Netz oder in die Batterie. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus Time of Use is: naar het net of naar de batterij. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Feed to Grid",
+                    "de": "Ins Netz einspeisen",
+                    "nl": "Terugleveren aan net"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "Charge Battery",
+                    "de": "Batterie laden",
+                    "nl": "Batterij laden"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "mode_remote_dispatch",
+              "type": "dropdown",
+              "label": {
+                "en": "Remote charge/discharge mode",
+                "de": "Fernsteuerungs-Modus",
+                "nl": "Aansturing op afstand"
+              },
+              "value": "0",
+              "hint": {
+                "en": "Who may command the battery from outside. Keep \"Local Control\" unless a third-party scheduler really is talking to the inverter — any other value overrides the working mode. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Wer die Batterie von aussen befehlen darf. „Lokale Steuerung“ beibehalten, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht — jeder andere Wert setzt den Betriebsmodus ausser Kraft. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wie de batterij van buitenaf mag aansturen. Houd „Lokale sturing” aan, tenzij er echt een externe regelaar met de omvormer praat — elke andere waarde heft de bedrijfsmodus op. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Local Control",
+                    "de": "Lokale Steuerung",
+                    "nl": "Lokale sturing"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "Remote: Max Self-Consumption",
+                    "de": "Fern: Max Eigenverbrauch",
+                    "nl": "Afstand: Max eigenverbruik"
+                  }
+                },
+                {
+                  "id": "2",
+                  "label": {
+                    "en": "Remote: Fully Fed to Grid",
+                    "de": "Fern: Volleinspeisung",
+                    "nl": "Afstand: Volledig terugleveren"
+                  }
+                },
+                {
+                  "id": "3",
+                  "label": {
+                    "en": "Remote: Time of Use",
+                    "de": "Fern: Zeitabhängige Nutzung",
+                    "nl": "Afstand: Time of Use"
+                  }
+                },
+                {
+                  "id": "4",
+                  "label": {
+                    "en": "Remote: AI Control",
+                    "de": "Fern: KI-Steuerung",
+                    "nl": "Afstand: KI-sturing"
+                  }
+                },
+                {
+                  "id": "5",
+                  "label": {
+                    "en": "Remote: Three-party Scheduling",
+                    "de": "Fern: Drittanbieter-Steuerung",
+                    "nl": "Afstand: Derden-sturing"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
             "en": "What the battery modes do",
             "de": "Was die Batteriemodi bewirken",
             "nl": "Wat de batterijmodi doen"
@@ -4361,6 +4599,98 @@
             "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Ladezustand ändert.",
             "nl": "Toont een tijdlijnmelding wanneer de laadstatus verandert."
           }
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Change battery mode",
+            "de": "Batteriemodus ändern",
+            "nl": "Batterijmodus wijzigen"
+          },
+          "children": [
+            {
+              "id": "mode_storage_working",
+              "type": "dropdown",
+              "label": {
+                "en": "Storage working mode",
+                "de": "Speicher-Betriebsmodus",
+                "nl": "Bedrijfsmodus opslag"
+              },
+              "value": "2",
+              "hint": {
+                "en": "What the inverter does with the battery on its own. What each mode means is explained under \"What the battery modes do\". Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. Was jeder Modus bedeutet, steht unter „Was die Batteriemodi bewirken“. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wat de omvormer uit zichzelf met de batterij doet. Wat elke modus betekent, staat onder „Wat de batterijmodi doen”. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "2",
+                  "label": {
+                    "en": "Maximise Self-Consumption",
+                    "de": "Eigenverbrauch maximieren",
+                    "nl": "Eigenverbruik maximaliseren"
+                  }
+                },
+                {
+                  "id": "4",
+                  "label": {
+                    "en": "Fully Fed to Grid",
+                    "de": "Volleinspeisung",
+                    "nl": "Volledig terugleveren"
+                  }
+                },
+                {
+                  "id": "5",
+                  "label": {
+                    "en": "Time of Use (LUNA2000)",
+                    "de": "Zeitabhängige Nutzung (LUNA2000)",
+                    "nl": "Time of Use (LUNA2000)"
+                  }
+                },
+                {
+                  "id": "6",
+                  "label": {
+                    "en": "Third-party Scheduling",
+                    "de": "Drittanbieter-Steuerung",
+                    "nl": "Derden-sturing"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "mode_excess_pv_tou",
+              "type": "dropdown",
+              "label": {
+                "en": "Excess PV energy (Time of Use)",
+                "de": "PV-Überschuss (Zeitabhängige Nutzung)",
+                "nl": "PV-overschot (Time of Use)"
+              },
+              "value": "0",
+              "hint": {
+                "en": "Where surplus solar goes while the working mode is Time of Use: into the grid, or into the battery. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung“ ist: ins Netz oder in die Batterie. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus Time of Use is: naar het net of naar de batterij. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Feed to Grid",
+                    "de": "Ins Netz einspeisen",
+                    "nl": "Terugleveren aan net"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "Charge Battery",
+                    "de": "Batterie laden",
+                    "nl": "Batterij laden"
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "group",

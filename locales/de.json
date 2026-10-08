@@ -64,6 +64,10 @@
         "present": "Energiemanagementsystem vorhanden",
         "absent": "Energiemanagementsystem nicht hinzugefügt"
       }
+    },
+    "modes": {
+      "notReadYet": "Dieser Modus lässt sich ändern, sobald die App seinen aktuellen Wert vom Gerät gelesen hat. Bitte in einer Minute nochmals versuchen.",
+      "invalid": "Dieser Wert kann nicht auf das Gerät geschrieben werden."
     }
   },
   "settings": {

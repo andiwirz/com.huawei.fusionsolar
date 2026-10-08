@@ -11,6 +11,7 @@ const {
   MAX_PV_STRINGS,
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { pendingModeWrites, syncModeSettings, applyModeWrites, revertModeSetting } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const modbusPolling = require('../../lib/modbus-polling');
 
@@ -105,6 +106,12 @@ const FEED_IN_MODES = new Set(['0', '1', '5', '6', '7']);
 // remembering — a second "enable" would otherwise save zero export as the thing to return to.
 const isOwnZeroExport = (state) => !!state && state.mode === '6' && state.maxFeedInW === 0;
 
+// The feed-in mode, changed from a dropdown in the device settings — see lib/mode-settings.js
+// and the comment where _registerControlListeners used to be.
+const MODE_SETTINGS = {
+  mode_active_power_control: { cap: 'activepower_controlmode', reg: 47415, ids: ['0', '1', '5', '6', '7'] },
+};
+
 const CONTROL_WRITE_MAP = {
   activepower_controlmode: 47415,
 };
@@ -136,7 +143,10 @@ class SUN2000ModbusDevice extends Device {
     });
   }
 
-  async onSettings({ newSettings, changedKeys }) {
+  async onSettings({ oldSettings = {}, newSettings, changedKeys }) {
+    // Before anything else is written — see lib/mode-settings.js.
+    const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
+
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
       await this._stopPolling();
       await this._startPolling();
@@ -193,6 +203,13 @@ class SUN2000ModbusDevice extends Device {
           .catch((err) => this.error('mppt_scan_interval write failed:', err.message));
       }
     }
+
+    // Not awaited, like every other write here: Homey stores the settings when this returns.
+    applyModeWrites(this, modeWrites, (w) => {
+      return writeModbusRegister(newSettings.address, parseInt(newSettings.port, 10) || 502,
+        parseIntSafe(newSettings.modbus_id, 1), w.reg, parseInt(w.value, 10));
+    }, (w, err) => revertModeSetting(this, w.key, oldSettings[w.key], err))
+      .catch((err) => this.error('Mode write failed:', err.message));
   }
 
   async onUninit() {
@@ -252,7 +269,8 @@ class SUN2000ModbusDevice extends Device {
   // means it to. So the tile only shows the mode (setable: false, uiComponent: sensor in the
   // manifest), and no listener is registered here at all: even a Homey app still rendering
   // the old picker from a cached definition has nothing to write through. Changing the mode
-  // stays possible, deliberately, through the flow cards below — "Set active power mode",
+  // stays possible, deliberately: from a dropdown in the device settings, written only on
+  // Save (since 1.2.266, see lib/mode-settings.js), and through the flow cards below — "Set active power mode",
   // the export-limit and zero-export cards, "Set max feed-in power (%)" — which all name what
   // they do and are run on purpose.
   //
@@ -889,6 +907,9 @@ class SUN2000ModbusDevice extends Device {
           .catch((err) => this.log('setSettings sync failed:', err.message));
         this._updatingSettingFromModbus = false;
       }
+
+      // The feed-in mode dropdown — see lib/mode-settings.js.
+      await syncModeSettings(this, MODE_SETTINGS, { mode_active_power_control: ctrl.activePowerControlMode });
 
       // Mark settings as initialised — onSettings writes are now safe
       this._settingsInitialized = true;

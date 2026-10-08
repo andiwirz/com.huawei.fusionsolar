@@ -324,9 +324,10 @@ Three differences are worth knowing before switching:
   `meter_power.pv_total` on EMMA Modbus and on OpenAPI. Pairing the same physical inverter on
   two of these drivers at once therefore counts its production twice.
 - **No driver changes the inverter from its tile.** `activepower_controlmode` on the Modbus
-  driver is shown, not set: since 1.2.263 the feed-in mode changes only through flow cards,
-  because a scroll gesture on the old picker could switch a feed-in limit off (issue #35).
-  The EMMA and cloud drivers have no inverter controls at all.
+  driver is shown, not set, because a scroll gesture on the old picker could switch a feed-in
+  limit off (issue #35). The mode is changed from a dropdown under *Feed-in Power Control* in
+  the device settings, written only on Save (since 1.2.266), or through flow cards. The EMMA
+  and cloud drivers have no inverter controls at all.
 
 ---
 
@@ -352,14 +353,23 @@ Direct Modbus TCP connection to the LUNA2000 battery via SUN2000 / SDongle. If n
 | Battery status              | Operating state as text (e.g. Running, Standby)          |
 | Installed battery modules   | Number of detected battery packs (read from registers 47750–47755) |
 
-#### Controllable Values
+#### Battery Modes
 
-| Capability                    | Options                                                                                              |
-|-------------------------------|------------------------------------------------------------------------------------------------------|
-| Storage working mode          | Adaptive · Fixed charge/discharge · Maximise self-consumption · TOU · Full feed-in · Third party    |
-| Force charge/discharge        | Stop · Charge · Discharge                                                                            |
-| Excess PV energy (TOU)        | Feed into grid · Charge battery                                                                      |
-| Remote charge/discharge mode  | Local control · Max self-consumption · Full feed-in · TOU · AI · Third party                        |
+The device tile shows the four modes but does not change them: until 1.2.266 they were scroll
+wheels that wrote whatever they landed on (issue #35). Three are changed in the device settings
+under **Change battery mode**, from dropdowns that list every value and write only on Save. Force
+charge/discharge has no dropdown — it is a command, not a setting, and stays with the flow cards.
+
+| Mode                          | Options                                                                                   | Changed from                         |
+|-------------------------------|-------------------------------------------------------------------------------------------|--------------------------------------|
+| Storage working mode          | Adaptive · Fixed charge/discharge · Maximise self-consumption · TOU · Full feed-in · Third party | Settings dropdown · flow card |
+| Force charge/discharge        | Stop · Charge · Discharge                                                                 | Flow cards                           |
+| Excess PV energy (TOU)        | Feed into grid · Charge battery                                                           | Settings dropdown · flow card        |
+| Remote charge/discharge mode  | Local control · Max self-consumption · Full feed-in · TOU · AI · Third party             | Settings dropdown · flow card        |
+
+A dropdown can be saved once the app has read the battery's current value from it — until then
+it shows its default, and a save is refused with a message rather than writing that default into
+the battery.
 
 ---
 
@@ -382,12 +392,19 @@ Reads battery data via the EMMA Energy Management Module (unit ID 0).
 | Daily charged energy     | Energy charged today (kWh)                           |
 | Daily discharged energy  | Energy discharged today (kWh)                        |
 
-#### Controllable Values
+#### Battery Modes
 
-| Capability                  | Options / Range                                                             |
+Shown on the device tile, changed in the device settings under **Change battery mode** (written
+only on Save, since 1.2.266) or through flow cards — same reason as on the LUNA2000 Modbus driver.
+
+| Mode                        | Options                                                                     |
 |-----------------------------|-----------------------------------------------------------------------------|
 | Storage working mode        | Self-consumption · Full feed-in · TOU · Third party                         |
 | Excess PV energy (TOU)      | Feed into grid · Charge battery                                             |
+
+A dropdown can be saved once the app has read the battery's current value from it — until then
+it shows its default, and a save is refused with a message rather than writing that default into
+the battery.
 
 #### Settings
 
@@ -710,6 +727,7 @@ These values are read from the inverter on startup and kept in sync.
 
 | Setting                    | Default | Description                                                                          |
 |----------------------------|---------|--------------------------------------------------------------------------------------|
+| Active power control mode  | –       | The feed-in mode (register 47415), written only on Save. Shows the inverter's current mode; it can be saved once the app has read it. |
 | Max feed-in power (W)      | –       | Maximum grid feed-in power in watts (register 47416). Set to 0 to block all export. |
 | Max feed-in power (%)      | –       | Maximum grid feed-in power as % of rated power (register 47418).                    |
 
@@ -812,7 +830,7 @@ These registers derate the inverter AC output directly and work without a DTSU66
 
 | Card                              | Description                                                                                        |
 |-----------------------------------|----------------------------------------------------------------------------------------------------|
-| Set active power control mode     | Sets the feed-in mode (reg 47415): Unlimited · DI active scheduling · Zero power grid connection · Limited by power (kW) · Limited by power (%). The device tile shows this mode but cannot change it. |
+| Set active power control mode     | Sets the feed-in mode (reg 47415): Unlimited · DI active scheduling · Zero power grid connection · Limited by power (kW) · Limited by power (%). The device tile shows this mode but cannot change it; the device settings offer it as a dropdown. |
 | Enable/disable grid export limit  | Enable: *Limited by power (kW)* (47415 = 6) with the watt value already on 47416. Disable: *Unlimited* (47415 = 0). |
 | Set max feed-in power             | Sets the feed-in limit in watts (reg 47416). Requires a power meter (DTSU666).                     |
 | Set max feed-in power (%)         | Switches to *Limited by power (%)* (47415 = 7) and sets the limit (reg 47418). Requires a power meter. |

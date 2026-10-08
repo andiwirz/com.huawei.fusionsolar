@@ -7,6 +7,7 @@ const {
   isLuna2000EmmaDataValid,
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { pendingModeWrites, syncModeSettings, applyModeWrites, revertModeSetting } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const modbusPolling = require('../../lib/modbus-polling');
 const enumLabel     = require('../../lib/enum-label');
@@ -61,6 +62,14 @@ const CONTROL_WRITE_MAP = {
 // is fighting this app for control. We only log it — behaviour is unchanged.
 const WRITE_CONFLICT_WINDOW_MS = 45000;
 
+// Changed from the "Change battery mode" dropdowns in the device settings, not from the tile —
+// see lib/mode-settings.js and issue #35. ids are the values each register takes, as strings.
+// The EMMA takes only 2, 4, 5 and 6 as working modes; 1 and 3 are reserved.
+const MODE_SETTINGS = {
+  mode_storage_working: { cap: 'storage_working_mode_settings',       reg: 40000, ids: ['2', '4', '5', '6'] },
+  mode_excess_pv_tou:   { cap: 'storage_excess_pv_energy_use_in_tou', reg: 40001, ids: ['0', '1'] },
+};
+
 class LUNA2000EmmaModbusDevice extends Device {
 
   async onInit() {
@@ -76,7 +85,8 @@ class LUNA2000EmmaModbusDevice extends Device {
     this._controlPollCounter         = 4;    // start at 4 so the first poll reads control registers
     this._lastPollStart              = 0;
     await this._ensureCapabilities();
-    this._registerControlListeners();
+    // No capability listeners for the battery modes — see "Why the battery modes cannot be
+    // changed from the device tile" further down.
     this._registerFlowActions();
     this._registerConditions();
     await this._startPolling();
@@ -86,7 +96,10 @@ class LUNA2000EmmaModbusDevice extends Device {
     });
   }
 
-  async onSettings({ newSettings, changedKeys }) {
+  async onSettings({ oldSettings = {}, newSettings, changedKeys }) {
+    // Before anything else is written — see lib/mode-settings.js.
+    const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
+
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
       await this._stopPolling();
       await this._startPolling();
@@ -105,6 +118,14 @@ class LUNA2000EmmaModbusDevice extends Device {
       writeModbusU32(address, port, modbusId, 40002, raw)
         .catch((err) => this.error('Max grid charge power write failed:', err.message));
     }
+
+    // Not awaited, like every other write here: Homey stores the settings when this returns.
+    applyModeWrites(this, modeWrites, (w) => {
+      this._noteWrite(w.cap, w.reg, parseInt(w.value, 10), 'settings'); // a number, as from the flow cards
+      return writeModbusRegister(newSettings.address, parseInt(newSettings.port, 10) || 502,
+        parseIntSafe(newSettings.modbus_id, 0), w.reg, parseInt(w.value, 10));
+    }, (w, err) => revertModeSetting(this, w.key, oldSettings[w.key], err))
+      .catch((err) => this.error('Mode write failed:', err.message));
   }
 
   async onUninit() { await this._stopPolling(); }
@@ -124,36 +145,13 @@ class LUNA2000EmmaModbusDevice extends Device {
     }
   }
 
-  _registerControlListeners() {
-    const host   = () => this.getSetting('address');
-    const port   = () => parseInt(this.getSetting('port'), 10) || 502;
-    const unitId = () => parseIntSafe(this.getSetting('modbus_id'), 0);
-
-    for (const [cap, regAddress] of Object.entries(CONTROL_WRITE_MAP)) {
-      this.registerCapabilityListener(cap, (value) => {
-        if (this._updatingFromModbus) return;
-
-        const previousValue = this.getCapabilityValue(cap);
-        this._noteWrite(cap, regAddress, value, 'capability');
-        this.log(`Write start  [${cap} → reg ${regAddress}] value=${value}`);
-        this._writeInProgress = true;
-
-        writeModbusRegister(host(), port(), unitId(), regAddress, parseInt(value, 10))
-          .then(() => {
-            this.log(`Write OK     [${cap} → reg ${regAddress}]`);
-          })
-          .catch(async (err) => {
-            this.error(`Write failed [${cap} → reg ${regAddress}]:`, err.message);
-            this._updatingFromModbus = true;
-            await this._set(cap, previousValue).catch(() => {});
-            this._updatingFromModbus = false;
-          })
-          .finally(() => {
-            this._writeInProgress = false;
-          });
-      });
-    }
-  }
+  // ─── Why the battery modes cannot be changed from the device tile ────────────
+  //
+  // Same reason and same change as in the luna2000_modbus driver (issue #35): the scroll
+  // wheels wrote whatever they landed on, with Fixed Charge/Discharge or Feed to Grid near
+  // the top. The tile shows both modes as text; they are changed from dropdowns in the
+  // device settings, written only on Save — see onSettings and lib/mode-settings.js.
+  // CONTROL_WRITE_MAP stays for the flow cards.
 
   // ─── Flow actions ──────────────────────────────────────────────────────────
 
@@ -475,6 +473,12 @@ class LUNA2000EmmaModbusDevice extends Device {
           .catch((err) => this.log('setSettings info rows failed:', err.message));
         this._updatingSettingFromModbus = false;
       }
+
+      // The "Change battery mode" dropdowns — see lib/mode-settings.js.
+      await syncModeSettings(this, MODE_SETTINGS, {
+        mode_storage_working: ctrl.essControlMode,
+        mode_excess_pv_tou:   ctrl.preferredUseSurplusPv,
+      });
 
       // Sync max grid charging power setting if it differs from what the EMMA reports
       if (ctrl.maxGridChargingPower !== null && ctrl.maxGridChargingPower !== undefined) {
