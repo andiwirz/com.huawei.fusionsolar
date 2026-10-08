@@ -248,7 +248,7 @@ Direct Modbus TCP connection to the SUN2000 inverter or SDongle.
 | Grid frequency              | Mains frequency (Hz)                                      |
 | Inverter status             | Operating state as text                                   |
 | Software version            | Inverter firmware version                                 |
-| Active power control mode   | Configurable feed-in limit                                |
+| Active power control mode   | Feed-in limit mode — shown here, changed only by flow cards |
 | Optimizers total / online   | Counts from register 37200 — only where optimizers are registered |
 | Grid active power           | Current (W) — only when DTSU666 is connected              |
 | Total grid import           | Cumulative (kWh) — only when DTSU666 is connected         |
@@ -323,8 +323,10 @@ Three differences are worth knowing before switching:
 - **Homey Energy reads a different capability on each driver**: `meter_power` on Modbus,
   `meter_power.pv_total` on EMMA Modbus and on OpenAPI. Pairing the same physical inverter on
   two of these drivers at once therefore counts its production twice.
-- **Only the Modbus driver can control anything.** `activepower_controlmode` is the one
-  writable capability among the three; the EMMA and cloud drivers are read-only.
+- **No driver changes the inverter from its tile.** `activepower_controlmode` on the Modbus
+  driver is shown, not set: since 1.2.263 the feed-in mode changes only through flow cards,
+  because a scroll gesture on the old picker could switch a feed-in limit off (issue #35).
+  The EMMA and cloud drivers have no inverter controls at all.
 
 ---
 

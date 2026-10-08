@@ -116,7 +116,8 @@ class SUN2000ModbusDevice extends Device {
     this._pvStringCount              = null; // populated by first poll from register 30071
     this._lastPollStart             = 0;
     await this._ensureCapabilities();
-    this._registerControlListeners();
+    // No capability listener for activepower_controlmode, deliberately — see the comment
+    // where _registerControlListeners used to be.
     this._registerFlowActions();
     this._registerPowerThresholdListeners();
     await this._startPolling();
@@ -211,37 +212,29 @@ class SUN2000ModbusDevice extends Device {
     }
   }
 
-  _registerControlListeners() {
-    const host    = () => this.getSetting('address');
-    const port    = () => parseInt(this.getSetting('port'), 10) || 502;
-    const unitId  = () => parseIntSafe(this.getSetting('modbus_id'), 1);
-
-    for (const [cap, regAddress] of Object.entries(CONTROL_WRITE_MAP)) {
-      this.registerCapabilityListener(cap, (value) => {
-        if (this._updatingFromModbus) return; // ignore updates triggered by poll reads
-
-        const previousValue = this.getCapabilityValue(cap);
-        this.log(`Write start  [${cap} → reg ${regAddress}] value=${value}`);
-        this._writeInProgress = true;
-
-        // Fire-and-forget: return immediately so Homey never shows a UI timeout.
-        // On failure the capability is reverted to its previous value.
-        writeModbusRegister(host(), port(), unitId(), regAddress, parseInt(value, 10))
-          .then(() => {
-            this.log(`Write OK     [${cap} → reg ${regAddress}]`);
-          })
-          .catch(async (err) => {
-            this.error(`Write failed [${cap} → reg ${regAddress}]:`, err.message);
-            this._updatingFromModbus = true;
-            await this._set(cap, previousValue).catch(() => {});
-            this._updatingFromModbus = false;
-          })
-          .finally(() => {
-            this._writeInProgress = false;
-          });
-      });
-    }
-  }
+  // ─── Why the feed-in mode cannot be changed from the device tile ─────────────
+  //
+  // Until 1.2.263 activepower_controlmode was a picker, and this file registered a capability
+  // listener that wrote whatever the picker held straight into register 47415. Reported as
+  // issue #35 by gsommer, whose house connection depends on a 5 kW feed-in limit: opening the
+  // inverter in the Homey app was enough to reset it to Unlimited. His log, from 1.2.262:
+  //
+  //     11:53:41  Write start  [activepower_controlmode → reg 47415] value=0
+  //     11:53:48  Write OK     [activepower_controlmode → reg 47415]
+  //
+  // No flow, no EMS — the tile. The picker is a scroll wheel with Unlimited at the top, on a
+  // screen people scroll through to read their readings, and every movement of it was a
+  // command to the inverter with no confirmation.
+  //
+  // A register that keeps a house's main fuse from tripping must change only when someone
+  // means it to. So the tile only shows the mode (setable: false, uiComponent: sensor in the
+  // manifest), and no listener is registered here at all: even a Homey app still rendering
+  // the old picker from a cached definition has nothing to write through. Changing the mode
+  // stays possible, deliberately, through the flow cards below — "Set active power mode",
+  // the export-limit and zero-export cards, "Set max feed-in power (%)" — which all name what
+  // they do and are run on purpose.
+  //
+  // CONTROL_WRITE_MAP stays: those flow cards take the register address from it.
 
   // ─── Flow actions ──────────────────────────────────────────────────────────
 
