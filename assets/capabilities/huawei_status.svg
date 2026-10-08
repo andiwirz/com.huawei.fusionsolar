@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M22 11L18 11A1 1 0 0 0 18 13L22 13A1 1 0 0 0 22 11ZM17.051 11.684L14.051 20.684A1 1 0 0 0 15.949 21.316L18.949 12.316A1 1 0 0 0 17.051 11.684ZM15.949 20.684L9.949 2.684A1 1 0 0 0 8.051 3.316L14.051 21.316A1 1 0 0 0 15.949 20.684ZM8.051 2.684L5.051 11.684A1 1 0 0 0 6.949 12.316L9.949 3.316A1 1 0 0 0 8.051 2.684ZM6 11L2 11A1 1 0 0 0 2 13L6 13A1 1 0 0 0 6 11Z"/></svg>
