@@ -767,8 +767,9 @@ sits in a group, the way the inverter's do:
 | Connection | IP Address · Modbus Port · Modbus Unit ID · Update Interval |
 | Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above — and whether an Energy Management device is installed, the tool for charging by price or forecast |
 | Charge and discharge power | Max charge power (W) · Max discharge power (W) |
-| Charging from the grid | Charge battery from grid · Grid charge power (W) · Grid charge cutoff SoC (%) |
+| Charging from the grid | Charge battery from grid · Grid charge power (W) · Grid charge power limit (W) · Grid charge cutoff SoC (%) |
 | State of charge limits | Charging cutoff capacity (%) · Discharge cutoff capacity (%) · Backup power SoC (%) |
+| Peak shaving | Peak shaving mode · Backup SoC for peak shaving (%) — the limits per time period are set in the FusionSolar app |
 | Notifications | Timeline notifications |
 
 The EMMA battery has Connection, Change battery mode, Charging from the grid (max grid charging

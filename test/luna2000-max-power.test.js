@@ -227,7 +227,8 @@ test('one poll is enough for a limit changed in Huawei’s own app', async () =>
   assert.strictEqual(d.settings.max_discharge_power, 0);
 });
 
-test('the scattered three are read on their own, and only those', async () => {
+test('the scattered ones are read on their own, and only those', async () => {
+  // Since 1.2.274 with the grid charge ceiling (47244) and peak shaving (47954/47955).
   reset();
   modbus.ctrl = { storageExcessPvEnergyUseInTou: 1, remoteChargeDischargeControlMode: 0 };
   const d = makeDevice();
@@ -235,7 +236,7 @@ test('the scattered three are read on their own, and only those', async () => {
   await d._fetchControl('192.168.1.10', 502, 1);
 
   const regs = asked(0);
-  assert.deepStrictEqual(regs, [47242, 47299, 47589]);
+  assert.deepStrictEqual(regs, [47242, 47244, 47299, 47589, 47954, 47955]);
   assert.strictEqual(d.caps['storage_excess_pv_energy_use_in_tou'], '1');
 });
 
@@ -792,7 +793,7 @@ test('every register _applyControl reads is in one of the two halves', () => {
       .matchAll(/(\w+):\s+CONTROL_REGISTERS/g)].map((m) => m[1]));
   const live = half('LIVE_CONTROL_REGISTERS');
   const rare = half('RARE_CONTROL_REGISTERS');
-  assert.ok(live.size === 11 && rare.size === 3, `halves are ${live.size}/${rare.size}, expected 11/3`);
+  assert.ok(live.size === 11 && rare.size === 6, `halves are ${live.size}/${rare.size}, expected 11/6`);
 
   // Bounded forwards from _applyControl: _notifyForceAbort is CALLED by the force cards
   // long before it is defined, so searching from the start of the file lands on a call and

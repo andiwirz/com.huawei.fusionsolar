@@ -162,10 +162,14 @@ test('the flow cards still register, and register no capability listener on the 
 
 // ── the dropdowns in the manifest ────────────────────────────────────────────────
 
+// A mode with no tile has no capability to compare against; peak shaving (1.2.274) is covered
+// in test/grid-ceiling-peak-shaving.test.js.
+const TILELESS = { luna2000_modbus: ['mode_capacity_control'] };
+
 test('each driver has its dropdowns, and nothing else is offered as one', () => {
   for (const [driverId, list] of Object.entries(DROPDOWNS)) {
     const found = flatSettings(driver(driverId).settings).filter((s) => /^mode_/.test(s.id)).map((s) => s.id);
-    assert.deepStrictEqual(found, list.map(([key]) => key), driverId);
+    assert.deepStrictEqual(found, [...list.map(([key]) => key), ...(TILELESS[driverId] || [])], driverId);
     for (const [key] of list) assert.strictEqual(setting(driverId, key).type, 'dropdown', `${driverId}/${key}`);
   }
 });

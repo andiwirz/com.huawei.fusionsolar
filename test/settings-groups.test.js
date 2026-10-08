@@ -35,8 +35,9 @@ test('the LUNA2000 settings come in these groups, in this order', () => {
     ['Connection', ['address', 'port', 'modbus_id', 'poll_interval']],
     ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'mode_remote_dispatch', 'info_ems_battery']],
     ['Charge and discharge power', ['max_charge_power', 'max_discharge_power']],
-    ['Charging from the grid', ['charge_from_grid', 'max_grid_charge_power', 'grid_charge_cutoff_soc']],
+    ['Charging from the grid', ['charge_from_grid', 'max_grid_charge_power', 'max_grid_charge_ceiling', 'grid_charge_cutoff_soc']],
     ['State of charge limits', ['charging_cutoff_capacity', 'discharge_cutoff_capacity', 'backup_power_soc']],
+    ['Peak shaving', ['mode_capacity_control', 'capacity_control_soc']],
     ['Notifications', ['enable_timeline_notifications']],
   ]);
 });

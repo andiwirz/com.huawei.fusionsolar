@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.273",
+  "version": "1.2.274",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4295,10 +4295,27 @@
               "max": 100000,
               "step": 100,
               "hint": {
-                "en": "The power the battery charges from the grid at (register 47242) — the value FusionSolar shows and sets. It cannot exceed the upper limit for grid charging (register 47244), which the flow card \"Set max power charge from grid\" sets. Needs \"Charge battery from grid\": saving this turns it on if it is off. Synced from the inverter every fifth poll while grid charging is on.",
-                "de": "Leistung, mit der die Batterie aus dem Netz lädt (Register 47242) — der Wert, den FusionSolar anzeigt und setzt. Er kann die Obergrenze fürs Netzladen (Register 47244) nicht überschreiten; diese setzt die Flow-Karte „Maximale Netzladeleistung setzen“. Braucht „Batterie aus dem Netz laden“: Beim Speichern wird das eingeschaltet, falls es aus ist. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert, solange das Netzladen eingeschaltet ist.",
-                "nl": "Vermogen waarmee de batterij uit het net laadt (register 47242) — de waarde die FusionSolar toont en instelt. Het kan de bovengrens voor laden uit het net (register 47244) niet overschrijden; die stelt de flowkaart „Maximaal laadvermogen uit het net instellen” in. Vereist „Batterij laden uit het net”: bij opslaan wordt dat ingeschakeld als het uit staat. Wordt bij elke vijfde uitlezing met de omvormer gesynchroniseerd, zolang laden uit het net aan staat."
+                "en": "The power the battery charges from the grid at (register 47242) — the value FusionSolar shows and sets. It cannot exceed the upper limit for grid charging (register 47244), set below or with the flow card \"Set max power charge from grid\". Needs \"Charge battery from grid\": saving this turns it on if it is off. Synced from the inverter every fifth poll while grid charging is on.",
+                "de": "Leistung, mit der die Batterie aus dem Netz lädt (Register 47242) — der Wert, den FusionSolar anzeigt und setzt. Er kann die Obergrenze fürs Netzladen (Register 47244) nicht überschreiten; diese wird darunter oder mit der Flow-Karte „Maximale Netzladeleistung setzen“ gesetzt. Braucht „Batterie aus dem Netz laden“: Beim Speichern wird das eingeschaltet, falls es aus ist. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert, solange das Netzladen eingeschaltet ist.",
+                "nl": "Vermogen waarmee de batterij uit het net laadt (register 47242) — de waarde die FusionSolar toont en instelt. Het kan de bovengrens voor laden uit het net (register 47244) niet overschrijden; die stel je hieronder of met de flowkaart „Maximaal laadvermogen uit het net instellen” in. Vereist „Batterij laden uit het net”: bij opslaan wordt dat ingeschakeld als het uit staat. Wordt bij elke vijfde uitlezing met de omvormer gesynchroniseerd, zolang laden uit het net aan staat."
               }
+            },
+            {
+              "id": "max_grid_charge_ceiling",
+              "type": "number",
+              "label": {
+                "en": "Grid charge power limit (W)",
+                "de": "Obergrenze Netzladeleistung (W)",
+                "nl": "Bovengrens laadvermogen uit het net (W)"
+              },
+              "hint": {
+                "en": "The highest power the battery may charge from the grid at (register 47244); the grid charge power above cannot go higher. Huawei's default is 2000 W. Synced from the inverter every fifth poll.",
+                "de": "Die höchste Leistung, mit der die Batterie aus dem Netz laden darf (Register 47244); die Netzladeleistung darüber kann nicht höher sein. Huaweis Standard ist 2000 W. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Het hoogste vermogen waarmee de batterij uit het net mag laden (register 47244); het laadvermogen uit het net hierboven kan niet hoger zijn. Standaard bij Huawei: 2000 W. Wordt bij elke vijfde uitlezing met de omvormer gesynchroniseerd."
+              },
+              "min": 0,
+              "max": 100000,
+              "step": 100
             },
             {
               "id": "grid_charge_cutoff_soc",
@@ -4377,6 +4394,74 @@
                 "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
                 "nl": "Minimale laadtoestand die bij netuitval voor noodstroom gereserveerd blijft (register 47102). Bereik: 0–100 %, standaard 0 %. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Peak shaving",
+            "de": "Lastspitzenkappung",
+            "nl": "Piekafvlakking"
+          },
+          "children": [
+            {
+              "id": "mode_capacity_control",
+              "type": "dropdown",
+              "label": {
+                "en": "Peak shaving",
+                "de": "Lastspitzenkappung",
+                "nl": "Piekafvlakking"
+              },
+              "value": "0",
+              "hint": {
+                "en": "Lets the battery cover load peaks so the power drawn from the grid stays under a limit (register 47954). The limits per time period are set in the FusionSolar app — this app does not write them, so set them there first. \"Apparent power limit\" works only in systems with several inverters. Written to the device only when you press Save.",
+                "de": "Lässt die Batterie Lastspitzen abdecken, damit der Netzbezug unter einer Grenze bleibt (Register 47954). Die Grenzen pro Zeitraum werden in der FusionSolar-App gesetzt — diese App schreibt sie nicht, deshalb zuerst dort einstellen. „Scheinleistungsbegrenzung“ funktioniert nur in Anlagen mit mehreren Wechselrichtern. Wird erst beim Speichern auf das Gerät geschrieben.",
+                "nl": "Laat de batterij belastingspieken opvangen, zodat de afname uit het net onder een grens blijft (register 47954). De grenzen per periode worden in de FusionSolar-app ingesteld — deze app schrijft ze niet, stel ze daar dus eerst in. „Begrenzing schijnbaar vermogen” werkt alleen in installaties met meerdere omvormers. Wordt pas naar het apparaat geschreven als je op Opslaan drukt."
+              },
+              "values": [
+                {
+                  "id": "0",
+                  "label": {
+                    "en": "Disabled",
+                    "de": "Deaktiviert",
+                    "nl": "Uitgeschakeld"
+                  }
+                },
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "Active power limit",
+                    "de": "Wirkleistungsbegrenzung",
+                    "nl": "Begrenzing werkzaam vermogen"
+                  }
+                },
+                {
+                  "id": "2",
+                  "label": {
+                    "en": "Apparent power limit (several inverters only)",
+                    "de": "Scheinleistungsbegrenzung (nur mit mehreren Wechselrichtern)",
+                    "nl": "Begrenzing schijnbaar vermogen (alleen bij meerdere omvormers)"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "capacity_control_soc",
+              "type": "number",
+              "label": {
+                "en": "Backup SoC for peak shaving (%)",
+                "de": "Reserve-SoC für Lastspitzenkappung (%)",
+                "nl": "Reserve-SoC voor piekafvlakking (%)"
+              },
+              "hint": {
+                "en": "The charge the battery keeps in reserve for peak shaving (register 47955), 0–100 %. Synced from the inverter every fifth poll.",
+                "de": "Ladezustand, den die Batterie für die Lastspitzenkappung zurückhält (Register 47955), 0–100 %. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Laadtoestand die de batterij in reserve houdt voor piekafvlakking (register 47955), 0–100 %. Wordt bij elke vijfde uitlezing met de omvormer gesynchroniseerd."
+              },
+              "min": 0,
+              "max": 100,
+              "step": 1
             }
           ]
         },
@@ -12689,9 +12774,9 @@
           "nl": "Modus capaciteitsregeling instellen op [[mode]]"
         },
         "hint": {
-          "en": "Sets the battery capacity control mode (register 47954). 'SoC peak shaving' uses the configured SoC threshold (register 47955) to limit peak loads.",
-          "de": "Setzt den Kapazitätssteuerungsmodus der Batterie (Register 47954). 'SoC-Lastspitzenkappung' nutzt den konfigurierten SoC-Schwellenwert (Register 47955), um Lastspitzen zu begrenzen.",
-          "nl": "Stelt de modus voor capaciteitsregeling van de batterij in (register 47954). 'SoC-piekafvlakking' gebruikt de ingestelde SoC-drempel (register 47955) om piekbelastingen te begrenzen."
+          "en": "Sets peak shaving (register 47954): off, active power limit, or apparent power limit (several inverters only). The limits per time period come from the FusionSolar app; the charge kept in reserve for it is set with \"Set capacity control peak-shaving SoC\" (register 47955).",
+          "de": "Setzt die Lastspitzenkappung (Register 47954): aus, Wirkleistungsbegrenzung oder Scheinleistungsbegrenzung (nur mit mehreren Wechselrichtern). Die Grenzen pro Zeitraum kommen aus der FusionSolar-App; den dafür zurückgehaltenen Ladezustand setzt „Kapazitätssteuerung Lastspitzen-SoC setzen“ (Register 47955).",
+          "nl": "Stelt piekafvlakking in (register 47954): uit, begrenzing werkzaam vermogen of begrenzing schijnbaar vermogen (alleen bij meerdere omvormers). De grenzen per periode komen uit de FusionSolar-app; de laadtoestand die daarvoor in reserve blijft, stel je in met „SoC voor piekafvlakking instellen” (register 47955)."
         },
         "args": [
           {
@@ -12719,9 +12804,17 @@
               {
                 "id": "1",
                 "label": {
-                  "en": "SoC peak shaving",
-                  "de": "SoC-Lastspitzenkappung",
-                  "nl": "SoC-piekafvlakking"
+                  "en": "Active power limit",
+                  "de": "Wirkleistungsbegrenzung",
+                  "nl": "Begrenzing werkzaam vermogen"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Apparent power limit (several inverters only)",
+                  "de": "Scheinleistungsbegrenzung (nur mit mehreren Wechselrichtern)",
+                  "nl": "Begrenzing schijnbaar vermogen (alleen bij meerdere omvormers)"
                 }
               }
             ]
@@ -12741,9 +12834,9 @@
           "nl": "SoC voor piekafvlakking instellen op [[target_soc]] %"
         },
         "hint": {
-          "en": "Sets the SoC threshold for peak shaving (register 47955). Requires capacity control mode to be set to 'SoC peak shaving' (register 47954 = 1).",
-          "de": "Setzt den SoC-Schwellenwert für die Lastspitzenkappung (Register 47955). Erfordert, dass der Kapazitätssteuerungsmodus auf 'SoC-Lastspitzenkappung' gesetzt ist (Register 47954 = 1).",
-          "nl": "Stelt de SoC-drempel voor piekafvlakking in (register 47955). Vereist dat de modus capaciteitsregeling op 'SoC-piekafvlakking' staat (register 47954 = 1)."
+          "en": "Sets the charge the battery keeps in reserve for peak shaving (register 47955). Takes effect while peak shaving is on (register 47954).",
+          "de": "Setzt den Ladezustand, den die Batterie für die Lastspitzenkappung zurückhält (Register 47955). Wirkt, solange die Lastspitzenkappung eingeschaltet ist (Register 47954).",
+          "nl": "Stelt de laadtoestand in die de batterij in reserve houdt voor piekafvlakking (register 47955). Werkt zolang piekafvlakking aan staat (register 47954)."
         },
         "args": [
           {

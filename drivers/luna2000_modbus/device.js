@@ -109,14 +109,20 @@ const LIVE_CONTROL_REGISTERS = {
   storageUnit2No:                   CONTROL_REGISTERS.storageUnit2No,                 // 47108
 };
 
-// The three that sit far enough away to need a request each, and that nothing reads often.
-// 47589 is the reason the throttle still earns its keep: it is a single-register span, and
-// the field log of 2026-08 shows it going silent for minutes at a time — a silent register
-// holds the host lock for the full RESPONSE_TIMEOUT_MS. Once every five polls, not every one.
+// The ones that sit far enough away to need a request of their own, and that nothing reads
+// often: 47242 with its ceiling 47244 right behind it, 47299, 47589, and since 1.2.274 peak
+// shaving at 47954/47955 — four requests. 47589 is the reason the throttle still earns its
+// keep: it is a single-register span, and the field log of 2026-08 shows it going silent for
+// minutes at a time — a silent register holds the host lock for the full RESPONSE_TIMEOUT_MS.
+// Once every five polls, not every one. A battery without peak shaving answers 47954 with
+// "illegal data address", which the client logs sparingly and does not count as a fault.
 const RARE_CONTROL_REGISTERS = {
   storageGridChargePower:           CONTROL_REGISTERS.storageGridChargePower,           // 47242
+  storageMaxGridChargePower:        CONTROL_REGISTERS.storageMaxGridChargePower,        // 47244
   storageExcessPvEnergyUseInTou:    CONTROL_REGISTERS.storageExcessPvEnergyUseInTou,    // 47299
   remoteChargeDischargeControlMode: CONTROL_REGISTERS.remoteChargeDischargeControlMode, // 47589
+  storageCapacityControlMode:       CONTROL_REGISTERS.storageCapacityControlMode,       // 47954
+  storageCapacityControlSoc:        CONTROL_REGISTERS.storageCapacityControlSoc,        // 47955
 };
 
 // The configured charge/discharge limits, setting id → the capability that mirrors it. A
@@ -142,6 +148,9 @@ const SETTING_LABEL = {
   mode_storage_working:      'Storage working mode',
   mode_excess_pv_tou:        'Excess PV energy (Time of Use)',
   mode_remote_dispatch:      'Remote charge/discharge mode',
+  max_grid_charge_ceiling:   'Grid charge power limit',
+  mode_capacity_control:     'Peak shaving',
+  capacity_control_soc:      'Backup SoC for peak shaving',
 };
 
 // Maps writable enum capability → Modbus register address (47xxx)
@@ -158,6 +167,9 @@ const MODE_SETTINGS = {
   mode_storage_working: { cap: 'storage_working_mode_settings',        reg: 47086, ids: ['0', '1', '2', '3', '4', '5', '6'] },
   mode_excess_pv_tou:   { cap: 'storage_excess_pv_energy_use_in_tou',  reg: 47299, ids: ['0', '1'] },
   mode_remote_dispatch: { cap: 'remote_charge_discharge_control_mode', reg: 47589, ids: ['0', '1', '2', '3', '4', '5'] },
+  // Peak shaving has no tile, so it names its values itself (SPC177: 2 is not supported in
+  // single-device systems, but a device reporting it must still fill the dropdown).
+  mode_capacity_control: { reg: 47954, ids: ['0', '1', '2'], labels: { 0: 'Disabled', 1: 'Active power limit', 2: 'Apparent power limit' } },
 };
 
 class LUNA2000ModbusDevice extends Device {
@@ -223,6 +235,7 @@ class LUNA2000ModbusDevice extends Device {
         charging_cutoff_capacity: { reg: 47081, scale: 10, u32: false },
         discharge_cutoff_capacity:{ reg: 47082, scale: 10, u32: false },
         backup_power_soc:         { reg: 47102, scale: 10, u32: false },
+        capacity_control_soc:     { reg: 47955, scale: 10, u32: false },
       };
       for (const [key, { reg, scale, u32 }] of Object.entries(socSettings)) {
         if (changedKeys.includes(key)) {
@@ -247,6 +260,14 @@ class LUNA2000ModbusDevice extends Device {
             .then(() => this._reflectMaxPower(key, raw))
             .catch((err) => this._revertSetting(key, oldSettings, err));
         }
+      }
+
+      // The ceiling the set point 47242 cannot exceed.
+      if (changedKeys.includes('max_grid_charge_ceiling')) {
+        const raw = Math.round(Math.max(0, parseFloat(newSettings.max_grid_charge_ceiling) || 0));
+        this.log(`Write max_grid_charge_ceiling: ${raw} W → reg 47244`);
+        writeModbusU32(address, port, modbusId, 47244, raw)
+          .catch((err) => this._revertSetting('max_grid_charge_ceiling', oldSettings, err));
       }
 
       // Register 47242 (active grid charge power set point) requires Charge from Grid
@@ -358,7 +379,8 @@ class LUNA2000ModbusDevice extends Device {
     if (this.getSetting('enable_timeline_notifications') === false) return;
     const label = SETTING_LABEL[settingId] || settingId;
     // A mode reads as its name, not as the register value behind the dropdown.
-    const shown = MODE_SETTINGS[settingId] ? this._enumLabel(MODE_SETTINGS[settingId].cap, previous) : previous;
+    const spec = MODE_SETTINGS[settingId];
+    const shown = !spec ? previous : spec.labels ? (spec.labels[previous] ?? previous) : this._enumLabel(spec.cap, previous);
     this.homey.notifications.createNotification({
       excerpt: `${this.getName()}: ${label} could not be written (${err.message}) — put back to ${shown}.`,
     }).catch((e) => this.log('Timeline notification failed:', e.message));
@@ -1368,6 +1390,8 @@ class LUNA2000ModbusDevice extends Device {
         ['storageMaxChargePower',          'max_charge_power'],
         ['storageMaxDischargePower',       'max_discharge_power'],
         ['storageBackupPowerSoc',          'backup_power_soc'],
+        ['storageMaxGridChargePower',      'max_grid_charge_ceiling'],   // rare half
+        ['storageCapacityControlSoc',      'capacity_control_soc'],      // rare half
       ];
       // Fields that Homey renders as blank when the value is 0 — always sync so
       // a stored null gets populated and a stored 0 triggers a settings refresh.
@@ -1466,6 +1490,7 @@ class LUNA2000ModbusDevice extends Device {
         mode_storage_working: ctrl.storageWorkingMode,
         mode_excess_pv_tou:   ctrl.storageExcessPvEnergyUseInTou,
         mode_remote_dispatch: ctrl.remoteChargeDischargeControlMode,
+        mode_capacity_control: ctrl.storageCapacityControlMode,
       });
 
       // onSettings refuses to write to the inverter until it has seen the registers it
