@@ -1,21 +1,18 @@
 'use strict';
 
-// The three boxes of the "What the battery modes do" group. Run: node --test
+// The one read-only box on the battery's settings page. Run: node --test
 //
-// From a field screenshot of 1.2.241: the group rendered as headings over EMPTY boxes.
-// Homey draws a setting of type "label" as a disabled input showing its value, and 1.2.237
-// had put the explanation in the hint — translatable, but hidden behind the (i) — and left
-// the value empty. Three headings, three empty boxes, reading as three settings with
-// nothing in them.
+// "Charging by price or forecast", at the end of the "Change battery mode" group, answers
+// whether the device that does price- and forecast-driven charging is installed; its (i)
+// says to use that device rather than the modes. Homey draws a setting of type "label" as a
+// disabled box showing its value — 1.2.237 left the value empty and showed empty boxes, so
+// since 1.2.242 the value is the answer.
 //
-// Since 1.2.242 each box answers the question its heading asks: the current working mode,
-// the current remote mode, and whether the device that does price-driven charging is even
-// installed. The mode names come from the capability's own enum titles via _enumLabel, so
-// the box can never disagree with the picker one screen away.
+// Until 1.2.272 two more boxes showed the working mode and the remote mode. Since 1.2.266 the
+// dropdowns right above them showed the same words, so they went, and their explanations
+// moved into the dropdowns' (i). The tests at the end keep them from being written again.
 //
-// Both battery drivers are covered here. The EMMA one has no remote charge/discharge mode,
-// so it has two rows rather than three — and it was the half the 1.2.242 mutation probe
-// found untested.
+// Both battery drivers are covered.
 
 const Module = require('module');
 const _origLoad = Module._load;
@@ -50,7 +47,6 @@ const manifest = require('../app.json');
 const LunaModbus = require('../drivers/luna2000_modbus/device.js');
 const LunaEmma   = require('../drivers/luna2000_emma_modbus/device.js');
 
-const ROWS = ['info_working_mode', 'info_remote_mode', 'info_ems_battery'];
 const card = () => { const c = { registerRunListener: () => c, trigger: async () => {} }; return c; };
 
 function makeDevice(Cls, lang = 'de') {
@@ -59,9 +55,7 @@ function makeDevice(Cls, lang = 'de') {
   for (const c of ['storage_working_mode_settings', 'storage_force_charge_discharge',
     'storage_excess_pv_energy_use_in_tou', 'remote_charge_discharge_control_mode',
     'luna2000_unit1_installed', 'luna2000_unit2_installed', 'measure_battery_modules']) d.caps[c] = null;
-  d.settings = Object.fromEntries(ROWS.map((r) => [r, '—']));
-  d.settings.charge_from_grid = false;
-  d.settings.max_grid_charge_power = 2000;
+  d.settings = { info_ems_battery: '—', charge_from_grid: false, max_grid_charge_power: 2000 };
   d.logs = [];
   d.log = (...a) => d.logs.push(a.join(' '));
   d.error = d.log;
@@ -92,45 +86,7 @@ function makeDevice(Cls, lang = 'de') {
   return d;
 }
 
-const titleOf = (capId, id, lang) =>
-  manifest.capabilities[capId].values.find((v) => String(v.id) === String(id)).title[lang];
-
 // ── the LUNA2000 Modbus driver ──────────────────────────────────────────────
-
-test('the working-mode box shows the mode, in the user’s language', async () => {
-  const d = makeDevice(LunaModbus);
-  await d._applyControl({ storageWorkingMode: 2 });
-  assert.strictEqual(d.settings.info_working_mode,
-    titleOf('storage_working_mode_settings', 2, 'de'),
-    'the box does not say what the picker on the same device says');
-});
-
-test('the remote-mode box shows its own mode', async () => {
-  const d = makeDevice(LunaModbus);
-  await d._applyControl({ remoteChargeDischargeControlMode: 0 });
-  assert.strictEqual(d.settings.info_remote_mode,
-    titleOf('remote_charge_discharge_control_mode', 0, 'de'));
-});
-
-// The two modes arrive in different halves of the split read. A row written from whichever
-// half happens to be running would blank the other every poll — the 1.2.240 shape.
-test('the half that carries one mode does not blank the other’s box', async () => {
-  const d = makeDevice(LunaModbus);
-  await d._applyControl({ storageWorkingMode: 2 });                  // live half
-  await d._applyControl({ remoteChargeDischargeControlMode: 0 });    // rare half
-  assert.strictEqual(d.settings.info_working_mode, titleOf('storage_working_mode_settings', 2, 'de'),
-    'the rare half cleared the row the live half had just filled');
-  assert.strictEqual(d.settings.info_remote_mode,
-    titleOf('remote_charge_discharge_control_mode', 0, 'de'));
-});
-
-test('a Dutch device gets Dutch, from the same source', async () => {
-  const d = makeDevice(LunaModbus, 'nl');
-  await d._applyControl({ storageWorkingMode: 2, remoteChargeDischargeControlMode: 0 });
-  assert.strictEqual(d.settings.info_working_mode, titleOf('storage_working_mode_settings', 2, 'nl'));
-  assert.strictEqual(d.settings.info_remote_mode,
-    titleOf('remote_charge_discharge_control_mode', 0, 'nl'));
-});
 
 test('the EMS box says whether the device that does this is installed', async () => {
   const d = makeDevice(LunaModbus);
@@ -151,28 +107,21 @@ test('no Energy Management driver at all reads as "not added"', async () => {
   assert.strictEqual(d.settings.info_ems_battery, 'modbus.battery.ems.absent');
 });
 
-test('a mode that did not move writes nothing to the store', async () => {
+test('an answer that did not change writes nothing to the store', async () => {
   const d = makeDevice(LunaModbus);
   await d._applyControl({ storageWorkingMode: 2 });
   const after = d.setSettingsCalls.length;
   await d._applyControl({ storageWorkingMode: 2 });
-  assert.deepStrictEqual(d.setSettingsCalls.slice(after).filter((c) => 'info_working_mode' in c), [],
+  assert.deepStrictEqual(d.setSettingsCalls.slice(after).filter((c) => 'info_ems_battery' in c), [],
     'the same string was written to the store again');
 });
 
-test('a register that did not arrive leaves its box alone', async () => {
-  const d = makeDevice(LunaModbus);
-  await d._applyControl({ storageWorkingMode: 2 });
-  await d._applyControl({});
-  assert.strictEqual(d.settings.info_working_mode, titleOf('storage_working_mode_settings', 2, 'de'));
-});
-
-// The rows are decoration; the settings sync is not. One must not take the other down.
-test('a store that refuses an info row still gets the real settings sync', async () => {
+// The box is decoration; the settings sync is not. One must not take the other down.
+test('a store that refuses the box still gets the real settings sync', async () => {
   const d = makeDevice(LunaModbus);
   const real = d.setSettings;
   d.setSettings = async (o) => {
-    if (Object.keys(o).some((k) => k.startsWith('info_'))) throw new Error('store is busy');
+    if ('info_ems_battery' in o) throw new Error('store is busy');
     return real(o);
   };
   d.settings.max_discharge_power = 5000;
@@ -185,12 +134,12 @@ test('a store that refuses an info row still gets the real settings sync', async
   assert.ok(d.logs.some((l) => /info rows failed/.test(l)), 'the refusal went unlogged');
 });
 
-test('the info rows are written under the guard, like every other sync', async () => {
+test('the box is written under the guard, like every other sync', async () => {
   const d = makeDevice(LunaModbus);
   let guarded = null;
   const real = d.setSettings;
   d.setSettings = async (o) => {
-    if ('info_working_mode' in o) guarded = d._updatingSettingFromModbus;
+    if ('info_ems_battery' in o) guarded = d._updatingSettingFromModbus;
     return real(o);
   };
   await d._applyControl({ storageWorkingMode: 2 });
@@ -200,19 +149,11 @@ test('the info rows are written under the guard, like every other sync', async (
 });
 
 // ── the EMMA battery driver ─────────────────────────────────────────────────
-//
-// Same group, two rows. Its working mode is the EMMA's ESS control mode (40000), and it has
-// no remote charge/discharge mode at all — which is why it has no row for one.
 
-test('the EMMA driver fills its own boxes', async () => {
+test('the EMMA driver fills the EMS box', async () => {
   const d = makeDevice(LunaEmma);
   modbus.ctrl = { essControlMode: 2 };
-
   await d._fetchControl('192.168.1.10', 502, 0);
-
-  assert.strictEqual(d.settings.info_working_mode,
-    titleOf('storage_working_mode_settings', 2, 'de'),
-    'the EMMA box is still empty, or says something the picker does not');
   assert.strictEqual(d.settings.info_ems_battery, 'modbus.battery.ems.absent');
 });
 
@@ -220,28 +161,32 @@ test('the EMMA driver reports an installed Energy Management device too', async 
   const d = makeDevice(LunaEmma);
   d.emsDevices = [{}];
   modbus.ctrl = { essControlMode: 2 };
-
   await d._fetchControl('192.168.1.10', 502, 0);
-
   assert.strictEqual(d.settings.info_ems_battery, 'modbus.battery.ems.present');
 });
 
-test('the EMMA driver never invents a remote mode it does not have', async () => {
-  const d = makeDevice(LunaEmma);
+// ── the two boxes that went in 1.2.272 ──────────────────────────────────────
+
+test('neither driver writes the mode boxes any more', async () => {
+  const luna = makeDevice(LunaModbus);
+  await luna._applyControl({ storageWorkingMode: 2, remoteChargeDischargeControlMode: 0 });
+  const emma = makeDevice(LunaEmma);
   modbus.ctrl = { essControlMode: 2 };
+  await emma._fetchControl('192.168.1.10', 502, 0);
 
-  await d._fetchControl('192.168.1.10', 502, 0);
-
-  assert.strictEqual(d.settings.info_remote_mode, '—',
-    'a row was filled for a capability this device does not have');
+  for (const d of [luna, emma]) {
+    const written = d.setSettingsCalls.flatMap((c) => Object.keys(c));
+    assert.ok(!written.includes('info_working_mode') && !written.includes('info_remote_mode'),
+      `a removed box was written: ${written.join(', ')}`);
+  }
 });
 
-test('an EMMA whose mode register stayed silent keeps its placeholder', async () => {
-  const d = makeDevice(LunaEmma);
-  modbus.ctrl = {};
-
-  await d._fetchControl('192.168.1.10', 502, 0);
-
-  assert.strictEqual(d.settings.info_working_mode, '—',
-    'an unread register was turned into a mode name');
+test('the manifest no longer has them', () => {
+  const flat = (list) => (list || []).flatMap((x) => (x.type === 'group' ? flat(x.children) : [x]));
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+    const ids = flat(manifest.drivers.find((d) => d.id === id).settings).map((s) => s.id);
+    assert.ok(!ids.includes('info_working_mode') && !ids.includes('info_remote_mode'), id);
+    assert.ok(!flat(manifest.drivers.find((d) => d.id === id).settings)
+      .some((s) => s.type === 'group' && s.label.en === 'What the battery modes do'), id);
+  }
 });

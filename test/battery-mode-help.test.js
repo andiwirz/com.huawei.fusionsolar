@@ -26,7 +26,7 @@ const LANGS = ['en', 'de', 'nl'];
 const driver = (id) => manifest.drivers.find((d) => d.id === id);
 const action = (id) => manifest.flow.actions.find((c) => c.id === id);
 
-// The settings list is flat except for the group added here, so collect both levels.
+// Every setting sits in a group since 1.2.270, so collect both levels.
 function settingsOf(d) {
   const out = [];
   for (const s of d.settings || []) {
@@ -55,12 +55,14 @@ test('every battery driver with a working mode explains it', () => {
     (d) => (d.capabilities || []).includes('storage_working_mode_settings'));
   assert.ok(withMode.length >= 2, 'no battery drivers found — the test is looking in the wrong place');
 
+  // Since 1.2.272 the explanation is the (i) of the dropdown that changes the mode — the box
+  // that used to carry it only repeated what the dropdown shows.
   for (const d of withMode) {
-    const row = labelRow(d.id, 'info_working_mode');
+    const row = labelRow(d.id, 'mode_storage_working');
     assert.ok(row, `${d.id} offers a working mode with nothing that says what it does`);
-    assert.strictEqual(row.type, 'label');
+    assert.strictEqual(row.type, 'dropdown');
     for (const lang of LANGS) {
-      assert.ok(row.hint[lang], `${d.id} info_working_mode has no ${lang} text`);
+      assert.ok(row.hint[lang], `${d.id} mode_storage_working has no ${lang} text`);
       assert.match(row.hint[lang], /FusionSolar/,
         `${d.id} (${lang}) does not say where the Time of Use schedule has to be set`);
     }
@@ -72,7 +74,7 @@ test('every battery driver with a working mode explains it', () => {
 test('the remote mode is explained exactly where it exists', () => {
   for (const d of manifest.drivers) {
     const hasCap = (d.capabilities || []).includes('remote_charge_discharge_control_mode');
-    const hasRow = !!labelRow(d.id, 'info_remote_mode');
+    const hasRow = !!labelRow(d.id, 'mode_remote_dispatch');
     assert.strictEqual(hasRow, hasCap,
       hasCap ? `${d.id} has a remote mode and does not explain it`
              : `${d.id} explains a remote mode it does not have`);
@@ -80,11 +82,14 @@ test('the remote mode is explained exactly where it exists', () => {
 });
 
 test('the remote-mode text names the value to keep', () => {
-  const row = labelRow('luna2000_modbus', 'info_remote_mode');
+  const row = labelRow('luna2000_modbus', 'mode_remote_dispatch');
   for (const lang of LANGS) {
     assert.ok(row.hint[lang].includes(LOCAL_CONTROL[lang]),
       `the ${lang} text does not name "${LOCAL_CONTROL[lang]}" as the normal setting`);
   }
+  // His second question: why there are two modes at all.
+  const WHY_BOTH = { en: /which is why both exist/, de: /deshalb gibt es beide/, nl: /daarom bestaan ze allebei/ };
+  for (const lang of LANGS) assert.match(row.hint[lang], WHY_BOTH[lang], `${lang}: does not say why both modes exist`);
 });
 
 // What he was actually trying to build. Both battery drivers point at it, because on

@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.271",
+  "version": "1.2.272",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4038,9 +4038,9 @@
               },
               "value": "2",
               "hint": {
-                "en": "What the inverter does with the battery on its own. What each mode means is explained under \"What the battery modes do\". Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. Was jeder Modus bedeutet, steht unter „Was die Batteriemodi bewirken“. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Wat de omvormer uit zichzelf met de batterij doet. Wat elke modus betekent, staat onder „Wat de batterijmodi doen”. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "What the inverter does with the battery on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wat de omvormer uit zichzelf met de batterij doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
               },
               "values": [
                 {
@@ -4144,9 +4144,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "Who may command the battery from outside. Keep \"Local Control\" unless a third-party scheduler really is talking to the inverter — any other value overrides the working mode. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Wer die Batterie von aussen befehlen darf. „Lokale Steuerung“ beibehalten, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht — jeder andere Wert setzt den Betriebsmodus ausser Kraft. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Wie de batterij van buitenaf mag aansturen. Houd „Lokale sturing” aan, tenzij er echt een externe regelaar met de omvormer praat — elke andere waarde heft de bedrijfsmodus op. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "Who may command the battery from outside — a different question from the working mode, which is why both exist. Keep \"Local Control\" unless a third-party scheduler really is talking to the inverter: any other value overrides the working mode, and without such a scheduler the battery then behaves unpredictably. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Wer die Batterie von aussen befehlen darf — eine andere Frage als der Betriebsmodus, deshalb gibt es beide. „Lokale Steuerung“ beibehalten, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht: Jeder andere Wert setzt den Betriebsmodus ausser Kraft, und ohne solchen Regler verhält sich die Batterie danach unvorhersehbar. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wie de batterij van buitenaf mag aansturen — een andere vraag dan de bedrijfsmodus, daarom bestaan ze allebei. Houd „Lokale sturing” aan, tenzij er echt een externe regelaar met de omvormer praat: elke andere waarde heft de bedrijfsmodus op, en zonder zo'n regelaar gedraagt de batterij zich daarna onvoorspelbaar. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
               },
               "values": [
                 {
@@ -4198,46 +4198,6 @@
                   }
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "What the battery modes do",
-            "de": "Was die Batteriemodi bewirken",
-            "nl": "Wat de batterijmodi doen"
-          },
-          "children": [
-            {
-              "id": "info_working_mode",
-              "type": "label",
-              "label": {
-                "en": "Storage working mode",
-                "de": "Speicher-Betriebsmodus",
-                "nl": "Bedrijfsmodus opslag"
-              },
-              "value": "—",
-              "hint": {
-                "en": "What the inverter does on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning.",
-                "de": "Was der Wechselrichter von sich aus tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen.",
-                "nl": "Wat de omvormer uit zichzelf doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen."
-              }
-            },
-            {
-              "id": "info_remote_mode",
-              "type": "label",
-              "label": {
-                "en": "Remote charge/discharge mode",
-                "de": "Fernsteuerungs-Modus",
-                "nl": "Aansturing op afstand"
-              },
-              "value": "—",
-              "hint": {
-                "en": "Who may command the battery from outside — a different question from the mode above, which is why both exist. \"Local Control\" means nobody, and that is what you want unless a third-party scheduler really is talking to the inverter. Any other value overrides the working mode, and without such a scheduler the battery then behaves unpredictably.",
-                "de": "Wer die Batterie von aussen befehlen darf — eine andere Frage als der Modus darüber, deshalb gibt es beide. „Lokale Steuerung“ heisst: niemand, und das ist der Normalfall, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht. Jeder andere Wert setzt den Betriebsmodus ausser Kraft, und ohne solchen Regler verhält sich die Batterie danach unvorhersehbar.",
-                "nl": "Wie de batterij van buitenaf mag aansturen — een andere vraag dan de modus hierboven, daarom bestaan beide. „Lokale sturing” betekent: niemand, en dat is wat je wilt tenzij er echt een externe planner met de omvormer praat. Elke andere waarde gaat vóór de bedrijfsmodus, en zonder zo'n planner gedraagt de batterij zich daarna onvoorspelbaar."
-              }
             },
             {
               "id": "info_ems_battery",
@@ -4700,9 +4660,9 @@
               },
               "value": "2",
               "hint": {
-                "en": "What the inverter does with the battery on its own. What each mode means is explained under \"What the battery modes do\". Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. Was jeder Modus bedeutet, steht unter „Was die Batteriemodi bewirken“. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Wat de omvormer uit zichzelf met de batterij doet. Wat elke modus betekent, staat onder „Wat de batterijmodi doen”. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "What the inverter does with the battery on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
+                "de": "Was der Wechselrichter von sich aus mit der Batterie tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
+                "nl": "Wat de omvormer uit zichzelf met de batterij doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
               },
               "values": [
                 {
@@ -4771,31 +4731,6 @@
                   }
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "What the battery modes do",
-            "de": "Was die Batteriemodi bewirken",
-            "nl": "Wat de batterijmodi doen"
-          },
-          "children": [
-            {
-              "id": "info_working_mode",
-              "type": "label",
-              "label": {
-                "en": "Storage working mode",
-                "de": "Speicher-Betriebsmodus",
-                "nl": "Bedrijfsmodus opslag"
-              },
-              "value": "—",
-              "hint": {
-                "en": "What the inverter does on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning.",
-                "de": "Was der Wechselrichter von sich aus tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen.",
-                "nl": "Wat de omvormer uit zichzelf doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen."
-              }
             },
             {
               "id": "info_ems_battery",

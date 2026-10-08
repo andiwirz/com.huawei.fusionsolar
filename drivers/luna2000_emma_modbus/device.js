@@ -10,7 +10,6 @@ const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, 
 const { pendingModeWrites, syncModeSettings, applyModeWrites, revertModeSetting } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const modbusPolling = require('../../lib/modbus-polling');
-const enumLabel     = require('../../lib/enum-label');
 
 const DEFAULT_INTERVAL_S = 60;
 const MIN_INTERVAL_S = 10;
@@ -449,16 +448,13 @@ class LUNA2000EmmaModbusDevice extends Device {
       }
 
 
-      // The two rows of the "What the battery modes do" group — see the same block in the
-      // luna2000_modbus driver. This device has no remote charge/discharge mode, so it has
-      // no row for one.
+      // The Energy Management row at the end of "Change battery mode" — see the same block in
+      // the luna2000_modbus driver.
       const infoUpdates = {};
       const infoRow = (settingId, text) => {
         if (text && this.getSetting(settingId) !== text) infoUpdates[settingId] = text;
       };
 
-      infoRow('info_working_mode',
-        this._enumLabel('storage_working_mode_settings', newMode, STORAGE_WORKING_MODE_LABELS));
       try {
         const ems = this.homey.drivers.getDriver('energy_management').getDevices().length > 0;
         infoRow('info_ems_battery', this.homey.__(ems ? 'modbus.battery.ems.present'
@@ -523,6 +519,6 @@ class LUNA2000EmmaModbusDevice extends Device {
 
 }
 
-Object.assign(LUNA2000EmmaModbusDevice.prototype, modbusPolling, enumLabel);
+Object.assign(LUNA2000EmmaModbusDevice.prototype, modbusPolling);
 
 module.exports = LUNA2000EmmaModbusDevice;

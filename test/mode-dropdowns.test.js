@@ -227,12 +227,14 @@ test('every dropdown says in all three languages that it writes on Save', () => 
   }
 });
 
-test('the battery dropdowns sit right above the explanation of the modes', () => {
+test('the battery dropdowns end with the advice on charging by price or forecast', () => {
+  // Since 1.2.272 the group carries the one note the modes are the wrong tool for.
   for (const driverId of ['luna2000_modbus', 'luna2000_emma_modbus']) {
     const top = driver(driverId).settings;
     const i = top.findIndex((s) => s.type === 'group' && s.label.en === 'Change battery mode');
     assert.ok(i >= 0, `${driverId}: no "Change battery mode" group`);
-    assert.strictEqual(top[i + 1].label.en, 'What the battery modes do', driverId);
+    const kids = top[i].children;
+    assert.strictEqual(kids[kids.length - 1].id, 'info_ems_battery', driverId);
     assert.strictEqual(top[i].label.de, 'Batteriemodus ändern');
     assert.strictEqual(top[i].label.nl, 'Batterijmodus wijzigen');
   }

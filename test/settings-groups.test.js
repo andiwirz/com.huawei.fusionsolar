@@ -33,8 +33,7 @@ test('a driver that groups its settings puts every one in a group', () => {
 test('the LUNA2000 settings come in these groups, in this order', () => {
   assert.deepStrictEqual(groups('luna2000_modbus').map((g) => [g.label.en, g.children.map((c) => c.id)]), [
     ['Connection', ['address', 'port', 'modbus_id', 'poll_interval']],
-    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'mode_remote_dispatch']],
-    ['What the battery modes do', ['info_working_mode', 'info_remote_mode', 'info_ems_battery']],
+    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'mode_remote_dispatch', 'info_ems_battery']],
     ['Charge and discharge power', ['max_charge_power', 'max_discharge_power']],
     ['Charging from the grid', ['charge_from_grid', 'max_grid_charge_power', 'grid_charge_cutoff_soc']],
     ['State of charge limits', ['charging_cutoff_capacity', 'discharge_cutoff_capacity', 'backup_power_soc']],
@@ -45,8 +44,7 @@ test('the LUNA2000 settings come in these groups, in this order', () => {
 test('the EMMA battery settings come in these groups, in this order', () => {
   assert.deepStrictEqual(groups('luna2000_emma_modbus').map((g) => [g.label.en, g.children.map((c) => c.id)]), [
     ['Connection', ['address', 'port', 'modbus_id', 'poll_interval']],
-    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou']],
-    ['What the battery modes do', ['info_working_mode', 'info_ems_battery']],
+    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'info_ems_battery']],
     ['Charging from the grid', ['max_grid_charge_power']],
     ['Notifications', ['enable_timeline_notifications']],
   ]);

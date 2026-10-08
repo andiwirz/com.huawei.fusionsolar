@@ -1429,27 +1429,19 @@ class LUNA2000ModbusDevice extends Device {
       }
 
 
-      // The three rows of the "What the battery modes do" group. They are settings of type
-      // "label", which Homey renders as a disabled box showing the VALUE — so leaving the
-      // value empty, as 1.2.237 did, put three empty boxes under three headings and read as
-      // three settings with nothing in them. Each now answers the question its heading asks,
-      // and the explanation stays in the hint behind the (i).
+      // The one setting of type "label" left, at the end of "Change battery mode": whether
+      // the device that does price- and forecast-driven charging is installed. Homey renders
+      // a label as a disabled box showing its value, so the value is the answer and the
+      // advice sits behind the (i). Until 1.2.272 two more rows here showed the working and
+      // the remote mode — since 1.2.266 word for word what the dropdowns above them show.
       //
-      // Written in a call of their own, with its own catch, for two reasons. Each row is
-      // gated on the register that feeds it being present in THIS half of the split read —
-      // the working mode rides with the battery data, the remote mode comes round every
-      // fifth poll — so folding them into settingUpdates above would let one half write a
-      // row the other half fed, which is the shape of the 1.2.240 regression. And a string
-      // the store refuses must not take the real settings sync down with it.
+      // Written in a call of its own, with its own catch: a string the store refuses must not
+      // take the real settings sync above down with it.
       const infoUpdates = {};
       const infoRow = (settingId, text) => {
         if (text && this.getSetting(settingId) !== text) infoUpdates[settingId] = text;
       };
 
-      infoRow('info_working_mode',
-        this._enumLabel('storage_working_mode_settings', newMode, STORAGE_WORKING_MODE_LABELS));
-      infoRow('info_remote_mode',
-        this._enumLabel('remote_charge_discharge_control_mode', newRemoteMode, REMOTE_MODE_LABELS));
       // Not a register: whether the device that does price- and forecast-driven charging is
       // even installed. getDriver throws on an app that has never had one, which is an
       // answer ("no"), not an error.

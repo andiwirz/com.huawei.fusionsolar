@@ -765,15 +765,14 @@ sits in a group, the way the inverter's do:
 | Group | Settings |
 |-------|----------|
 | Connection | IP Address · Modbus Port · Modbus Unit ID · Update Interval |
-| Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above |
-| What the battery modes do | Explanations and the modes as currently read; nothing to set |
+| Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above — and whether an Energy Management device is installed, the tool for charging by price or forecast |
 | Charge and discharge power | Max charge power (W) · Max discharge power (W) |
 | Charging from the grid | Charge battery from grid · Max grid charge power (W) · Grid charge cutoff SoC (%) |
 | State of charge limits | Charging cutoff capacity (%) · Discharge cutoff capacity (%) · Backup power SoC (%) |
 | Notifications | Timeline notifications |
 
-The EMMA battery has Connection, Change battery mode, What the battery modes do, Charging from
-the grid (max grid charging power) and Notifications.
+The EMMA battery has Connection, Change battery mode, Charging from the grid (max grid charging
+power) and Notifications.
 
 ### SDongle A Modbus
 
