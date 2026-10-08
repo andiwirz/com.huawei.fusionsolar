@@ -138,7 +138,7 @@ const SETTING_LABEL = {
   backup_power_soc:          'Backup power SoC',
   max_charge_power:          'Max charge power',
   max_discharge_power:       'Max discharge power',
-  max_grid_charge_power:     'Max grid charge power',
+  max_grid_charge_power:     'Grid charge power',
   mode_storage_working:      'Storage working mode',
   mode_excess_pv_tou:        'Excess PV energy (Time of Use)',
   mode_remote_dispatch:      'Remote charge/discharge mode',

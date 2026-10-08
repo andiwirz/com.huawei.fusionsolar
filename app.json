@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.272",
+  "version": "1.2.273",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -2373,9 +2373,9 @@
               },
               "value": "",
               "hint": {
-                "en": "The OCPP Station ID configured on the charger. The charger must connect to ws://[Homey-IP]:8887/[station-id].",
-                "de": "Die am Charger konfigurierte OCPP Station-ID. Der Charger muss sich zu ws://[Homey-IP]:8887/[station-id] verbinden.",
-                "nl": "De OCPP Station ID geconfigureerd op de lader. De lader moet verbinding maken met ws://[Homey-IP]:8887/[station-id]."
+                "en": "The OCPP Station ID configured on the charger. The charger must connect to ws://[Homey-IP]:[port]/[station-id] — the port is the OCPP Port below, 8887 unless changed.",
+                "de": "Die am Charger konfigurierte OCPP Station-ID. Der Charger muss sich zu ws://[Homey-IP]:[Port]/[station-id] verbinden — der Port ist der OCPP Port weiter unten, 8887, sofern nicht geändert.",
+                "nl": "De OCPP Station ID geconfigureerd op de lader. De lader moet verbinding maken met ws://[Homey-IP]:[poort]/[station-id] — de poort is de OCPP Poort hieronder, 8887 tenzij gewijzigd."
               },
               "highlight": true
             },
@@ -2702,9 +2702,9 @@
               },
               "value": true,
               "hint": {
-                "en": "Posts to Homey's Timeline when the car connects, charging starts, charging stops, and the car disconnects.",
-                "de": "Veröffentlicht Einträge in Homeys Zeitleiste, wenn das Auto sich verbindet, das Laden startet, stoppt und das Auto die Verbindung trennt.",
-                "nl": "Plaatst berichten op de Tijdlijn van Homey wanneer de auto verbindt, het laden start, stopt en de auto wordt losgekoppeld."
+                "en": "Posts to the timeline when the car connects or disconnects, charging starts, pauses, resumes or stops, the charging limit changes, the car draws no power, and when the charger goes offline or comes back. Switching this off silences the offline warning too.",
+                "de": "Meldet in der Timeline, wenn das Auto angeschlossen oder getrennt wird, das Laden startet, pausiert, fortgesetzt wird oder stoppt, sich das Ladelimit ändert, das Auto keinen Strom zieht, und wenn die Ladestation offline geht oder zurückkommt. Ausgeschaltet entfällt auch die Offline-Warnung.",
+                "nl": "Plaatst berichten op de tijdlijn wanneer de auto wordt aangesloten of losgekoppeld, het laden start, pauzeert, hervat of stopt, de laadlimiet verandert, de auto geen stroom afneemt, en wanneer de laadpaal offline gaat of terugkomt. Uitgeschakeld vervalt ook de offline-waarschuwing."
               }
             }
           ]
@@ -3254,8 +3254,8 @@
               "value": "",
               "hint": {
                 "en": "IP address of the SUN2000 inverter or SDongle.",
-                "de": "IP-Adresse des Inverter SUN 2000s oder SDongle.",
-                "nl": "IP-adres van de Inverter SUN 2000 of SDongle."
+                "de": "IP-Adresse des Wechselrichters SUN2000 oder des SDongle.",
+                "nl": "IP-adres van de omvormer SUN2000 of de SDongle."
               },
               "highlight": true
             },
@@ -3394,9 +3394,9 @@
               "max": 100000,
               "step": 100,
               "hint": {
-                "en": "Maximum power fed into the grid in watts (register 47416). Only effective when active power control mode is set to 'Limited by power'. Synced from the inverter every 5 poll cycles.",
-                "de": "Maximale Einspeiseleistung in Watt (Register 47416). Nur wirksam wenn der Einspeisemodus auf 'Leistungsbegrenzt' gesetzt ist. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert.",
-                "nl": "Maximaal vermogen dat aan het net wordt teruggeleverd, in watt (register 47416). Alleen van kracht wanneer de vermogensregeling op 'Begrensd op vermogen' staat. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
+                "en": "Maximum power fed into the grid in watts (register 47416). Only effective when the active power control mode above is \"Limited by Power (kW)\". Synced from the inverter every 5 poll cycles.",
+                "de": "Maximale Einspeiseleistung in Watt (Register 47416). Nur wirksam, wenn der Wirkleistungs-Steuermodus oben auf „Leistungsbegrenzt (kW)“ steht. Wird alle 5 Abfragezyklen mit dem Wechselrichter synchronisiert.",
+                "nl": "Maximaal vermogen dat aan het net wordt teruggeleverd, in watt (register 47416). Alleen van kracht wanneer de regelmodus werkzaam vermogen hierboven op „Vermogensbegrensd (kW)” staat. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
               }
             },
             {
@@ -3411,9 +3411,9 @@
               "max": 100,
               "step": 1,
               "hint": {
-                "en": "Maximum power fed into the grid as percentage of rated power (register 47418). Only effective when active power control mode is set to 'Limited by percentage'. Synced from the inverter every 5 poll cycles.",
-                "de": "Maximale Einspeiseleistung als Prozentsatz der Nennleistung (Register 47418). Nur wirksam wenn der Einspeisemodus auf 'Prozentbegrenzt' gesetzt ist. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert.",
-                "nl": "Maximaal terugleververmogen als percentage van het nominale vermogen (register 47418). Alleen van kracht wanneer de vermogensregeling op 'Begrensd op percentage' staat. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
+                "en": "Maximum power fed into the grid as percentage of rated power (register 47418). Only effective when the active power control mode above is \"Limited by Power (%)\". Synced from the inverter every 5 poll cycles.",
+                "de": "Maximale Einspeiseleistung als Prozentsatz der Nennleistung (Register 47418). Nur wirksam, wenn der Wirkleistungs-Steuermodus oben auf „Leistungsbegrenzt (%)“ steht. Wird alle 5 Abfragezyklen mit dem Wechselrichter synchronisiert.",
+                "nl": "Maximaal terugleververmogen als percentage van het nominale vermogen (register 47418). Alleen van kracht wanneer de regelmodus werkzaam vermogen hierboven op „Vermogensbegrensd (%)” staat. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
               }
             }
           ]
@@ -3480,7 +3480,7 @@
               },
               "hint": {
                 "en": "Enables MPPT multi-peak scanning (register 42054). When PV strings are obviously shaded, the inverter sweeps its full voltage range at regular intervals to locate the global maximum power point — avoiding local peaks caused by bypass diodes. ⚠️ Only enable if your strings experience recurring shading (chimney, trees, etc.). If panels are never shaded, leave this OFF: each scan causes a brief power dip that wastes energy unnecessarily. Typical scan interval: 10–30 min. Synced from the inverter every 5 poll cycles.",
-                "de": "Aktiviert das MPPT-Multimodal-Scanning (Register 42054). Bei offensichtlicher Teilverschattung der PV-Strings durchsucht der Wechselrichter in regelmässigen Abständen den gesamten Spannungsbereich, um den globalen Leistungspunkt zu finden — und vermeidet so lokale Maxima durch Bypass-Dioden. ⚠️ Nur aktivieren wenn die Strings wiederkehrend verschattet werden (Schornstein, Bäume usw.). Bei unverschatteten Anlagen ausgeschaltet lassen: jeder Scan verursacht einen kurzen Leistungseinbruch und verschwendet unnötig Energie. Typisches Scan-Intervall: 10–30 min. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert.",
+                "de": "Aktiviert das MPPT-Multimodal-Scanning (Register 42054). Bei offensichtlicher Teilverschattung der PV-Strings durchsucht der Wechselrichter in regelmässigen Abständen den gesamten Spannungsbereich, um den globalen Leistungspunkt zu finden — und vermeidet so lokale Maxima durch Bypass-Dioden. ⚠️ Nur aktivieren wenn die Strings wiederkehrend verschattet werden (Schornstein, Bäume usw.). Bei unverschatteten Anlagen ausgeschaltet lassen: jeder Scan verursacht einen kurzen Leistungseinbruch und verschwendet unnötig Energie. Typisches Scan-Intervall: 10–30 min. Wird alle 5 Abfragezyklen mit dem Wechselrichter synchronisiert.",
                 "nl": "Schakelt het MPPT-scannen op meerdere pieken in (register 42054). Bij duidelijke beschaduwing van de PV-strings doorloopt de omvormer met vaste tussenpozen het volledige spanningsbereik om het globale maximale vermogenspunt te vinden — en vermijdt zo lokale pieken door bypassdioden. ⚠️ Alleen inschakelen als uw strings terugkerende schaduw hebben (schoorsteen, bomen enzovoort). Bij panelen zonder schaduw uit laten staan: elke scan veroorzaakt een korte vermogensdip en verspilt onnodig energie. Gebruikelijk scaninterval: 10–30 min. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
               }
             },
@@ -3502,7 +3502,7 @@
               "step": 1,
               "hint": {
                 "en": "How often the MPPT multi-peak scan runs (register 42055). Only relevant when MPPT multimodal scanning is enabled. Typical range: 10–30 min. Shorter intervals react faster to changing shade patterns but cause more frequent power dips. Longer intervals reduce losses but may miss a better power point for longer. Synced from the inverter every 5 poll cycles.",
-                "de": "Wie häufig der MPPT-Multimodal-Scan durchgeführt wird (Register 42055). Nur relevant wenn MPPT-Multimodal-Scanning aktiviert ist. Typischer Bereich: 10–30 min. Kürzere Intervalle reagieren schneller auf wechselnde Verschattung, verursachen aber häufigere Leistungseinbrüche. Längere Intervalle reduzieren die Verluste, können aber einen besseren Arbeitspunkt länger verpassen. Wird alle 5 Abfragezyklen mit dem Inverter synchronisiert.",
+                "de": "Wie häufig der MPPT-Multimodal-Scan durchgeführt wird (Register 42055). Nur relevant wenn MPPT-Multimodal-Scanning aktiviert ist. Typischer Bereich: 10–30 min. Kürzere Intervalle reagieren schneller auf wechselnde Verschattung, verursachen aber häufigere Leistungseinbrüche. Längere Intervalle reduzieren die Verluste, können aber einen besseren Arbeitspunkt länger verpassen. Wird alle 5 Abfragezyklen mit dem Wechselrichter synchronisiert.",
                 "nl": "Hoe vaak de MPPT-scan op meerdere pieken wordt uitgevoerd (register 42055). Alleen van belang wanneer MPPT-multimodaal scannen is ingeschakeld. Gebruikelijk bereik: 10–30 min. Kortere tussenpozen reageren sneller op wisselende schaduw, maar veroorzaken vaker een vermogensdip. Langere tussenpozen beperken het verlies, maar kunnen een beter werkpunt langer missen. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
               }
             }
@@ -3527,8 +3527,8 @@
               "value": true,
               "hint": {
                 "en": "Show a timeline notification when the inverter status changes.",
-                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Inverterstatus ändert.",
-                "nl": "Toont een tijdlijnmelding wanneer de inverterstatus verandert."
+                "de": "Zeigt eine Timeline-Benachrichtigung, wenn sich der Status des Wechselrichters ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de status van de omvormer verandert."
               }
             }
           ]
@@ -3957,8 +3957,8 @@
               "value": "",
               "hint": {
                 "en": "IP address of the SUN2000 inverter or SDongle the battery is connected to.",
-                "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem die Batterie angeschlossen ist.",
-                "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de batterij is aangesloten."
+                "de": "IP-Adresse des Wechselrichters SUN2000 oder des SDongle, an dem die Batterie angeschlossen ist.",
+                "nl": "IP-adres van de omvormer SUN2000 of de SDongle waarop de batterij is aangesloten."
               },
               "highlight": true
             },
@@ -3992,8 +3992,8 @@
               "max": 247,
               "hint": {
                 "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
-                "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
-                "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
+                "de": "Dieselbe Modbus Geräte-ID wie beim Wechselrichter SUN2000 (Standard: 1).",
+                "nl": "Dezelfde Modbus apparaat-ID als de omvormer SUN2000 (standaard: 1)."
               }
             },
             {
@@ -4237,7 +4237,7 @@
               "step": 100,
               "hint": {
                 "en": "Maximum power the battery charges at (register 47075). Synced from the inverter on every poll.",
-                "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
                 "nl": "Maximaal vermogen waarmee de batterij laadt (register 47075). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             },
@@ -4254,7 +4254,7 @@
               "step": 100,
               "hint": {
                 "en": "Maximum power the battery discharges at (register 47077). Synced from the inverter on every poll.",
-                "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
                 "nl": "Maximaal vermogen waarmee de batterij ontlaadt (register 47077). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             }
@@ -4279,7 +4279,7 @@
               "value": false,
               "hint": {
                 "en": "Enables or disables grid charging (register 47087). Synced from the inverter on every poll.",
-                "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Stromnetz (Register 47087). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Stromnetz (Register 47087). Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
                 "nl": "Schakelt het laden uit het net in of uit (register 47087). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             },
@@ -4287,17 +4287,17 @@
               "id": "max_grid_charge_power",
               "type": "number",
               "label": {
-                "en": "Max grid charge power (W)",
-                "de": "Maximale Netzladeleistung (W)",
-                "nl": "Maximaal laadvermogen uit het net (W)"
+                "en": "Grid charge power (W)",
+                "de": "Netzladeleistung (W)",
+                "nl": "Laadvermogen uit het net (W)"
               },
               "min": 0,
               "max": 100000,
               "step": 100,
               "hint": {
-                "en": "Active grid charge power set point (register 47242). This is the value shown and set by FusionSolar. Requires 'Charge from grid' to be enabled — saving this setting will automatically enable it if currently off.",
-                "de": "Aktiver Sollwert für die Netzladeleistung (Register 47242). Dieser Wert wird auch von FusionSolar angezeigt und gesetzt. Erfordert, dass 'Batterie aus dem Netz laden' aktiviert ist — wird beim Speichern automatisch aktiviert falls nötig.",
-                "nl": "Actieve instelwaarde voor het laadvermogen uit het net (register 47242). Dit is de waarde die FusionSolar toont en instelt. Vereist dat 'Batterij laden uit het net' is ingeschakeld — bij opslaan wordt dat zo nodig automatisch ingeschakeld."
+                "en": "The power the battery charges from the grid at (register 47242) — the value FusionSolar shows and sets. It cannot exceed the upper limit for grid charging (register 47244), which the flow card \"Set max power charge from grid\" sets. Needs \"Charge battery from grid\": saving this turns it on if it is off. Synced from the inverter every fifth poll while grid charging is on.",
+                "de": "Leistung, mit der die Batterie aus dem Netz lädt (Register 47242) — der Wert, den FusionSolar anzeigt und setzt. Er kann die Obergrenze fürs Netzladen (Register 47244) nicht überschreiten; diese setzt die Flow-Karte „Maximale Netzladeleistung setzen“. Braucht „Batterie aus dem Netz laden“: Beim Speichern wird das eingeschaltet, falls es aus ist. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert, solange das Netzladen eingeschaltet ist.",
+                "nl": "Vermogen waarmee de batterij uit het net laadt (register 47242) — de waarde die FusionSolar toont en instelt. Het kan de bovengrens voor laden uit het net (register 47244) niet overschrijden; die stelt de flowkaart „Maximaal laadvermogen uit het net instellen” in. Vereist „Batterij laden uit het net”: bij opslaan wordt dat ingeschakeld als het uit staat. Wordt bij elke vijfde uitlezing met de omvormer gesynchroniseerd, zolang laden uit het net aan staat."
               }
             },
             {
@@ -4311,9 +4311,9 @@
               "min": 20,
               "max": 100,
               "hint": {
-                "en": "Battery SoC at which grid charging stops (register 47088). Range: 20–100 %, default 50 %.",
-                "de": "Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %.",
-                "nl": "Laadtoestand waarbij het laden uit het net stopt (register 47088). Bereik: 20–100 %, standaard 50 %."
+                "en": "Battery SoC at which grid charging stops (register 47088). Range: 20–100 %, default 50 %. Synced from the inverter on every poll.",
+                "de": "Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Laadtoestand waarbij het laden uit het net stopt (register 47088). Bereik: 20–100 %, standaard 50 %. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             }
           ]
@@ -4337,9 +4337,9 @@
               "min": 90,
               "max": 100,
               "hint": {
-                "en": "Maximum SoC the battery charges to (register 47081). Range: 90–100 %, default 100 %.",
-                "de": "Maximaler Ladezustand, bis zu dem die Batterie geladen wird (Register 47081). Bereich: 90–100 %, Standard 100 %.",
-                "nl": "Maximale laadtoestand waartoe de batterij wordt geladen (register 47081). Bereik: 90–100 %, standaard 100 %."
+                "en": "Maximum SoC the battery charges to (register 47081). Range: 90–100 %, default 100 %. Synced from the inverter on every poll.",
+                "de": "Maximaler Ladezustand, bis zu dem die Batterie geladen wird (Register 47081). Bereich: 90–100 %, Standard 100 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Maximale laadtoestand waartoe de batterij wordt geladen (register 47081). Bereik: 90–100 %, standaard 100 %. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             },
             {
@@ -4355,9 +4355,9 @@
               "max": 20,
               "step": 1,
               "hint": {
-                "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are deployed, the configured value is applied. If no PV modules are deployed and the configured value is below 15 %, it is treated as 15 %.",
-                "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Wenn PV-Module bereitgestellt werden, wird der konfigurierte Wert angewendet. Wenn keine PV-Module bereitgestellt werden und der konfigurierte Wert unter 15 % liegt, wird der Wert als 15 % behandelt.",
-                "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %, standaard 15 %. Zijn er PV-modules aanwezig, dan geldt de ingestelde waarde. Zijn er geen PV-modules aanwezig en ligt de ingestelde waarde onder 15 %, dan wordt 15 % aangehouden."
+                "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are connected, the configured value applies. If none are connected and the value is below 15 %, 15 % applies. Synced from the inverter on every poll.",
+                "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Sind PV-Module angeschlossen, gilt der eingestellte Wert. Sind keine angeschlossen und liegt der Wert unter 15 %, gelten 15 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %, standaard 15 %. Zijn er PV-modules aanwezig, dan geldt de ingestelde waarde. Zijn er geen PV-modules aanwezig en ligt de ingestelde waarde onder 15 %, dan wordt 15 % aangehouden. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             },
             {
@@ -4373,9 +4373,9 @@
               "max": 100,
               "step": 1,
               "hint": {
-                "en": "Minimum SoC reserved for backup power during grid outages (register 47102). Range: 0–100 %, default 0 %.",
-                "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %.",
-                "nl": "Minimale laadtoestand die bij netuitval voor noodstroom gereserveerd blijft (register 47102). Bereik: 0–100 %, standaard 0 %."
+                "en": "Minimum SoC reserved for backup power during grid outages (register 47102). Range: 0–100 %, default 0 %. Synced from the inverter on every poll.",
+                "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Minimale laadtoestand die bij netuitval voor noodstroom gereserveerd blijft (register 47102). Bereik: 0–100 %, standaard 0 %. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             }
           ]
@@ -4398,9 +4398,9 @@
               },
               "value": true,
               "hint": {
-                "en": "Show a timeline notification when the battery status changes.",
-                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
-                "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
+                "en": "Posts to the timeline when the battery status changes, when the battery refuses a setting the app wrote (the setting is put back), and when a force charge or discharge could not be started. Switching this off silences these warnings too.",
+                "de": "Meldet in der Timeline, wenn sich der Batteriestatus ändert, wenn die Batterie eine Einstellung ablehnt, die die App geschrieben hat (die Einstellung wird zurückgesetzt), und wenn eine Zwangsladung oder -entladung nicht gestartet werden konnte. Ausgeschaltet entfallen auch diese Warnungen.",
+                "nl": "Plaatst een tijdlijnmelding wanneer de batterijstatus verandert, wanneer de batterij een instelling weigert die de app schreef (de instelling wordt teruggezet), en wanneer geforceerd laden of ontladen niet kon starten. Uitgeschakeld vervallen ook deze waarschuwingen."
               }
             }
           ]
@@ -4770,9 +4770,9 @@
               "max": 50,
               "step": 0.1,
               "hint": {
-                "en": "Maximum power for charging the battery from the grid (0–50 kW). Written to EMMA register 40002.",
-                "de": "Maximale Ladeleistung der Batterie aus dem Netz (0–50 kW). Wird in EMMA-Register 40002 geschrieben.",
-                "nl": "Maximaal vermogen om de batterij uit het net te laden (0–50 kW). Wordt naar EMMA-register 40002 geschreven."
+                "en": "Maximum power for charging the battery from the grid (0–50 kW). Written to EMMA register 40002. Synced from the EMMA every 5 poll cycles.",
+                "de": "Maximale Ladeleistung der Batterie aus dem Netz (0–50 kW). Wird in EMMA-Register 40002 geschrieben. Wird alle 5 Abfragezyklen mit dem EMMA synchronisiert.",
+                "nl": "Maximaal vermogen om de batterij uit het net te laden (0–50 kW). Wordt naar EMMA-register 40002 geschreven. Wordt elke 5 uitleescycli met de EMMA gesynchroniseerd."
               }
             }
           ]
@@ -4795,9 +4795,9 @@
               },
               "value": true,
               "hint": {
-                "en": "Show a timeline notification when the battery charging state changes.",
-                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Ladezustand ändert.",
-                "nl": "Toont een tijdlijnmelding wanneer de laadstatus verandert."
+                "en": "Posts to the timeline when the battery starts charging, starts discharging or goes idle.",
+                "de": "Meldet in der Timeline, wenn die Batterie zu laden oder zu entladen beginnt oder in Ruhe geht.",
+                "nl": "Plaatst een tijdlijnmelding wanneer de batterij begint te laden, begint te ontladen of in rust gaat."
               }
             }
           ]

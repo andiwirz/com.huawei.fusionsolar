@@ -747,7 +747,7 @@ These registers derate the inverter AC output directly and work without a DTSU66
 
 | Setting                   | Default | Description                                                                         |
 |---------------------------|---------|-------------------------------------------------------------------------------------|
-| Output limit (W)          | –       | Absolute output cap in watts (register 40126). Set to 0 for no limit.              |
+| Output limit (W)          | –       | Absolute output cap in watts (register 40126). 0 shuts the inverter down; *Remove inverter output limit* sets rated power × 1.1 for no cap. |
 | Output limit (%)          | –       | Output cap as % of rated power (register 40125). Set to 100 for no limit.          |
 
 ### LUNA2000 / DTSU666 (Modbus)
@@ -767,7 +767,7 @@ sits in a group, the way the inverter's do:
 | Connection | IP Address · Modbus Port · Modbus Unit ID · Update Interval |
 | Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above — and whether an Energy Management device is installed, the tool for charging by price or forecast |
 | Charge and discharge power | Max charge power (W) · Max discharge power (W) |
-| Charging from the grid | Charge battery from grid · Max grid charge power (W) · Grid charge cutoff SoC (%) |
+| Charging from the grid | Charge battery from grid · Grid charge power (W) · Grid charge cutoff SoC (%) |
 | State of charge limits | Charging cutoff capacity (%) · Discharge cutoff capacity (%) · Backup power SoC (%) |
 | Notifications | Timeline notifications |
 
