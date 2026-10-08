@@ -65,10 +65,33 @@ test('every icon a capability references exists', () => {
   assert.deepStrictEqual(missing, []);
 });
 
+// The five modes shown as text since 1.2.263 / 1.2.266 instead of as scroll wheels (issue #35).
+// A text tile without an icon of its own shows Homey's generic one.
+const MODE_TILES = ['storage_working_mode_settings', 'storage_force_charge_discharge',
+  'storage_excess_pv_energy_use_in_tou', 'remote_charge_discharge_control_mode', 'activepower_controlmode'];
+
+test('every mode tile has an icon of its own', () => {
+  for (const cap of MODE_TILES) {
+    assert.strictEqual(app.capabilities[cap].icon, `/assets/capabilities/${cap}.svg`, cap);
+  }
+  const drawings = MODE_TILES.map((cap) => fs.readFileSync(path.join(ROOT, 'assets', 'capabilities', `${cap}.svg`), 'utf8'));
+  assert.strictEqual(new Set(drawings).size, MODE_TILES.length, 'two modes share one drawing');
+});
+
+test('the mode icons stay inside their box', () => {
+  // Drawn as polygons; every point must lie within the 24×24 viewBox or the phone clips it.
+  for (const cap of MODE_TILES) {
+    const d = fs.readFileSync(path.join(ROOT, 'assets', 'capabilities', `${cap}.svg`), 'utf8').match(/ d="([^"]+)"/)[1];
+    const nums = d.match(/-?\d+(\.\d+)?/g).map(Number);
+    assert.ok(nums.every((n) => n >= 0 && n <= 24), `${cap}: a point lies outside 0..24`);
+  }
+});
+
 test('the converted icons keep the 24×24 box and carry no fixed size', () => {
   // A width/height on the root would pin the icon to a pixel size; Homey scales by viewBox.
   for (const n of ['battery_rated_capacity', 'sun2000_software_version', 'sdongle_type',
-    'isitepower_remaining_backup_time', 'isitepower_discharge_cycles']) {
+    'isitepower_remaining_backup_time', 'isitepower_discharge_cycles',
+    ...MODE_TILES]) {
     const svg = fs.readFileSync(path.join(ROOT, 'assets', 'capabilities', `${n}.svg`), 'utf8');
     const root = svg.match(/<svg\b[^>]*>/)[0];
     assert.match(root, /viewBox="0 0 24 24"/, `${n}: viewBox changed`);

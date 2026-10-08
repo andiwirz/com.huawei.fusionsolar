@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.267",
+  "version": "1.2.268",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -749,6 +749,7 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/capabilities/activepower_controlmode.svg",
       "insights": false,
       "values": [
         {
@@ -803,6 +804,7 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/capabilities/storage_working_mode_settings.svg",
       "insights": false,
       "values": [
         {
@@ -873,6 +875,7 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/capabilities/storage_force_charge_discharge.svg",
       "insights": false,
       "values": [
         {
@@ -911,6 +914,7 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/capabilities/storage_excess_pv_energy_use_in_tou.svg",
       "insights": false,
       "values": [
         {
@@ -941,6 +945,7 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/capabilities/remote_charge_discharge_control_mode.svg",
       "insights": false,
       "values": [
         {
