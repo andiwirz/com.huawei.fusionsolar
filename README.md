@@ -371,6 +371,10 @@ A dropdown can be saved once the app has read the battery's current value from i
 it shows its default, and a save is refused with a message rather than writing that default into
 the battery.
 
+The log notes each mode once after every app start (`Mode dropdown filled`), and again whenever
+the battery reports a different one (`Mode dropdown follows the device`) — changed in the
+FusionSolar app, by a flow card, or by anything else talking to it.
+
 ---
 
 ### Battery LUNA2000 (EMMA Modbus)
@@ -405,6 +409,10 @@ only on Save, since 1.2.266) or through flow cards — same reason as on the LUN
 A dropdown can be saved once the app has read the battery's current value from it — until then
 it shows its default, and a save is refused with a message rather than writing that default into
 the battery.
+
+The log notes each mode once after every app start (`Mode dropdown filled`), and again whenever
+the battery reports a different one (`Mode dropdown follows the device`) — changed in the
+FusionSolar app, by a flow card, or by anything else talking to it.
 
 #### Settings
 
@@ -727,7 +735,7 @@ These values are read from the inverter on startup and kept in sync.
 
 | Setting                    | Default | Description                                                                          |
 |----------------------------|---------|--------------------------------------------------------------------------------------|
-| Active power control mode  | –       | The feed-in mode (register 47415), written only on Save. Shows the inverter's current mode; it can be saved once the app has read it. |
+| Active power control mode  | –       | The feed-in mode (register 47415), written only on Save. Shows the inverter's current mode; it can be saved once the app has read it. A change the inverter reports is logged as `Mode dropdown follows the device`. |
 | Max feed-in power (W)      | –       | Maximum grid feed-in power in watts (register 47416). Set to 0 to block all export. |
 | Max feed-in power (%)      | –       | Maximum grid feed-in power as % of rated power (register 47418).                    |
 

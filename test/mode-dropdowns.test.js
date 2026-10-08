@@ -336,6 +336,112 @@ test('a failing setSettings is logged and does not leave the poll flag up', asyn
   assert.ok(d.logs.some((l) => /mode dropdowns failed: busy/.test(l)));
 });
 
+// ── lib/mode-settings: what the log says about the modes (1.2.267) ───────────────
+//
+// "When did my mode change, and what changed it" was the question issue #35 could not answer
+// from a log: a mode read back different from before fired a flow trigger and left no line.
+
+const LUNA_SPEC = {
+  mode_storage_working: { cap: 'storage_working_mode_settings',        reg: 47086, ids: ['0', '1', '2', '3', '4', '5', '6'] },
+  mode_remote_dispatch: { cap: 'remote_charge_discharge_control_mode', reg: 47589, ids: ['0', '1', '2', '3', '4', '5'] },
+};
+const logDevice = (stored) => Object.assign(syncDevice(stored), { homey: { manifest: app } });
+const modeLines = (d) => d.logs.filter((l) => /^Mode dropdown/.test(l));
+
+test('the first read after a start logs every mode once, with the name the tile shows', async () => {
+  const d = logDevice({ mode_storage_working: '2', mode_remote_dispatch: '0' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 2, mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(modeLines(d), [
+    'Mode dropdown filled [mode_storage_working]: 2 = Maximise Self-Consumption',
+    'Mode dropdown filled [mode_remote_dispatch]: 0 = Local Control',
+  ]);
+  assert.deepStrictEqual(d.calls, [], 'nothing to store, nothing stored');
+});
+
+test('a mode that changed while the app was not running says what the dropdown held', async () => {
+  const d = logDevice({ mode_storage_working: '2' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 5 });
+  assert.deepStrictEqual(modeLines(d), ['Mode dropdown filled [mode_storage_working]: 5 = Time of Use (LUNA2000), setting held 2']);
+});
+
+test('a dropdown that never held a value is filled without a "held" remark', async () => {
+  const d = logDevice({});
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(modeLines(d), ['Mode dropdown filled [mode_remote_dispatch]: 0 = Local Control']);
+});
+
+test('after that, an unchanged mode logs nothing, poll after poll', async () => {
+  const d = logDevice({ mode_storage_working: '2' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 2 });
+  d.logs.length = 0;
+  for (let i = 0; i < 3; i++) await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 2 });
+  assert.deepStrictEqual(d.logs, []);
+});
+
+test('a mode changed elsewhere is logged once, from what to what', async () => {
+  const d = logDevice({ mode_remote_dispatch: '1' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 1 });
+  d.logs.length = 0;
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 0 });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(d.logs, ['Mode dropdown follows the device [mode_remote_dispatch]: 1 → 0 = Local Control']);
+});
+
+test('a save from the dropdown leaves no "follows" line — the dropdown already holds the value', async () => {
+  const d = logDevice({ mode_storage_working: '2' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 2 });
+  d.logs.length = 0;
+  d.settings.mode_storage_working = '5'; // what Homey stores when the page is saved
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 5 });
+  assert.deepStrictEqual(d.logs, []);
+});
+
+test('a dropdown that could not take the new value does not claim it did', async () => {
+  const d = logDevice({ mode_storage_working: '2', mode_remote_dispatch: '0' });
+  const store = d.setSettings;
+  d.setSettings = async () => { throw new Error('busy'); };
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 5, mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(modeLines(d), ['Mode dropdown filled [mode_remote_dispatch]: 0 = Local Control'],
+    'the unchanged mode is still logged, the one that failed is not');
+  d.logs.length = 0;
+  d.setSettings = store;
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: 5, mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(d.logs, ['Mode dropdown follows the device [mode_storage_working]: 2 → 5 = Time of Use (LUNA2000)']);
+});
+
+test('a later change that could not be stored is not logged as followed either', async () => {
+  const d = logDevice({ mode_remote_dispatch: '1' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 1 });
+  d.logs.length = 0;
+  d.setSettings = async () => { throw new Error('busy'); };
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_remote_dispatch: 0 });
+  assert.deepStrictEqual(modeLines(d), []);
+  assert.ok(d.logs.some((l) => /mode dropdowns failed: busy/.test(l)));
+});
+
+test('a mode missing from this read, or not on the list, logs nothing', async () => {
+  const d = logDevice({ mode_storage_working: '2' });
+  await modes.syncModeSettings(d, LUNA_SPEC, { mode_storage_working: null, mode_remote_dispatch: 9 });
+  assert.deepStrictEqual(d.logs, []);
+});
+
+test('without a manifest to hand, the line still carries the number', async () => {
+  const d = syncDevice({ a: '0' });
+  await modes.syncModeSettings(d, SPEC, { a: 2 });
+  assert.deepStrictEqual(modeLines(d), ['Mode dropdown filled [a]: 2, setting held 0']);
+});
+
+test('the inverter\'s feed-in mode is logged by name as well — the 47415 read-change line', async () => {
+  const d = logDevice({ mode_active_power_control: '6' });
+  const spec = { mode_active_power_control: { cap: 'activepower_controlmode', reg: 47415, ids: ['0', '1', '5', '6', '7'] } };
+  await modes.syncModeSettings(d, spec, { mode_active_power_control: 6 });
+  await modes.syncModeSettings(d, spec, { mode_active_power_control: 0 });
+  assert.deepStrictEqual(modeLines(d), [
+    'Mode dropdown filled [mode_active_power_control]: 6 = Limited by Power (kW)',
+    'Mode dropdown follows the device [mode_active_power_control]: 6 → 0 = Unlimited',
+  ]);
+});
+
 // ── lib/mode-settings: writing ───────────────────────────────────────────────────
 
 function writeDevice() {
