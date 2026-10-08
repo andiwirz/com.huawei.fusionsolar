@@ -757,6 +757,22 @@ These registers derate the inverter AC output directly and work without a DTSU66
 | Modbus unit ID       | 1       | Unit ID of the device (default: 1)            |
 | Update interval (s)  | 60      | How often data is polled (min. 10 s)          |
 
+On the battery these four are the **Connection** group. Since 1.2.270 every battery setting
+sits in a group, the way the inverter's do:
+
+| Group | Settings |
+|-------|----------|
+| Connection | IP Address · Modbus Port · Modbus Unit ID · Update Interval |
+| Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above |
+| What the battery modes do | Explanations and the modes as currently read; nothing to set |
+| Charge and discharge power | Max charge power (W) · Max discharge power (W) |
+| Charging from the grid | Charge battery from grid · Max grid charge power (W) · Grid charge cutoff SoC (%) |
+| State of charge limits | Charging cutoff capacity (%) · Discharge cutoff capacity (%) · Backup power SoC (%) |
+| Notifications | Timeline notifications |
+
+The EMMA battery has Connection, Change battery mode, What the battery modes do, Charging from
+the grid (max grid charging power) and Notifications.
+
 ### SDongle A Modbus
 
 | Setting              | Default | Description                                   |

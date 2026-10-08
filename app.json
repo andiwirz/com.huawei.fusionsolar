@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.269",
+  "version": "1.2.270",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -3889,225 +3889,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the SUN2000 inverter or SDongle the battery is connected to.",
-            "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem die Batterie angeschlossen ist.",
-            "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de batterij is aangesloten."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502. SDongle typically uses 6607.",
-            "de": "Standard 502. SDongle verwendet typischerweise 6607.",
-            "nl": "Standaard 502. SDongle gebruikt meestal 6607."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 1,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
-            "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
-            "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the battery.",
-            "de": "Wie oft Daten von der Batterie abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de batterij worden gelezen."
-          }
-        },
-        {
-          "id": "max_charge_power",
-          "type": "number",
-          "label": {
-            "en": "Max charge power (W)",
-            "de": "Maximale Ladeleistung (W)",
-            "nl": "Maximaal laadvermogen (W)"
-          },
-          "min": 0,
-          "max": 100000,
-          "step": 100,
-          "hint": {
-            "en": "Maximum power the battery charges at (register 47075). Synced from the inverter on every poll.",
-            "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
-            "nl": "Maximaal vermogen waarmee de batterij laadt (register 47075). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
-          }
-        },
-        {
-          "id": "max_discharge_power",
-          "type": "number",
-          "label": {
-            "en": "Max discharge power (W)",
-            "de": "Maximale Entladeleistung (W)",
-            "nl": "Maximaal ontlaadvermogen (W)"
-          },
-          "min": 0,
-          "max": 100000,
-          "step": 100,
-          "hint": {
-            "en": "Maximum power the battery discharges at (register 47077). Synced from the inverter on every poll.",
-            "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
-            "nl": "Maximaal vermogen waarmee de batterij ontlaadt (register 47077). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
-          }
-        },
-        {
-          "id": "max_grid_charge_power",
-          "type": "number",
-          "label": {
-            "en": "Max grid charge power (W)",
-            "de": "Maximale Netzladeleistung (W)",
-            "nl": "Maximaal laadvermogen uit het net (W)"
-          },
-          "min": 0,
-          "max": 100000,
-          "step": 100,
-          "hint": {
-            "en": "Active grid charge power set point (register 47242). This is the value shown and set by FusionSolar. Requires 'Charge from grid' to be enabled — saving this setting will automatically enable it if currently off.",
-            "de": "Aktiver Sollwert für die Netzladeleistung (Register 47242). Dieser Wert wird auch von FusionSolar angezeigt und gesetzt. Erfordert, dass 'Batterie aus dem Netz laden' aktiviert ist — wird beim Speichern automatisch aktiviert falls nötig.",
-            "nl": "Actieve instelwaarde voor het laadvermogen uit het net (register 47242). Dit is de waarde die FusionSolar toont en instelt. Vereist dat 'Batterij laden uit het net' is ingeschakeld — bij opslaan wordt dat zo nodig automatisch ingeschakeld."
-          }
-        },
-        {
-          "id": "charge_from_grid",
-          "type": "checkbox",
-          "label": {
-            "en": "Charge battery from grid",
-            "de": "Batterie aus dem Netz laden",
-            "nl": "Batterij laden uit het net"
-          },
-          "value": false,
-          "hint": {
-            "en": "Enables or disables grid charging (register 47087). Synced from the inverter on every poll.",
-            "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Stromnetz (Register 47087). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
-            "nl": "Schakelt het laden uit het net in of uit (register 47087). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
-          }
-        },
-        {
-          "id": "grid_charge_cutoff_soc",
-          "type": "number",
-          "label": {
-            "en": "Grid charge cutoff SoC (%)",
-            "de": "Netzlade-Ziel-SoC (%)",
-            "nl": "Eind-SoC bij laden uit het net (%)"
-          },
-          "min": 20,
-          "max": 100,
-          "hint": {
-            "en": "Battery SoC at which grid charging stops (register 47088). Range: 20–100 %, default 50 %.",
-            "de": "Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %.",
-            "nl": "Laadtoestand waarbij het laden uit het net stopt (register 47088). Bereik: 20–100 %, standaard 50 %."
-          }
-        },
-        {
-          "id": "charging_cutoff_capacity",
-          "type": "number",
-          "label": {
-            "en": "Charging cutoff capacity (%)",
-            "de": "Maximaler Ladezustand (%)",
-            "nl": "Maximale laadtoestand (%)"
-          },
-          "min": 90,
-          "max": 100,
-          "hint": {
-            "en": "Maximum SoC the battery charges to (register 47081). Range: 90–100 %, default 100 %.",
-            "de": "Maximaler Ladezustand, bis zu dem die Batterie geladen wird (Register 47081). Bereich: 90–100 %, Standard 100 %.",
-            "nl": "Maximale laadtoestand waartoe de batterij wordt geladen (register 47081). Bereik: 90–100 %, standaard 100 %."
-          }
-        },
-        {
-          "id": "discharge_cutoff_capacity",
-          "type": "number",
-          "label": {
-            "en": "Discharge cutoff capacity (%)",
-            "de": "Minimaler Entladezustand (%)",
-            "nl": "Minimale ontlaadtoestand (%)"
-          },
-          "value": 15,
-          "min": 0,
-          "max": 20,
-          "step": 1,
-          "hint": {
-            "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are deployed, the configured value is applied. If no PV modules are deployed and the configured value is below 15 %, it is treated as 15 %.",
-            "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Wenn PV-Module bereitgestellt werden, wird der konfigurierte Wert angewendet. Wenn keine PV-Module bereitgestellt werden und der konfigurierte Wert unter 15 % liegt, wird der Wert als 15 % behandelt.",
-            "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %, standaard 15 %. Zijn er PV-modules aanwezig, dan geldt de ingestelde waarde. Zijn er geen PV-modules aanwezig en ligt de ingestelde waarde onder 15 %, dan wordt 15 % aangehouden."
-          }
-        },
-        {
-          "id": "backup_power_soc",
-          "type": "number",
-          "label": {
-            "en": "Backup power SoC (%)",
-            "de": "Backup-Energie-SoC (%)",
-            "nl": "SoC voor noodstroom (%)"
-          },
-          "value": 0,
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "hint": {
-            "en": "Minimum SoC reserved for backup power during grid outages (register 47102). Range: 0–100 %, default 0 %.",
-            "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %.",
-            "nl": "Minimale laadtoestand die bij netuitval voor noodstroom gereserveerd blijft (register 47102). Bereik: 0–100 %, standaard 0 %."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the battery status changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the SUN2000 inverter or SDongle the battery is connected to.",
+                "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem die Batterie angeschlossen ist.",
+                "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de batterij is aangesloten."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502. SDongle typically uses 6607.",
+                "de": "Standard 502. SDongle verwendet typischerweise 6607.",
+                "nl": "Standaard 502. SDongle gebruikt meestal 6607."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 1,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
+                "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
+                "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the battery.",
+                "de": "Wie oft Daten von der Batterie abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de batterij worden gelezen."
+              }
+            }
+          ]
         },
         {
           "type": "group",
@@ -4344,6 +4205,195 @@
               }
             }
           ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Charge and discharge power",
+            "de": "Lade- und Entladeleistung",
+            "nl": "Laad- en ontlaadvermogen"
+          },
+          "children": [
+            {
+              "id": "max_charge_power",
+              "type": "number",
+              "label": {
+                "en": "Max charge power (W)",
+                "de": "Maximale Ladeleistung (W)",
+                "nl": "Maximaal laadvermogen (W)"
+              },
+              "min": 0,
+              "max": 100000,
+              "step": 100,
+              "hint": {
+                "en": "Maximum power the battery charges at (register 47075). Synced from the inverter on every poll.",
+                "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "nl": "Maximaal vermogen waarmee de batterij laadt (register 47075). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
+              }
+            },
+            {
+              "id": "max_discharge_power",
+              "type": "number",
+              "label": {
+                "en": "Max discharge power (W)",
+                "de": "Maximale Entladeleistung (W)",
+                "nl": "Maximaal ontlaadvermogen (W)"
+              },
+              "min": 0,
+              "max": 100000,
+              "step": 100,
+              "hint": {
+                "en": "Maximum power the battery discharges at (register 47077). Synced from the inverter on every poll.",
+                "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "nl": "Maximaal vermogen waarmee de batterij ontlaadt (register 47077). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Charging from the grid",
+            "de": "Laden aus dem Netz",
+            "nl": "Laden van het net"
+          },
+          "children": [
+            {
+              "id": "charge_from_grid",
+              "type": "checkbox",
+              "label": {
+                "en": "Charge battery from grid",
+                "de": "Batterie aus dem Netz laden",
+                "nl": "Batterij laden uit het net"
+              },
+              "value": false,
+              "hint": {
+                "en": "Enables or disables grid charging (register 47087). Synced from the inverter on every poll.",
+                "de": "Aktiviert oder deaktiviert das Laden der Batterie aus dem Stromnetz (Register 47087). Wird bei jeder Abfrage mit dem Inverter synchronisiert.",
+                "nl": "Schakelt het laden uit het net in of uit (register 47087). Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
+              }
+            },
+            {
+              "id": "max_grid_charge_power",
+              "type": "number",
+              "label": {
+                "en": "Max grid charge power (W)",
+                "de": "Maximale Netzladeleistung (W)",
+                "nl": "Maximaal laadvermogen uit het net (W)"
+              },
+              "min": 0,
+              "max": 100000,
+              "step": 100,
+              "hint": {
+                "en": "Active grid charge power set point (register 47242). This is the value shown and set by FusionSolar. Requires 'Charge from grid' to be enabled — saving this setting will automatically enable it if currently off.",
+                "de": "Aktiver Sollwert für die Netzladeleistung (Register 47242). Dieser Wert wird auch von FusionSolar angezeigt und gesetzt. Erfordert, dass 'Batterie aus dem Netz laden' aktiviert ist — wird beim Speichern automatisch aktiviert falls nötig.",
+                "nl": "Actieve instelwaarde voor het laadvermogen uit het net (register 47242). Dit is de waarde die FusionSolar toont en instelt. Vereist dat 'Batterij laden uit het net' is ingeschakeld — bij opslaan wordt dat zo nodig automatisch ingeschakeld."
+              }
+            },
+            {
+              "id": "grid_charge_cutoff_soc",
+              "type": "number",
+              "label": {
+                "en": "Grid charge cutoff SoC (%)",
+                "de": "Netzlade-Ziel-SoC (%)",
+                "nl": "Eind-SoC bij laden uit het net (%)"
+              },
+              "min": 20,
+              "max": 100,
+              "hint": {
+                "en": "Battery SoC at which grid charging stops (register 47088). Range: 20–100 %, default 50 %.",
+                "de": "Ladezustand, bei dem das Netzladen stoppt (Register 47088). Bereich: 20–100 %, Standard 50 %.",
+                "nl": "Laadtoestand waarbij het laden uit het net stopt (register 47088). Bereik: 20–100 %, standaard 50 %."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "State of charge limits",
+            "de": "Grenzen des Ladezustands",
+            "nl": "Grenzen van de laadtoestand"
+          },
+          "children": [
+            {
+              "id": "charging_cutoff_capacity",
+              "type": "number",
+              "label": {
+                "en": "Charging cutoff capacity (%)",
+                "de": "Maximaler Ladezustand (%)",
+                "nl": "Maximale laadtoestand (%)"
+              },
+              "min": 90,
+              "max": 100,
+              "hint": {
+                "en": "Maximum SoC the battery charges to (register 47081). Range: 90–100 %, default 100 %.",
+                "de": "Maximaler Ladezustand, bis zu dem die Batterie geladen wird (Register 47081). Bereich: 90–100 %, Standard 100 %.",
+                "nl": "Maximale laadtoestand waartoe de batterij wordt geladen (register 47081). Bereik: 90–100 %, standaard 100 %."
+              }
+            },
+            {
+              "id": "discharge_cutoff_capacity",
+              "type": "number",
+              "label": {
+                "en": "Discharge cutoff capacity (%)",
+                "de": "Minimaler Entladezustand (%)",
+                "nl": "Minimale ontlaadtoestand (%)"
+              },
+              "value": 15,
+              "min": 0,
+              "max": 20,
+              "step": 1,
+              "hint": {
+                "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are deployed, the configured value is applied. If no PV modules are deployed and the configured value is below 15 %, it is treated as 15 %.",
+                "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Wenn PV-Module bereitgestellt werden, wird der konfigurierte Wert angewendet. Wenn keine PV-Module bereitgestellt werden und der konfigurierte Wert unter 15 % liegt, wird der Wert als 15 % behandelt.",
+                "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %, standaard 15 %. Zijn er PV-modules aanwezig, dan geldt de ingestelde waarde. Zijn er geen PV-modules aanwezig en ligt de ingestelde waarde onder 15 %, dan wordt 15 % aangehouden."
+              }
+            },
+            {
+              "id": "backup_power_soc",
+              "type": "number",
+              "label": {
+                "en": "Backup power SoC (%)",
+                "de": "Backup-Energie-SoC (%)",
+                "nl": "SoC voor noodstroom (%)"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 100,
+              "step": 1,
+              "hint": {
+                "en": "Minimum SoC reserved for backup power during grid outages (register 47102). Range: 0–100 %, default 0 %.",
+                "de": "Mindest-SoC, der für den Stromausfall-Betrieb reserviert wird (Register 47102). Bereich: 0–100 %, Standard 0 %.",
+                "nl": "Minimale laadtoestand die bij netuitval voor noodstroom gereserveerd blijft (register 47102). Bereik: 0–100 %, standaard 0 %."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
+          },
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the battery status changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
+              }
+            }
+          ]
         }
       ]
     },
@@ -4501,109 +4551,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the EMMA energy management module.",
-            "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
-            "nl": "IP-adres van de EMMA energiemanagementmodule."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502.",
-            "de": "Standard 502.",
-            "nl": "Standaard 502."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 0,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "EMMA typically uses unit ID 0.",
-            "de": "EMMA verwendet typischerweise Geräte-ID 0.",
-            "nl": "EMMA gebruikt meestal apparaat-ID 0."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the battery.",
-            "de": "Wie oft Daten von der Batterie abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de batterij worden gelezen."
-          }
-        },
-        {
-          "id": "max_grid_charge_power",
-          "type": "number",
-          "label": {
-            "en": "Max. Grid Charging Power (kW)",
-            "de": "Max. Ladeleistung aus Netz (kW)",
-            "nl": "Max. laadvermogen uit het net (kW)"
-          },
-          "value": 5,
-          "min": 0,
-          "max": 50,
-          "step": 0.1,
-          "hint": {
-            "en": "Maximum power for charging the battery from the grid (0–50 kW). Written to EMMA register 40002.",
-            "de": "Maximale Ladeleistung der Batterie aus dem Netz (0–50 kW). Wird in EMMA-Register 40002 geschrieben.",
-            "nl": "Maximaal vermogen om de batterij uit het net te laden (0–50 kW). Wordt naar EMMA-register 40002 geschreven."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the battery charging state changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Ladezustand ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de laadstatus verandert."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the EMMA energy management module.",
+                "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
+                "nl": "IP-adres van de EMMA energiemanagementmodule."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502.",
+                "de": "Standard 502.",
+                "nl": "Standaard 502."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "EMMA typically uses unit ID 0.",
+                "de": "EMMA verwendet typischerweise Geräte-ID 0.",
+                "nl": "EMMA gebruikt meestal apparaat-ID 0."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the battery.",
+                "de": "Wie oft Daten von der Batterie abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de batterij worden gelezen."
+              }
+            }
+          ]
         },
         {
           "type": "group",
@@ -4733,6 +4760,59 @@
                 "en": "Do not use the modes above for this. Add the Energy Management device instead: it charges from the grid in the cheapest hours up to a target you set, skips that on a day enough sun is forecast, and holds the discharge back for the most expensive hours. It steers the battery with force charge/discharge and the power limits, and leaves the working mode on \"Maximise Self-Consumption\".",
                 "de": "Dafür nicht die Modi oben verwenden. Stattdessen das Gerät „Energieverwaltung“ hinzufügen: es lädt in den günstigsten Stunden aus dem Netz bis zu einem Zielwert, lässt das an einem Tag mit genug Sonnenprognose sein und hält die Entladung für die teuersten Stunden zurück. Es steuert die Batterie über Zwangsladung und Zwangsentladung sowie die Leistungsgrenzen und lässt den Betriebsmodus auf „Eigenverbrauch maximieren“ stehen.",
                 "nl": "Gebruik hiervoor niet de modi hierboven. Voeg in plaats daarvan het Energiebeheer-apparaat toe: het laadt in de goedkoopste uren uit het net tot een door jou ingestelde waarde, slaat dat over op een dag met genoeg zonneprognose, en houdt het ontladen achter voor de duurste uren. Het stuurt de batterij aan met geforceerd laden en ontladen en met de vermogensgrenzen, en laat de bedrijfsmodus op „Eigenverbruik maximaliseren” staan."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Charging from the grid",
+            "de": "Laden aus dem Netz",
+            "nl": "Laden van het net"
+          },
+          "children": [
+            {
+              "id": "max_grid_charge_power",
+              "type": "number",
+              "label": {
+                "en": "Max. Grid Charging Power (kW)",
+                "de": "Max. Ladeleistung aus Netz (kW)",
+                "nl": "Max. laadvermogen uit het net (kW)"
+              },
+              "value": 5,
+              "min": 0,
+              "max": 50,
+              "step": 0.1,
+              "hint": {
+                "en": "Maximum power for charging the battery from the grid (0–50 kW). Written to EMMA register 40002.",
+                "de": "Maximale Ladeleistung der Batterie aus dem Netz (0–50 kW). Wird in EMMA-Register 40002 geschrieben.",
+                "nl": "Maximaal vermogen om de batterij uit het net te laden (0–50 kW). Wordt naar EMMA-register 40002 geschreven."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
+          },
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the battery charging state changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Ladezustand ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de laadstatus verandert."
               }
             }
           ]
