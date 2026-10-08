@@ -52,9 +52,20 @@ test('the EMMA battery settings come in these groups, in this order', () => {
   ]);
 });
 
-test('the groups the battery shares with the inverter carry the same names', () => {
+test('the OCPP charger settings come in these groups, in this order', () => {
+  // Grouped in 1.2.271, the third driver after the inverter and the battery.
+  assert.deepStrictEqual(groups('smartcharger_ocpp').map((g) => [g.label.en, g.children.map((c) => c.id)]), [
+    ['Connection', ['station_id', 'ocpp_port', 'ocpp_username', 'ocpp_password']],
+    ['Charger', ['charger_vendor', 'charger_model', 'number_of_phases']],
+    ['Charging', ['auto_start_charging', 'default_charging_amps']],
+    ['Display', ['show_vehicle_soc']],
+    ['Notifications', ['enable_timeline_notifications']],
+  ]);
+});
+
+test('the groups a driver shares with the inverter carry the same names', () => {
   const sun = Object.fromEntries(groups('sun2000_modbus').map((g) => [g.label.en, g.label]));
-  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus', 'smartcharger_ocpp']) {
     for (const g of groups(id)) {
       if (sun[g.label.en]) assert.deepStrictEqual(g.label, sun[g.label.en], `${id}: ${g.label.en}`);
     }
@@ -62,7 +73,7 @@ test('the groups the battery shares with the inverter carry the same names', () 
 });
 
 test('every group is named in all three languages, and no setting sits in two', () => {
-  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus', 'smartcharger_ocpp']) {
     for (const g of groups(id)) for (const lang of ['en', 'de', 'nl']) assert.ok(g.label[lang], `${id}: ${g.label.en} (${lang})`);
     const ids = flat(driver(id).settings).map((s) => s.id);
     assert.strictEqual(new Set(ids).size, ids.length, `${id}: a setting appears twice`);

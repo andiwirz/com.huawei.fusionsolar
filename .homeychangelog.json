@@ -1,4 +1,9 @@
 {
+  "1.2.271": {
+    "en": "The OCPP charger’s device settings are sorted into groups, like the inverter’s and the battery’s: Connection, Charger, Charging, Display and Notifications. Nothing about the settings themselves changed.",
+    "de": "Die Geräteeinstellungen des OCPP-Laders sind in Gruppen geordnet, wie bei Wechselrichter und Batterie: Verbindung, Ladestation, Laden, Anzeige und Benachrichtigungen. An den Einstellungen selbst ändert sich nichts.",
+    "nl": "De apparaatinstellingen van de OCPP-laadpaal zijn in groepen ingedeeld, zoals bij de omvormer en de batterij. De instellingen zelf zijn niet veranderd."
+  },
   "1.2.270": {
     "en": "The battery’s device settings are sorted into groups, like the inverter’s.\n\nConnection, the battery modes, charge and discharge power, charging from the grid, the state of charge limits and notifications each have a heading of their own, instead of one unlabelled list above the modes. Nothing about the settings themselves changed.",
     "de": "Die Geräteeinstellungen der Batterie sind in Gruppen geordnet, wie beim Wechselrichter.\n\nVerbindung, Batteriemodi, Lade- und Entladeleistung, Laden aus dem Netz, Grenzen des Ladezustands und Benachrichtigungen haben je eine eigene Überschrift, statt als eine Liste ohne Titel über den Modi zu stehen. An den Einstellungen selbst ändert sich nichts.",

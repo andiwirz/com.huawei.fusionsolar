@@ -517,16 +517,18 @@ Configure the SCharger via FusionSolar → *Device Commissioning* → *OCPP Sett
 
 #### Device Settings
 
-| Setting                      | Default | Description                                                              |
-|------------------------------|---------|--------------------------------------------------------------------------|
-| Station ID                   | –       | Unique identifier matching the Path field on the charger                 |
-| OCPP port                    | 8887    | WebSocket server port                                                    |
-| Username / Password          | –       | Optional Basic Auth credentials (must match charger settings)            |
-| Auto-start charging          | on      | Automatically starts charging when a car connects                        |
-| Default charging current (A) | 16      | Current limit applied on each new session                                |
-| Number of phases             | 3       | Phase count used for SetChargingProfile (1 or 3)                         |
-| Charger model                | –       | Hardware variant (affects minimum current floor validation)              |
-| Timeline notifications       | off     | Posts session start/stop events to the Homey timeline                    |
+| Group | Setting | Default | Description |
+|-------|---------|---------|-------------|
+| Connection | Station ID | – | Unique identifier matching the Path field on the charger |
+| Connection | OCPP port | 8887 | WebSocket server port |
+| Connection | Username / Password | – | Optional Basic Auth credentials (must match charger settings) |
+| Charger | Charger vendor | Huawei | Not read from the charger; edit freely |
+| Charger | Charger model | Other / not sure | Hardware variant; the 7KS rejects three phases |
+| Charger | Number of phases | 3 (Tri-Phase) | How the charger is wired; used for SetChargingProfile. Never auto-detected |
+| Charging | Auto-start charging | on | Automatically starts charging when a car connects |
+| Charging | Default charging current | 10A | Current used by auto-start and by "Start charging" without an ampere value |
+| Display | Show vehicle battery level | on | Off removes the tile for cars that do not report their state of charge |
+| Notifications | Timeline notifications | on | Posts car connected, charging started/stopped and car disconnected to the timeline |
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.270",
+  "version": "1.2.271",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -2356,308 +2356,358 @@
       ],
       "settings": [
         {
-          "id": "station_id",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "Station ID",
-            "de": "Station ID",
-            "nl": "Station ID"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "The OCPP Station ID configured on the charger. The charger must connect to ws://[Homey-IP]:8887/[station-id].",
-            "de": "Die am Charger konfigurierte OCPP Station-ID. Der Charger muss sich zu ws://[Homey-IP]:8887/[station-id] verbinden.",
-            "nl": "De OCPP Station ID geconfigureerd op de lader. De lader moet verbinding maken met ws://[Homey-IP]:8887/[station-id]."
-          },
-          "highlight": true
-        },
-        {
-          "id": "ocpp_port",
-          "type": "number",
-          "label": {
-            "en": "OCPP Port",
-            "de": "OCPP Port",
-            "nl": "OCPP Poort"
-          },
-          "value": 8887,
-          "min": 1024,
-          "max": 65535,
-          "hint": {
-            "en": "WebSocket port the OCPP server listens on. Enter the same port in the SCharger OCPP settings (default: 8887).",
-            "de": "WebSocket Port des OCPP Servers. Denselben Port in den OCPP-Einstellungen des SChargers eintragen (Standard: 8887).",
-            "nl": "WebSocket poort van de OCPP server. Dezelfde poort invoeren in de OCPP-instellingen van de SCharger (standaard: 8887)."
-          }
-        },
-        {
-          "id": "ocpp_username",
-          "type": "text",
-          "label": {
-            "en": "Username (optional)",
-            "de": "Benutzername (optional)",
-            "nl": "Gebruikersnaam (optioneel)"
-          },
-          "value": "",
-          "hint": {
-            "en": "Leave empty to skip authentication. If set, the SCharger must send the same username in its OCPP settings.",
-            "de": "Leer lassen um Authentifizierung zu überspringen. Falls gesetzt, muss der SCharger denselben Benutzernamen in seinen OCPP-Einstellungen verwenden.",
-            "nl": "Leeg laten om authenticatie over te slaan. Indien ingesteld moet de SCharger dezelfde gebruikersnaam in zijn OCPP-instellingen gebruiken."
-          }
-        },
-        {
-          "id": "ocpp_password",
-          "type": "password",
-          "label": {
-            "en": "Password (optional)",
-            "de": "Passwort (optional)",
-            "nl": "Wachtwoord (optioneel)"
-          },
-          "value": "",
-          "hint": {
-            "en": "Password for Basic Authentication. Only used if a username is set.",
-            "de": "Passwort für die Basisauthentifizierung. Wird nur verwendet wenn ein Benutzername gesetzt ist.",
-            "nl": "Wachtwoord voor basisauthenticatie. Alleen gebruikt als een gebruikersnaam is ingesteld."
-          }
-        },
-        {
-          "id": "auto_start_charging",
-          "type": "checkbox",
-          "label": {
-            "en": "Auto-start charging when car connects",
-            "de": "Laden automatisch starten wenn Auto angeschlossen",
-            "nl": "Automatisch starten bij aansluiten auto"
-          },
-          "value": true,
-          "hint": {
-            "en": "When enabled, charging begins automatically as soon as the car plugs in. When disabled, use the 'Start charging' flow action or the on/off button to start manually.",
-            "de": "Wenn aktiviert, beginnt der Ladevorgang automatisch sobald das Auto angeschlossen wird. Wenn deaktiviert, mit der Flow-Aktion 'Laden starten' oder dem Ein/Aus-Schalter manuell starten.",
-            "nl": "Indien ingeschakeld begint het laden automatisch zodra de auto wordt aangesloten. Indien uitgeschakeld, gebruik de flow-actie 'Starten met laden' of de aan/uit-knop om handmatig te starten."
-          }
-        },
-        {
-          "id": "show_vehicle_soc",
-          "type": "checkbox",
-          "label": {
-            "en": "Show vehicle battery level",
-            "de": "Batteriestand des Fahrzeugs anzeigen",
-            "nl": "Accuniveau van het voertuig tonen"
-          },
-          "value": true,
-          "hint": {
-            "en": "The charger can only report the car's state of charge if the car sends it over OCPP, and many cars do not. Turn this off to remove the tile instead of leaving it empty.",
-            "de": "Die Ladestation kann den Ladestand des Autos nur melden, wenn das Auto ihn über OCPP sendet — viele Autos tun das nicht. Ausschalten entfernt die Kachel, statt sie leer stehen zu lassen.",
-            "nl": "Het laadpunt kan het laadniveau van de auto alleen melden als de auto dit via OCPP verstuurt, en veel auto’s doen dat niet. Uitschakelen verwijdert de tegel in plaats van hem leeg te laten staan."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Enable Timeline notifications",
-            "de": "Zeitleisten-Benachrichtigungen aktivieren",
-            "nl": "Tijdlijn-meldingen inschakelen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Posts to Homey's Timeline when the car connects, charging starts, charging stops, and the car disconnects.",
-            "de": "Veröffentlicht Einträge in Homeys Zeitleiste, wenn das Auto sich verbindet, das Laden startet, stoppt und das Auto die Verbindung trennt.",
-            "nl": "Plaatst berichten op de Tijdlijn van Homey wanneer de auto verbindt, het laden start, stopt en de auto wordt losgekoppeld."
-          }
-        },
-        {
-          "id": "charger_vendor",
-          "type": "text",
-          "label": {
-            "en": "Charger vendor",
-            "de": "Hersteller der Ladestation",
-            "nl": "Laadpaalfabrikant"
-          },
-          "value": "Huawei",
-          "hint": {
-            "en": "Not read from the charger — defaults to \"Huawei\", but you can edit it freely.",
-            "de": "Wird nicht von der Ladestation ausgelesen — Standard ist \"Huawei\", kann aber frei geändert werden.",
-            "nl": "Wordt niet uitgelezen van de lader — standaard \"Huawei\", maar vrij aanpasbaar."
-          }
-        },
-        {
-          "id": "charger_model",
-          "type": "dropdown",
-          "label": {
-            "en": "Charger model",
-            "de": "Modell der Ladestation",
-            "nl": "Laadpaalmodel"
-          },
-          "value": "other",
-          "highlight": true,
-          "values": [
+          "children": [
             {
-              "id": "7ks",
+              "id": "station_id",
+              "type": "text",
               "label": {
-                "en": "SCharger-7KS-S0 (Mono-Phase only)",
-                "de": "SCharger-7KS-S0 (nur Mono-Phase)",
-                "nl": "SCharger-7KS-S0 (alleen Mono-Phase)"
+                "en": "Station ID",
+                "de": "Station ID",
+                "nl": "Station ID"
+              },
+              "value": "",
+              "hint": {
+                "en": "The OCPP Station ID configured on the charger. The charger must connect to ws://[Homey-IP]:8887/[station-id].",
+                "de": "Die am Charger konfigurierte OCPP Station-ID. Der Charger muss sich zu ws://[Homey-IP]:8887/[station-id] verbinden.",
+                "nl": "De OCPP Station ID geconfigureerd op de lader. De lader moet verbinding maken met ws://[Homey-IP]:8887/[station-id]."
+              },
+              "highlight": true
+            },
+            {
+              "id": "ocpp_port",
+              "type": "number",
+              "label": {
+                "en": "OCPP Port",
+                "de": "OCPP Port",
+                "nl": "OCPP Poort"
+              },
+              "value": 8887,
+              "min": 1024,
+              "max": 65535,
+              "hint": {
+                "en": "WebSocket port the OCPP server listens on. Enter the same port in the SCharger OCPP settings (default: 8887).",
+                "de": "WebSocket Port des OCPP Servers. Denselben Port in den OCPP-Einstellungen des SChargers eintragen (Standard: 8887).",
+                "nl": "WebSocket poort van de OCPP server. Dezelfde poort invoeren in de OCPP-instellingen van de SCharger (standaard: 8887)."
               }
             },
             {
-              "id": "22kt",
+              "id": "ocpp_username",
+              "type": "text",
               "label": {
-                "en": "SCharger-22KT-S0 (Mono-Phase or Tri-Phase)",
-                "de": "SCharger-22KT-S0 (Mono-Phase oder Tri-Phase)",
-                "nl": "SCharger-22KT-S0 (Mono-Phase of Tri-Phase)"
+                "en": "Username (optional)",
+                "de": "Benutzername (optional)",
+                "nl": "Gebruikersnaam (optioneel)"
+              },
+              "value": "",
+              "hint": {
+                "en": "Leave empty to skip authentication. If set, the SCharger must send the same username in its OCPP settings.",
+                "de": "Leer lassen um Authentifizierung zu überspringen. Falls gesetzt, muss der SCharger denselben Benutzernamen in seinen OCPP-Einstellungen verwenden.",
+                "nl": "Leeg laten om authenticatie over te slaan. Indien ingesteld moet de SCharger dezelfde gebruikersnaam in zijn OCPP-instellingen gebruiken."
               }
             },
             {
-              "id": "other",
+              "id": "ocpp_password",
+              "type": "password",
               "label": {
-                "en": "Other / not sure",
-                "de": "Andere / nicht sicher",
-                "nl": "Anders / niet zeker"
+                "en": "Password (optional)",
+                "de": "Passwort (optional)",
+                "nl": "Wachtwoord (optioneel)"
+              },
+              "value": "",
+              "hint": {
+                "en": "Password for Basic Authentication. Only used if a username is set.",
+                "de": "Passwort für die Basisauthentifizierung. Wird nur verwendet wenn ein Benutzername gesetzt ist.",
+                "nl": "Wachtwoord voor basisauthenticatie. Alleen gebruikt als een gebruikersnaam is ingesteld."
               }
             }
-          ],
-          "hint": {
-            "en": "If set to SCharger-7KS-S0 and 'Number of phases' is set to 3, saving is rejected with an error.",
-            "de": "Wenn auf SCharger-7KS-S0 gesetzt und 'Anzahl der Phasen' auf 3, wird das Speichern mit einem Fehler abgelehnt.",
-            "nl": "Als dit is ingesteld op SCharger-7KS-S0 en 'Aantal fasen' op 3, wordt opslaan geweigerd."
-          }
+          ]
         },
         {
-          "id": "number_of_phases",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Number of phases",
-            "de": "Anzahl der Phasen",
-            "nl": "Aantal fasen"
+            "en": "Charger",
+            "de": "Ladestation",
+            "nl": "Laadpaal"
           },
-          "value": "3",
-          "highlight": true,
-          "values": [
+          "children": [
             {
-              "id": "1",
+              "id": "charger_vendor",
+              "type": "text",
               "label": {
-                "en": "1 (Mono-Phase)",
-                "de": "1 (Mono-Phase)",
-                "nl": "1 (Mono-Phase)"
+                "en": "Charger vendor",
+                "de": "Hersteller der Ladestation",
+                "nl": "Laadpaalfabrikant"
+              },
+              "value": "Huawei",
+              "hint": {
+                "en": "Not read from the charger — defaults to \"Huawei\", but you can edit it freely.",
+                "de": "Wird nicht von der Ladestation ausgelesen — Standard ist \"Huawei\", kann aber frei geändert werden.",
+                "nl": "Wordt niet uitgelezen van de lader — standaard \"Huawei\", maar vrij aanpasbaar."
               }
             },
             {
-              "id": "3",
+              "id": "charger_model",
+              "type": "dropdown",
               "label": {
-                "en": "3 (Tri-Phase)",
-                "de": "3 (Tri-Phase)",
-                "nl": "3 (Tri-Phase)"
+                "en": "Charger model",
+                "de": "Modell der Ladestation",
+                "nl": "Laadpaalmodel"
+              },
+              "value": "other",
+              "highlight": true,
+              "values": [
+                {
+                  "id": "7ks",
+                  "label": {
+                    "en": "SCharger-7KS-S0 (Mono-Phase only)",
+                    "de": "SCharger-7KS-S0 (nur Mono-Phase)",
+                    "nl": "SCharger-7KS-S0 (alleen Mono-Phase)"
+                  }
+                },
+                {
+                  "id": "22kt",
+                  "label": {
+                    "en": "SCharger-22KT-S0 (Mono-Phase or Tri-Phase)",
+                    "de": "SCharger-22KT-S0 (Mono-Phase oder Tri-Phase)",
+                    "nl": "SCharger-22KT-S0 (Mono-Phase of Tri-Phase)"
+                  }
+                },
+                {
+                  "id": "other",
+                  "label": {
+                    "en": "Other / not sure",
+                    "de": "Andere / nicht sicher",
+                    "nl": "Anders / niet zeker"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "If set to SCharger-7KS-S0 and 'Number of phases' is set to 3, saving is rejected with an error.",
+                "de": "Wenn auf SCharger-7KS-S0 gesetzt und 'Anzahl der Phasen' auf 3, wird das Speichern mit einem Fehler abgelehnt.",
+                "nl": "Als dit is ingesteld op SCharger-7KS-S0 en 'Aantal fasen' op 3, wordt opslaan geweigerd."
+              }
+            },
+            {
+              "id": "number_of_phases",
+              "type": "dropdown",
+              "label": {
+                "en": "Number of phases",
+                "de": "Anzahl der Phasen",
+                "nl": "Aantal fasen"
+              },
+              "value": "3",
+              "highlight": true,
+              "values": [
+                {
+                  "id": "1",
+                  "label": {
+                    "en": "1 (Mono-Phase)",
+                    "de": "1 (Mono-Phase)",
+                    "nl": "1 (Mono-Phase)"
+                  }
+                },
+                {
+                  "id": "3",
+                  "label": {
+                    "en": "3 (Tri-Phase)",
+                    "de": "3 (Tri-Phase)",
+                    "nl": "3 (Tri-Phase)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "How your charger is wired — Mono-Phase or Tri-Phase. Never auto-detected — check your charger installation and set this to match.",
+                "de": "Wie deine Ladestation verkabelt ist — Mono-Phase oder Tri-Phase. Wird nie automatisch erkannt — überprüfe die Installation und stelle es entsprechend ein.",
+                "nl": "Hoe je lader is aangesloten — Mono-Phase of Tri-Phase. Nooit automatisch gedetecteerd — controleer de installatie en stel dit dienovereenkomstig in."
               }
             }
-          ],
-          "hint": {
-            "en": "How your charger is wired — Mono-Phase or Tri-Phase. Never auto-detected — check your charger installation and set this to match.",
-            "de": "Wie deine Ladestation verkabelt ist — Mono-Phase oder Tri-Phase. Wird nie automatisch erkannt — überprüfe die Installation und stelle es entsprechend ein.",
-            "nl": "Hoe je lader is aangesloten — Mono-Phase of Tri-Phase. Nooit automatisch gedetecteerd — controleer de installatie en stel dit dienovereenkomstig in."
-          }
+          ]
         },
         {
-          "id": "default_charging_amps",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Default charging current",
-            "de": "Standard-Ladestrom",
-            "nl": "Standaard laadstroom"
+            "en": "Charging",
+            "de": "Laden",
+            "nl": "Laden"
           },
-          "value": "10",
-          "values": [
+          "children": [
             {
-              "id": "6",
+              "id": "auto_start_charging",
+              "type": "checkbox",
               "label": {
-                "en": "6A",
-                "de": "6A",
-                "nl": "6A"
+                "en": "Auto-start charging when car connects",
+                "de": "Laden automatisch starten wenn Auto angeschlossen",
+                "nl": "Automatisch starten bij aansluiten auto"
+              },
+              "value": true,
+              "hint": {
+                "en": "When enabled, charging begins automatically as soon as the car plugs in. When disabled, use the 'Start charging' flow action or the on/off button to start manually.",
+                "de": "Wenn aktiviert, beginnt der Ladevorgang automatisch sobald das Auto angeschlossen wird. Wenn deaktiviert, mit der Flow-Aktion 'Laden starten' oder dem Ein/Aus-Schalter manuell starten.",
+                "nl": "Indien ingeschakeld begint het laden automatisch zodra de auto wordt aangesloten. Indien uitgeschakeld, gebruik de flow-actie 'Starten met laden' of de aan/uit-knop om handmatig te starten."
               }
             },
             {
-              "id": "7",
+              "id": "default_charging_amps",
+              "type": "dropdown",
               "label": {
-                "en": "7A",
-                "de": "7A",
-                "nl": "7A"
-              }
-            },
-            {
-              "id": "8",
-              "label": {
-                "en": "8A",
-                "de": "8A",
-                "nl": "8A"
-              }
-            },
-            {
-              "id": "9",
-              "label": {
-                "en": "9A",
-                "de": "9A",
-                "nl": "9A"
-              }
-            },
-            {
-              "id": "10",
-              "label": {
-                "en": "10A",
-                "de": "10A",
-                "nl": "10A"
-              }
-            },
-            {
-              "id": "11",
-              "label": {
-                "en": "11A",
-                "de": "11A",
-                "nl": "11A"
-              }
-            },
-            {
-              "id": "12",
-              "label": {
-                "en": "12A",
-                "de": "12A",
-                "nl": "12A"
-              }
-            },
-            {
-              "id": "13",
-              "label": {
-                "en": "13A",
-                "de": "13A",
-                "nl": "13A"
-              }
-            },
-            {
-              "id": "14",
-              "label": {
-                "en": "14A",
-                "de": "14A",
-                "nl": "14A"
-              }
-            },
-            {
-              "id": "15",
-              "label": {
-                "en": "15A",
-                "de": "15A",
-                "nl": "15A"
-              }
-            },
-            {
-              "id": "16",
-              "label": {
-                "en": "16A",
-                "de": "16A",
-                "nl": "16A"
+                "en": "Default charging current",
+                "de": "Standard-Ladestrom",
+                "nl": "Standaard laadstroom"
+              },
+              "value": "10",
+              "values": [
+                {
+                  "id": "6",
+                  "label": {
+                    "en": "6A",
+                    "de": "6A",
+                    "nl": "6A"
+                  }
+                },
+                {
+                  "id": "7",
+                  "label": {
+                    "en": "7A",
+                    "de": "7A",
+                    "nl": "7A"
+                  }
+                },
+                {
+                  "id": "8",
+                  "label": {
+                    "en": "8A",
+                    "de": "8A",
+                    "nl": "8A"
+                  }
+                },
+                {
+                  "id": "9",
+                  "label": {
+                    "en": "9A",
+                    "de": "9A",
+                    "nl": "9A"
+                  }
+                },
+                {
+                  "id": "10",
+                  "label": {
+                    "en": "10A",
+                    "de": "10A",
+                    "nl": "10A"
+                  }
+                },
+                {
+                  "id": "11",
+                  "label": {
+                    "en": "11A",
+                    "de": "11A",
+                    "nl": "11A"
+                  }
+                },
+                {
+                  "id": "12",
+                  "label": {
+                    "en": "12A",
+                    "de": "12A",
+                    "nl": "12A"
+                  }
+                },
+                {
+                  "id": "13",
+                  "label": {
+                    "en": "13A",
+                    "de": "13A",
+                    "nl": "13A"
+                  }
+                },
+                {
+                  "id": "14",
+                  "label": {
+                    "en": "14A",
+                    "de": "14A",
+                    "nl": "14A"
+                  }
+                },
+                {
+                  "id": "15",
+                  "label": {
+                    "en": "15A",
+                    "de": "15A",
+                    "nl": "15A"
+                  }
+                },
+                {
+                  "id": "16",
+                  "label": {
+                    "en": "16A",
+                    "de": "16A",
+                    "nl": "16A"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Charging current used when auto-start triggers or when 'Start charging' is called without a specific ampere value.",
+                "de": "Ladestrom der verwendet wird wenn Auto-Start ausgelöst wird oder 'Laden starten' ohne spezifischen Ampere-Wert aufgerufen wird.",
+                "nl": "Laadstroom die wordt gebruikt wanneer auto-start wordt geactiveerd of 'Starten met laden' wordt aangeroepen zonder een specifieke ampèrewaarde."
               }
             }
-          ],
-          "hint": {
-            "en": "Charging current used when auto-start triggers or when 'Start charging' is called without a specific ampere value.",
-            "de": "Ladestrom der verwendet wird wenn Auto-Start ausgelöst wird oder 'Laden starten' ohne spezifischen Ampere-Wert aufgerufen wird.",
-            "nl": "Laadstroom die wordt gebruikt wanneer auto-start wordt geactiveerd of 'Starten met laden' wordt aangeroepen zonder een specifieke ampèrewaarde."
-          }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Display",
+            "de": "Anzeige",
+            "nl": "Weergave"
+          },
+          "children": [
+            {
+              "id": "show_vehicle_soc",
+              "type": "checkbox",
+              "label": {
+                "en": "Show vehicle battery level",
+                "de": "Batteriestand des Fahrzeugs anzeigen",
+                "nl": "Accuniveau van het voertuig tonen"
+              },
+              "value": true,
+              "hint": {
+                "en": "The charger can only report the car's state of charge if the car sends it over OCPP, and many cars do not. Turn this off to remove the tile instead of leaving it empty.",
+                "de": "Die Ladestation kann den Ladestand des Autos nur melden, wenn das Auto ihn über OCPP sendet — viele Autos tun das nicht. Ausschalten entfernt die Kachel, statt sie leer stehen zu lassen.",
+                "nl": "Het laadpunt kan het laadniveau van de auto alleen melden als de auto dit via OCPP verstuurt, en veel auto’s doen dat niet. Uitschakelen verwijdert de tegel in plaats van hem leeg te laten staan."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
+          },
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Enable Timeline notifications",
+                "de": "Zeitleisten-Benachrichtigungen aktivieren",
+                "nl": "Tijdlijn-meldingen inschakelen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Posts to Homey's Timeline when the car connects, charging starts, charging stops, and the car disconnects.",
+                "de": "Veröffentlicht Einträge in Homeys Zeitleiste, wenn das Auto sich verbindet, das Laden startet, stoppt und das Auto die Verbindung trennt.",
+                "nl": "Plaatst berichten op de Tijdlijn van Homey wanneer de auto verbindt, het laden start, stopt en de auto wordt losgekoppeld."
+              }
+            }
+          ]
         }
       ]
     },

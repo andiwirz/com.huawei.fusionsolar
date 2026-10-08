@@ -44,7 +44,9 @@ function fakeCharger(settings = {}) {
 }
 
 test('the setting exists on the driver, in every language', () => {
-  const s = (DRIVER.settings || []).find((x) => x.id === 'show_vehicle_soc');
+  // In a group since 1.2.271 — look through the groups, not just the top level.
+  const flat = (list) => (list || []).flatMap((x) => (x.type === 'group' ? flat(x.children) : [x]));
+  const s = flat(DRIVER.settings).find((x) => x.id === 'show_vehicle_soc');
   assert.ok(s, 'the switch is gone from the device settings');
   assert.strictEqual(s.type, 'checkbox');
   assert.strictEqual(s.value, true, 'the tile is hidden by default, so a car that does '
