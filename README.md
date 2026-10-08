@@ -246,7 +246,7 @@ Direct Modbus TCP connection to the SUN2000 inverter or SDongle.
 | PVn voltage                 | DC voltage per PV string (V) — one per string, up to 24    |
 | PVn current                 | DC current per PV string (A) — one per string, up to 24    |
 | Grid frequency              | Mains frequency (Hz)                                      |
-| Inverter status             | Operating state as text                                   |
+| Inverter status             | Operating state as text. "Standby: battery empty" at night once the battery has reached its discharge cutoff. A code Huawei does not document shows its range and number, e.g. "Shutdown (0x030D)" |
 | Software version            | Inverter firmware version                                 |
 | Active power control mode   | Feed-in limit mode — shown here, changed only by flow cards |
 | Optimizers total / online   | Counts from register 37200 — only where optimizers are registered |

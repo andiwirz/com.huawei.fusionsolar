@@ -70,7 +70,8 @@ const DEPRECATED_CAPABILITIES = [
   'meter_power.exported',
 ];
 
-// OpenAPI inverter_state values (different from Modbus register 32089!)
+// OpenAPI inverter_state values: Modbus register 32089 in decimal (768 = 0x0300), with
+// different wording and a few cloud-only states (45056, 49152) on top.
 const INVERTER_STATE_MAP = {
   0:     'Standby: initializing',
   1:     'Standby: insulation resistance detecting',
@@ -87,6 +88,7 @@ const INVERTER_STATE_MAP = {
   772:   'Shutdown: power limited',
   773:   'Shutdown: manual startup required',
   774:   'Shutdown: DC switch disconnected',
+  780:   'Standby: battery empty', // 0x030C — see DEVICE_STATUS_MAP in lib/modbus-registers.js
   1025:  'Grid scheduling: cosψ-P curve',
   1026:  'Grid scheduling: Q-U curve',
   1280:  'Ready for terminal test',
