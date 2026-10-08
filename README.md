@@ -812,14 +812,25 @@ These registers derate the inverter AC output directly and work without a DTSU66
 
 | Card                              | Description                                                                                        |
 |-----------------------------------|----------------------------------------------------------------------------------------------------|
-| Set active power control mode     | Sets the inverter feed-in mode (reg 40029): No limit · Feed-in limitation · Zero export · etc.    |
-| Set max feed-in power (W)         | Sets the maximum grid feed-in power in watts (reg 47416). Requires DTSU666.                        |
-| Set max feed-in power (%)         | Sets the maximum grid feed-in power as % of rated power (reg 47418). Requires DTSU666.             |
-| Set max charge power (W)          | Sets the maximum battery charge power in watts (reg 47075).                                         |
-| Set max discharge power (W)       | Sets the maximum battery discharge power in watts (reg 47077).                                      |
-| Set inverter output limit (W)     | Caps inverter AC output in watts (reg 40126). Works without DTSU666.                               |
-| Set inverter output limit (%)     | Caps inverter AC output as % of rated power (reg 40125). Works without DTSU666.                    |
-| Remove inverter output limit      | Resets regs 40125/40126 to disable the output limit (sets 40125 = 100%, 40126 = 0).               |
+| Set active power control mode     | Sets the feed-in mode (reg 47415): Unlimited · DI active scheduling · Zero power grid connection · Limited by power (kW) · Limited by power (%). The device tile shows this mode but cannot change it. |
+| Enable/disable grid export limit  | Enable: *Limited by power (kW)* (47415 = 6) with the watt value already on 47416. Disable: *Unlimited* (47415 = 0). |
+| Set max feed-in power             | Sets the feed-in limit in watts (reg 47416). Requires a power meter (DTSU666).                     |
+| Set max feed-in power (%)         | Switches to *Limited by power (%)* (47415 = 7) and sets the limit (reg 47418). Requires a power meter. |
+| Enable zero export                | 47415 = 6, 47416 = 0 W. Remembers the mode and limit in force before.                              |
+| Disable zero export               | Puts back the mode and limit from before *Enable zero export* — watt limit first (47416), then the mode (47415). Only when nothing was remembered does it fall back to *Unlimited*. |
+| Set inverter output limit (W)     | Caps inverter AC output in watts (reg 40126). Works without a power meter.                         |
+| Set inverter output limit (%)     | Caps inverter AC output as % of rated power (reg 40125). Works without a power meter.              |
+| Remove inverter output limit      | Sets 40126 to rated power × 1.1 and 40125 to 100 %.                                                |
+| Start inverter / Shut down inverter | Writes reg 40200 / 40201.                                                                        |
+| Set MPPT multimodal scanning      | Reg 42054.                                                                                         |
+| Set MPPT scanning interval        | Reg 42055, in minutes.                                                                             |
+
+> **Zero export and a standing feed-in limit.** Many installations need a permanent limit — a
+> main fuse, or a grid operator's 60/70 % rule. Until 1.2.264, *Disable zero export* returned to
+> *Unlimited* regardless, and *Enable zero export* had already overwritten the watt limit with
+> 0 W, so a negative-price flow quietly removed that protection. Both cards now hand the
+> earlier state back. *Enable/disable grid export limit* keeps its literal meaning: off is
+> *Unlimited*.
 
 #### Battery LUNA2000 (Modbus)
 

@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.263",
+  "version": "1.2.264",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -10741,9 +10741,9 @@
           "nl": "Nul-teruglevering inschakelen voor [[device]]"
         },
         "hint": {
-          "en": "Activates zero export: sets active power control mode to 'Max feed-in power' (register 47415 = 6) and sets the feed-in limit to 0 W (register 47416 = 0). The inverter will continue producing power for self-consumption but will not export any surplus to the grid.",
-          "de": "Aktiviert die Nulleinspeisung: setzt den Wirkleistungs-Steuermodus auf 'Max. Einspeiseleistung' (Register 47415 = 6) und setzt das Einspeise-Limit auf 0 W (Register 47416 = 0). Der Wechselrichter produziert weiterhin Strom für den Eigenverbrauch, speist jedoch keinen Überschuss ins Netz ein.",
-          "nl": "Activeert nul-teruglevering: zet de regelmodus voor actief vermogen op 'Max. terugleververmogen' (register 47415 = 6) en de terugleverlimiet op 0 W (register 47416 = 0). De omvormer blijft stroom opwekken voor eigen verbruik, maar levert geen overschot meer terug aan het net."
+          "en": "Activates zero export: sets active power control mode to 'Max feed-in power' (register 47415 = 6) and sets the feed-in limit to 0 W (register 47416 = 0). The inverter will continue producing power for self-consumption but will not export any surplus to the grid. The feed-in mode and limit in force before are remembered, so 'Disable zero export' can put them back.",
+          "de": "Aktiviert die Nulleinspeisung: setzt den Wirkleistungs-Steuermodus auf 'Max. Einspeiseleistung' (Register 47415 = 6) und setzt das Einspeise-Limit auf 0 W (Register 47416 = 0). Der Wechselrichter produziert weiterhin Strom für den Eigenverbrauch, speist jedoch keinen Überschuss ins Netz ein. Der vorher gültige Modus samt Grenze wird gemerkt, damit 'Nulleinspeisung deaktivieren' ihn wiederherstellen kann.",
+          "nl": "Activeert nul-teruglevering: zet de regelmodus voor actief vermogen op 'Max. terugleververmogen' (register 47415 = 6) en de terugleverlimiet op 0 W (register 47416 = 0). De omvormer blijft stroom opwekken voor eigen verbruik, maar levert geen overschot meer terug aan het net. De modus en limiet die daarvoor golden worden onthouden, zodat 'Nul-teruglevering uitschakelen' ze kan terugzetten."
         },
         "args": [
           {
@@ -10766,9 +10766,9 @@
           "nl": "Nul-teruglevering uitschakelen voor [[device]]"
         },
         "hint": {
-          "en": "Deactivates zero export: sets active power control mode to 'No limit' (register 47415 = 0). The inverter will export surplus solar power to the grid freely.",
-          "de": "Deaktiviert die Nulleinspeisung: setzt den Wirkleistungs-Steuermodus auf 'Keine Begrenzung' (Register 47415 = 0). Der Wechselrichter speist Solarüberschuss wieder unbegrenzt ins Netz ein.",
-          "nl": "Schakelt nul-teruglevering uit: zet de regelmodus voor actief vermogen op 'Geen begrenzing' (register 47415 = 0). De omvormer levert het zonne-overschot weer onbeperkt terug aan het net."
+          "en": "Deactivates zero export: puts back the feed-in mode and limit that were in force before 'Enable zero export' ran (registers 47416 and 47415) — a standing feed-in limit stays a limit. If no earlier state is known, for instance because zero export was switched on outside this app, it returns to 'No limit' (register 47415 = 0).",
+          "de": "Deaktiviert die Nulleinspeisung: stellt den Modus samt Grenze wieder her, der vor 'Nulleinspeisung aktivieren' galt (Register 47416 und 47415) — eine stehende Einspeisegrenze bleibt eine Grenze. Ist kein früherer Zustand bekannt, etwa weil die Nulleinspeisung ausserhalb dieser App eingeschaltet wurde, geht er auf 'Keine Begrenzung' (Register 47415 = 0).",
+          "nl": "Schakelt nul-teruglevering uit: zet de modus en limiet terug die golden vóór 'Nul-teruglevering inschakelen' (registers 47416 en 47415) — een vaste terugleverlimiet blijft een limiet. Is er geen eerdere toestand bekend, bijvoorbeeld omdat nul-teruglevering buiten deze app is ingeschakeld, dan gaat hij naar 'Geen begrenzing' (register 47415 = 0)."
         },
         "args": [
           {
