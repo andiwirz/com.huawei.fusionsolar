@@ -891,6 +891,17 @@ power) and Notifications.
 | Set grid charge power (W)         | Sets the active grid-to-battery charge power setpoint (reg 47242)                                  |
 | Set grid charge cutoff SoC (%)    | Sets the SoC at which grid charging stops (reg 47088)                                              |
 
+**Forced charging and discharging work like the Home Assistant integration** ([wlcrs/huawei_solar](https://github.com/wlcrs/huawei_solar/wiki/Force-charge-discharge-battery), since 1.2.302). A forced run ends either after a duration or at a target SoC, and register 47246 decides which: 0 = duration (47083), 1 = target SoC (47101). Until 1.2.301 no card wrote it, so each ran in the mode the battery happened to have — on a battery set to target SoC the minute cards ignored their minutes. Now:
+
+| Card | Writes, in this order |
+|---|---|
+| Start charging / discharging for minutes | power (47247 / 47249) → minutes (47083) → mode 47246 = 0 → start (47100) |
+| Start charging / discharging until SoC % | target SoC (47101) → power (47247 / 47249) → mode 47246 = 1 → start (47100) |
+| Set force charge/discharge → charge / discharge | mode 47246 = 1 → start (47100): runs to the target SoC already set, at the power already set |
+| Set force charge/discharge → stop | stop (47100 = 0) → discharge power 0 (47249) → minutes 0 (47083) → mode 47246 = 0 |
+
+Each step waits for the one before it, and a step that fails starts nothing — the timeline says which value could not be written, instead of the run starting on a value left from an earlier one. After a stop, a discharge started with *Set force charge/discharge* needs a power again (a start card, or *Set force discharge power*), as in the HA integration.
+
 #### Battery LUNA2000 (EMMA Modbus)
 
 | Card                              | Description                                                                                        |

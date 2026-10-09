@@ -468,172 +468,158 @@ class LUNA2000ModbusDevice extends Device {
       cards['luna2000_set_remote_mode'] = ({ mode }) =>
         writeEnum('luna2000_set_remote_mode', 'remote_charge_discharge_control_mode', mode);
 
-      cards['luna2000_set_force_charge_discharge'] = ({ mode }) =>
-        writeEnum('luna2000_set_force_charge_discharge', 'storage_force_charge_discharge', mode);
+      // ── Forced charging and discharging, the way the Home Assistant integration does it ──
+      //
+      // wlcrs/huawei_solar (services.py) writes a run's values first, then the mode in 47246 —
+      // 0 runs for the minutes in 47083, 1 runs to the target SoC in 47101 — and the start
+      // command in 47100 last, every step only after the one before it succeeded. Its stop
+      // writes 47100 = 0 and then clears the discharge power (47249), the minutes (47083) and
+      // sets the mode back to "duration" (1.2.302, on Andi's request after comparing the two).
+      //
+      // Until 1.2.301 this app never wrote 47246, so each card ran in whatever mode the battery
+      // last had. Measured on Andi's LUNA2000: mode 1 — there the minute cards ignored their
+      // minutes and ran to an old target SoC. And a failed power or minutes write used to start
+      // the run anyway, on the value left from an earlier one.
+      const MODE_DURATION = 0;
+      const MODE_SOC = 1;
+
+      // Runs the steps in order and starts nothing when one fails: the start command is the
+      // last step, so an aborted sequence leaves the battery as it was.
+      const forceSequence = (label, kind, steps, done) => {
+        const h = host(), p = port(), u = unitId();
+        self._writeInProgress = true;
+        (async () => {
+          try {
+            for (const [fn, reg, value, what] of steps) {
+              try {
+                await fn(h, p, u, reg, value);
+              } catch (err) {
+                self.error(`${label}: ${what} (reg ${reg}) write failed — aborting, the run was not started:`, err.message);
+                self._pendingForceMode = null;
+                self._notifyForceAbort(kind, what, err);
+                return;
+              }
+            }
+            self.log(`${label} command sent`);
+            if (done) await done();
+          } finally {
+            self._writeInProgress = false;
+          }
+        })();
+      };
+
+      // "Zwangsladen/Entladen steuern" — the one card HA has no counterpart for. Charging and
+      // discharging run to the target SoC in 47101 (set by "Zwangslade-Ziel-SoC setzen" or the
+      // last start card), at the power already in 47247/47249: the card sets mode 1 first, so it
+      // does the same on every battery whatever mode the last card left behind. Stop is HA's.
+      cards['luna2000_set_force_charge_discharge'] = ({ mode }) => {
+        const value = parseInt(mode, 10);
+        const reflect = async () => {
+          self._updatingFromModbus = true;
+          try { await self._set('storage_force_charge_discharge', String(value)); } catch (_) {}
+          finally { self._updatingFromModbus = false; }
+        };
+        if (value === 0) {
+          self.log('Force stop: 47100 = 0, then clear discharge power, minutes and mode (as HA)');
+          self._pendingForceMode = null;
+          const h = host(), p = port(), u = unitId();
+          self._writeInProgress = true;
+          (async () => {
+            try {
+              try {
+                await writeModbusRegister(h, p, u, 47100, 0);
+              } catch (err) {
+                self.error('Force stop: stop write (reg 47100) failed:', err.message);
+                return;
+              }
+              await reflect();
+              // The battery is stopped; the clean-up afterwards is best effort.
+              for (const [fn, reg, v, what] of [
+                [writeModbusU32, 47249, 0, 'discharge power'],
+                [writeModbusRegister, 47083, 0, 'duration'],
+                [writeModbusRegister, 47246, MODE_DURATION, 'mode'],
+              ]) {
+                try { await fn(h, p, u, reg, v); } catch (err) {
+                  self.error(`Force stop: clearing ${what} (reg ${reg}) failed:`, err.message);
+                }
+              }
+              self.log('Force stop sent');
+            } finally {
+              self._writeInProgress = false;
+            }
+          })();
+          return;
+        }
+        const label = value === 1 ? 'Force charge (to target SoC)' : 'Force discharge (to target SoC)';
+        self.log(`${label}: mode 47246 = ${MODE_SOC}, then 47100 = ${value}`);
+        forceSequence(label, value === 1 ? 'charge' : 'discharge', [
+          [writeModbusRegister, 47246, MODE_SOC, 'mode'],
+          [writeModbusRegister, 47100, value, 'start command'],
+        ], reflect);
+      };
 
       cards['luna2000_start_force_charge'] = ({ device, power, target_soc }) => {
-        const h = host(), p = port(), u = unitId();
         const powerW = self._forcePowerW('charge', power);
         const socRaw  = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
         self.log(`Force charge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
-        self._writeInProgress = true;
         self._pendingForceMode = { direction: 'charging', powerW, sentAt: Date.now() };
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit.
-        // Each register is written independently: a failure on one does not skip the rest.
-        // The mode write (47100) is always attempted last so new power/SoC values are
-        // applied even when the battery is already in force-charge mode.
-        (async () => {
-          // Write the target SoC FIRST and treat it as a hard precondition. Force-charge
-          // mode (47100=1) charges up to whatever 47101 currently holds, so if the new
-          // target cannot be written we must NOT enable the mode — otherwise the battery would
-          // charge to a STALE target left over from an earlier run.
-          try {
-            await writeModbusRegister(h, p, u, 47101, socRaw);
-          } catch (err) {
-            self.error('Force charge: SOC write failed — aborting, mode NOT enabled to avoid charging to a stale target:', err.message);
-            self._pendingForceMode = null;
-            self._writeInProgress = false;
-            self._notifyForceAbort('charge', target_soc, err);
-            return;
-          }
-          let anyFail = false;
-          try {
-            await writeModbusU32(h, p, u, 47247, powerW);
-          } catch (err) { self.error('Force charge: power write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47100, 1);
-          } catch (err) { self.error('Force charge: mode write failed:', err.message); anyFail = true; }
-          self.log(anyFail ? 'Force charge command sent (with partial write failures)' : 'Force charge command sent');
-          self._writeInProgress = false;
-        })();
+        // The target SoC goes first: a run must never start on a stale target.
+        forceSequence('Force charge', 'charge', [
+          [writeModbusRegister, 47101, socRaw, `target SoC (${target_soc}%)`],
+          [writeModbusU32, 47247, powerW, 'charge power'],
+          [writeModbusRegister, 47246, MODE_SOC, 'mode'],
+          [writeModbusRegister, 47100, 1, 'start command'],
+        ]);
       };
 
-      cards['luna2000_start_force_discharge'] = ({ device, power, target_soc }) => {
-        const h = host(), p = port(), u = unitId();
+      const startForceDischargeSoc = ({ device, power, target_soc }) => {
         const powerW = self._forcePowerW('discharge', power);
         const socRaw  = Math.round(Math.max(0, Math.min(99, target_soc)) * 10);
         self.log(`Force discharge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
-        self._writeInProgress = true;
         self._pendingForceMode = { direction: 'discharging', powerW, sentAt: Date.now() };
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit.
-        // Each register is written independently: a failure on one does not skip the rest.
-        // The mode write (47100) is always attempted last so new power/SoC values are
-        // applied even when the battery is already in force-discharge mode.
-        (async () => {
-          // Write the target SoC FIRST and treat it as a hard precondition. Force-discharge
-          // mode (47100=2) discharges down to whatever 47101 currently holds, so if the new
-          // target cannot be written we must NOT enable the mode — otherwise the battery would
-          // discharge to a STALE target left over from an earlier run (e.g. a morning 2% run).
-          try {
-            await writeModbusRegister(h, p, u, 47101, socRaw);
-          } catch (err) {
-            self.error('Force discharge: SOC write failed — aborting, mode NOT enabled to avoid discharging to a stale target:', err.message);
-            self._pendingForceMode = null;
-            self._writeInProgress = false;
-            self._notifyForceAbort('discharge', target_soc, err);
-            return;
-          }
-          let anyFail = false;
-          try {
-            await writeModbusU32(h, p, u, 47249, powerW);
-          } catch (err) { self.error('Force discharge: power write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47100, 2);
-          } catch (err) { self.error('Force discharge: mode write failed:', err.message); anyFail = true; }
-          self.log(anyFail ? 'Force discharge command sent (with partial write failures)' : 'Force discharge command sent');
-          self._writeInProgress = false;
-        })();
+        // The target SoC goes first: a run must never discharge to a stale target (e.g. a
+        // morning 2% run).
+        forceSequence('Force discharge', 'discharge', [
+          [writeModbusRegister, 47101, socRaw, `target SoC (${target_soc}%)`],
+          [writeModbusU32, 47249, powerW, 'discharge power'],
+          [writeModbusRegister, 47246, MODE_SOC, 'mode'],
+          [writeModbusRegister, 47100, 2, 'start command'],
+        ]);
       };
-
-      cards['luna2000_start_force_discharge_soc'] = ({ device, power, target_soc }) => {
-        const h = host(), p = port(), u = unitId();
-        const powerW = self._forcePowerW('discharge', power);
-        const socRaw  = Math.round(Math.max(0, Math.min(99, target_soc)) * 10);
-        self.log(`Force discharge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
-        self._writeInProgress = true;
-        self._pendingForceMode = { direction: 'discharging', powerW, sentAt: Date.now() };
-        // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit.
-        // Each register is written independently: a failure on one does not skip the rest.
-        // The mode write (47100) is always attempted last so new power/SoC values are
-        // applied even when the battery is already in force-discharge mode.
-        (async () => {
-          // Write the target SoC FIRST and treat it as a hard precondition. Force-discharge
-          // mode (47100=2) discharges down to whatever 47101 currently holds, so if the new
-          // target cannot be written we must NOT enable the mode — otherwise the battery would
-          // discharge to a STALE target left over from an earlier run (e.g. a morning 2% run).
-          try {
-            await writeModbusRegister(h, p, u, 47101, socRaw);
-          } catch (err) {
-            self.error('Force discharge: SOC write failed — aborting, mode NOT enabled to avoid discharging to a stale target:', err.message);
-            self._pendingForceMode = null;
-            self._writeInProgress = false;
-            self._notifyForceAbort('discharge', target_soc, err);
-            return;
-          }
-          let anyFail = false;
-          try {
-            await writeModbusU32(h, p, u, 47249, powerW);
-          } catch (err) { self.error('Force discharge: power write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47100, 2);
-          } catch (err) { self.error('Force discharge: mode write failed:', err.message); anyFail = true; }
-          self.log(anyFail ? 'Force discharge command sent (with partial write failures)' : 'Force discharge command sent');
-          self._writeInProgress = false;
-        })();
-      };
+      cards['luna2000_start_force_discharge'] = startForceDischargeSoc;
+      // Deprecated twin of the card above, kept for flows that still use it.
+      cards['luna2000_start_force_discharge_soc'] = startForceDischargeSoc;
 
       cards['luna2000_start_force_charge_duration'] = ({ device, power, duration }) => {
-        const h = host(), p = port(), u = unitId();
         const powerW = self._forcePowerW('charge', power);
         const durationMin = Math.round(Math.max(1, Math.min(1440, duration)));
         self.log(`Force charge for ${durationMin} min: power=${powerW} W`);
-        self._writeInProgress = true;
         self._pendingForceMode = { direction: 'charging', powerW, sentAt: Date.now() };
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit.
-        // Each register is written independently: a failure on one does not skip the rest.
-        // Reg 47083 (hardware timer) stops force mode after the specified minutes — no software timer needed.
-        // 47100 is always written so new power/duration values take effect even if already active.
-        (async () => {
-          let anyFail = false;
-          try {
-            await writeModbusU32(h, p, u, 47247, powerW);
-          } catch (err) { self.error('Force charge (timed): power write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47083, durationMin);
-          } catch (err) { self.error('Force charge (timed): duration write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47100, 1);
-          } catch (err) { self.error('Force charge (timed): mode write failed:', err.message); anyFail = true; }
-          self.log(anyFail ? 'Force charge (timed) command sent (with partial write failures)' : `Force charge (timed) command sent: ${powerW} W for ${durationMin} min`);
-          self._writeInProgress = false;
-        })();
+        // Reg 47083 (hardware timer) stops the run after the minutes — with mode 47246 = 0,
+        // which is what makes the battery count them at all.
+        forceSequence('Force charge (timed)', 'charge', [
+          [writeModbusU32, 47247, powerW, 'charge power'],
+          [writeModbusRegister, 47083, durationMin, `duration (${durationMin} min)`],
+          [writeModbusRegister, 47246, MODE_DURATION, 'mode'],
+          [writeModbusRegister, 47100, 1, 'start command'],
+        ]);
       };
 
       cards['luna2000_start_force_discharge_duration'] = ({ device, power, duration }) => {
-        const h = host(), p = port(), u = unitId();
         const powerW = self._forcePowerW('discharge', power);
         const durationMin   = Math.round(Math.max(1, Math.min(1440, duration)));
         self.log(`Force discharge for ${durationMin} min: power=${powerW} W`);
-        self._writeInProgress = true;
         self._pendingForceMode = { direction: 'discharging', powerW, sentAt: Date.now() };
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit.
-        // Each register is written independently: a failure on one does not skip the rest.
-        // Reg 47083 (hardware timer) stops force mode after the specified minutes — no software timer needed.
-        // 47100 is always written so new power/duration values take effect even if already active.
-        (async () => {
-          let anyFail = false;
-          try {
-            await writeModbusU32(h, p, u, 47249, powerW);
-          } catch (err) { self.error('Force discharge (timed): power write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47083, durationMin);
-          } catch (err) { self.error('Force discharge (timed): duration write failed:', err.message); anyFail = true; }
-          try {
-            await writeModbusRegister(h, p, u, 47100, 2);
-          } catch (err) { self.error('Force discharge (timed): mode write failed:', err.message); anyFail = true; }
-          self.log(anyFail ? 'Force discharge (timed) command sent (with partial write failures)' : `Force discharge (timed) command sent: ${powerW} W for ${durationMin} min`);
-          self._writeInProgress = false;
-        })();
+        forceSequence('Force discharge (timed)', 'discharge', [
+          [writeModbusU32, 47249, powerW, 'discharge power'],
+          [writeModbusRegister, 47083, durationMin, `duration (${durationMin} min)`],
+          [writeModbusRegister, 47246, MODE_DURATION, 'mode'],
+          [writeModbusRegister, 47100, 2, 'start command'],
+        ]);
       };
 
       cards['luna2000_set_force_charge_power'] = ({ device, power }) => {
@@ -1525,12 +1511,13 @@ class LUNA2000ModbusDevice extends Device {
 
   // Surfaces an aborted force charge/discharge on the timeline. The flow action is
   // fire-and-forget (it must return before the ~10 s Homey flow timeout while the
-  // modbus writes run with retries), so a failed target-SoC write can never fail the
-  // card itself — this notification is the only way the user learns the run was skipped.
-  _notifyForceAbort(kind, targetSocPct, err) {
+  // modbus writes run with retries), so a failed write can never fail the card itself —
+  // this notification is the only way the user learns the run was skipped. Since 1.2.302
+  // any failed step aborts the run (as in the HA integration), so it names the step.
+  _notifyForceAbort(kind, what, err) {
     if (this.getSetting('enable_timeline_notifications') === false) return;
     this.homey.notifications.createNotification({
-      excerpt: `${this.getName()}: Force ${kind} NOT started — could not set target SoC (${targetSocPct}%): ${err.message}. Battery left unchanged to avoid running to an old target.`,
+      excerpt: `${this.getName()}: Force ${kind} NOT started — could not set the ${what}: ${err.message}. Battery left unchanged rather than running on an old value.`,
     }).catch((e) => this.log('Timeline notification failed:', e.message));
   }
 

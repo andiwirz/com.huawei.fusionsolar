@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.301",
+  "version": "1.2.302",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -12135,9 +12135,9 @@
           "nl": "Geforceerd laden/ontladen instellen op [[mode]]"
         },
         "hint": {
-          "en": "Force the LUNA2000 battery to charge, discharge, or stop. The battery returns to its normal working mode after the command completes. Writes register 47100 only: the power, target SoC and duration are whatever is already set on the inverter.",
-          "de": "LUNA2000-Batterie zum Laden, Entladen oder Stoppen zwingen. Die Batterie kehrt nach Abschluss in den normalen Betriebsmodus zurück. Schreibt nur Register 47100: Leistung, Ziel-SoC und Dauer sind die Werte, die im Wechselrichter bereits eingestellt sind.",
-          "nl": "Dwingt de LUNA2000-batterij te laden, te ontladen of te stoppen. Na afloop keert de batterij terug naar haar normale bedrijfsmodus. Schrijft alleen register 47100: vermogen, doel-SoC en duur zijn de waarden die al in de omvormer zijn ingesteld."
+          "en": "Starts or stops forced charging or discharging of the LUNA2000. Charging and discharging run to the target SoC already set (register 47101, e.g. with \"Set force charge target percentage\") at the power already set (47247/47249): the card sets the mode to \"target SoC\" (register 47246 = 1) and then sends the command (47100). Stop works like the Home Assistant integration: it stops (47100 = 0) and then clears the discharge power (47249), the duration (47083) and the mode (47246 = 0), so the next run starts from known values.",
+          "de": "Startet oder stoppt das Zwangsladen bzw. -entladen der LUNA2000. Laden und Entladen laufen bis zum bereits gesetzten Ziel-SoC (Register 47101, z. B. mit „Zwangslade-Ziel-SoC setzen“) mit der bereits gesetzten Leistung (47247/47249): Die Karte setzt den Modus auf „Ziel-SoC“ (Register 47246 = 1) und sendet dann den Befehl (47100). Stopp arbeitet wie die Home-Assistant-Integration: Es stoppt (47100 = 0) und setzt danach Entladeleistung (47249), Dauer (47083) und Modus (47246 = 0) zurück, damit der nächste Lauf von bekannten Werten ausgeht.",
+          "nl": "Start of stopt het geforceerd laden of ontladen van de LUNA2000. Laden en ontladen lopen tot de al ingestelde doel-SoC (register 47101, bv. met „Doel-SoC voor geforceerd laden instellen”) met het al ingestelde vermogen (47247/47249): de kaart zet de modus op „doel-SoC” (register 47246 = 1) en stuurt daarna het commando (47100). Stoppen werkt zoals de Home Assistant-integratie: het stopt (47100 = 0) en zet daarna het ontlaadvermogen (47249), de duur (47083) en de modus (47246 = 0) terug, zodat de volgende run van bekende waarden uitgaat."
         },
         "args": [
           {
@@ -12195,9 +12195,9 @@
           "nl": "Laden met [[power]] W tot [[target_soc]] % starten"
         },
         "hint": {
-          "en": "Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47247, 47101, 47100). The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
-          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47247, 47101, 47100). Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
-          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47247, 47101, 47100). Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
+          "en": "Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47101, 47247, mode 47246 = 1, start 47100). If one step fails nothing starts, and the timeline says why. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung, bis der Ziel-SoC erreicht ist (Register 47101, 47247, Modus 47246 = 1, Start 47100). Schlägt ein Schritt fehl, startet nichts, und die Zeitleiste sagt warum. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47101, 47247, modus 47246 = 1, start 47100). Mislukt een stap, dan start er niets en zegt de tijdlijn waarom. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12254,9 +12254,9 @@
           "nl": "Ontladen met [[power]] W tot [[target_soc]] % starten"
         },
         "hint": {
-          "en": "Starts force discharging the LUNA2000 at the given power until the target SoC is reached (registers 47249, 47101, 47100). The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
-          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47249, 47101, 47100). Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
-          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47249, 47101, 47100). Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
+          "en": "Starts force discharging the LUNA2000 at the given power until the target SoC is reached (registers 47101, 47249, mode 47246 = 1, start 47100). If one step fails nothing starts, and the timeline says why. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung, bis der Ziel-SoC erreicht ist (Register 47101, 47249, Modus 47246 = 1, Start 47100). Schlägt ein Schritt fehl, startet nichts, und die Zeitleiste sagt warum. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47101, 47249, modus 47246 = 1, start 47100). Mislukt een stap, dan start er niets en zegt de tijdlijn waarom. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12373,9 +12373,9 @@
           "nl": "Laden met [[power]] W gedurende [[duration]] minuten starten"
         },
         "hint": {
-          "en": "Starts force charging the LUNA2000 at the given power for the specified duration (registers 47247, 47083, 47100). The battery firmware stops automatically when the timer expires. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
-          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47247, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
-          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47247, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
+          "en": "Starts force charging the LUNA2000 at the given power for the specified duration (registers 47247, 47083, mode 47246 = 0, start 47100). The battery firmware stops automatically when the timer expires — on every battery, since the card sets the mode to \"duration\" itself. If one step fails nothing starts, and the timeline says why. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47247, 47083, Modus 47246 = 0, Start 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers – bei jeder Batterie, weil die Karte den Modus „Dauer“ selbst setzt. Schlägt ein Schritt fehl, startet nichts, und die Zeitleiste sagt warum. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47247, 47083, modus 47246 = 0, start 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is – bij elke batterij, omdat de kaart de modus „duur” zelf instelt. Mislukt een stap, dan start er niets en zegt de tijdlijn waarom. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12432,9 +12432,9 @@
           "nl": "Ontladen met [[power]] W gedurende [[duration]] minuten starten"
         },
         "hint": {
-          "en": "Starts force discharging the LUNA2000 at the given power for the specified duration (registers 47249, 47083, 47100). The battery firmware stops automatically when the timer expires. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
-          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47249, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
-          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47249, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
+          "en": "Starts force discharging the LUNA2000 at the given power for the specified duration (registers 47249, 47083, mode 47246 = 0, start 47100). The battery firmware stops automatically when the timer expires — on every battery, since the card sets the mode to \"duration\" itself. If one step fails nothing starts, and the timeline says why. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47249, 47083, Modus 47246 = 0, Start 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers – bei jeder Batterie, weil die Karte den Modus „Dauer“ selbst setzt. Schlägt ein Schritt fehl, startet nichts, und die Zeitleiste sagt warum. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47249, 47083, modus 47246 = 0, start 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is – bij elke batterij, omdat de kaart de modus „duur” zelf instelt. Mislukt een stap, dan start er niets en zegt de tijdlijn waarom. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12619,9 +12619,9 @@
           "nl": "Doel voor geforceerd laden instellen op [[target_soc]] %"
         },
         "hint": {
-          "en": "Sets the target state of charge at which force charging stops (register 47101). Does not start force charging.",
-          "de": "Setzt den Ziel-Ladezustand, bei dem das Zwangsladen stoppt (Register 47101). Startet kein Zwangsladen.",
-          "nl": "Stelt de laadtoestand in waarbij het geforceerd laden stopt (register 47101). Start het geforceerd laden niet."
+          "en": "Sets the target state of charge at which a forced charge or discharge started with \"Set force charge/discharge\" stops (register 47101). Does not start anything. The start cards with a target SoC write their own.",
+          "de": "Setzt den Ziel-Ladezustand, bei dem ein Zwangsladen oder -entladen über „Zwangsladen/Entladen steuern“ stoppt (Register 47101). Startet nichts. Die Start-Karten mit Ziel-SoC schreiben ihren eigenen.",
+          "nl": "Stelt de doel-laadtoestand in waarbij geforceerd laden of ontladen via „Geforceerd laden/ontladen aansturen” stopt (register 47101). Start niets. De startkaarten met een doel-SoC schrijven hun eigen."
         },
         "args": [
           {
@@ -12966,9 +12966,9 @@
           "nl": "Vermogen voor geforceerd ontladen instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the power for forced discharging (register 47249, UINT32). Does not start discharging — use \"Start discharging until SoC %\", \"Start discharging for minutes\" or \"Set force charge/discharge\" for that. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
-          "de": "Setzt die Leistung für die Zwangsentladung (Register 47249, UINT32). Startet keine Entladung – dafür „Entladen bis SoC % starten“, „Entladen für Minuten starten“ oder „Zwangsladen/Entladen steuern“ verwenden. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
-          "nl": "Stelt het vermogen voor geforceerd ontladen in (register 47249, UINT32). Start het ontladen niet – gebruik daarvoor „Ontladen tot SoC % starten”, „Ontladen gedurende minuten starten” of „Geforceerd laden/ontladen aansturen”. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
+          "en": "Sets the power for forced discharging (register 47249, UINT32). Does not start discharging — use \"Start discharging until SoC %\", \"Start discharging for minutes\" or \"Set force charge/discharge\" for that. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0. A stop through \"Set force charge/discharge\" sets it to 0, as in the Home Assistant integration.",
+          "de": "Setzt die Leistung für die Zwangsentladung (Register 47249, UINT32). Startet keine Entladung – dafür „Entladen bis SoC % starten“, „Entladen für Minuten starten“ oder „Zwangsladen/Entladen steuern“ verwenden. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt. Ein Stopp über „Zwangsladen/Entladen steuern“ setzt sie auf 0, wie in der Home-Assistant-Integration.",
+          "nl": "Stelt het vermogen voor geforceerd ontladen in (register 47249, UINT32). Start het ontladen niet – gebruik daarvoor „Ontladen tot SoC % starten”, „Ontladen gedurende minuten starten” of „Geforceerd laden/ontladen aansturen”. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd. Een stop via „Geforceerd laden/ontladen aansturen” zet het op 0, zoals in de Home Assistant-integratie."
         },
         "args": [
           {

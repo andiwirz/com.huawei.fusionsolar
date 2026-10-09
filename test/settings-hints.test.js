@@ -86,7 +86,8 @@ test('the battery\'s list matches what the driver posts', () => {
   const src = source('luna2000_modbus');
   assert.match(src, /createNotification\(\{ excerpt: `\$\{this\.getName\(\)\}: \$\{statusLabel\}` \}\)/, 'status change');
   assert.match(src, /could not be written \(\$\{err\.message\}\) — put back to/, 'refused setting');
-  assert.match(src, /_notifyForceAbort\(kind, targetSocPct, err\)/, 'aborted force charge');
+  // Since 1.2.302 any failed step aborts the run and the notice names it (force-run-ha.test.js).
+  assert.match(src, /_notifyForceAbort\(kind, what, err\)/, 'aborted force charge');
 });
 
 test('the EMMA switch is about charging, discharging and idle — not the state of charge', () => {
