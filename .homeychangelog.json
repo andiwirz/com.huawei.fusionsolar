@@ -1,4 +1,9 @@
 {
+  "1.2.284": {
+    "en": "Battery settings: the (i) beside \"Storage working mode\" now explains every option the dropdown offers — Maximise Self-Consumption, Time of Use, Fully Fed to Grid, Third-party Scheduling, and why the three LG modes are not meant for a LUNA2000. The wording follows Huawei's own manual; for example, in \"Fully Fed to Grid\" the battery also discharges whenever the sun is below the inverter's maximum output.",
+    "de": "Batterie-Einstellungen: Das (i) neben „Speicher-Betriebsmodus“ erklärt jetzt jede Option der Auswahl — Eigenverbrauch maximieren, Zeitabhängige Nutzung, Volleinspeisung, Drittanbieter-Steuerung — und warum die drei LG-Modi nicht für eine LUNA2000 gedacht sind. Die Erklärungen folgen Huaweis Handbuch; bei „Volleinspeisung“ etwa entlädt die Batterie auch, sobald die Sonne unter der maximalen Ausgangsleistung des Wechselrichters liegt.",
+    "nl": "Batterij-instellingen: de (i) naast „Bedrijfsmodus opslag” legt nu elke optie van de keuzelijst uit, volgens de handleiding van Huawei."
+  },
   "1.2.283": {
     "en": "LUNA2000 Modbus battery: the \"Backup Power SoC\" tile is hidden. The value is in the device settings (\"Backup power SoC (%)\", under \"State of charge limits\") and follows the battery; its flow cards and Insights keep working. The icon added in 1.2.279 never showed — Homey does not take an icon for a built-in capability. The EMMA battery keeps the tile, as it has no such setting.",
     "de": "LUNA2000-Modbus-Batterie: Die Kachel „Backup-Energie-SoC“ ist ausgeblendet. Der Wert steht in den Geräteeinstellungen („Backup-Energie-SoC (%)“ unter „Grenzen des Ladezustands“) und folgt der Batterie; die Flow-Karten und Insights dazu funktionieren weiter. Das in 1.2.279 ergänzte Icon wurde nie angezeigt — Homey übernimmt bei einer eingebauten Capability kein eigenes Icon. Die EMMA-Batterie behält die Kachel, weil sie keine solche Einstellung hat.",

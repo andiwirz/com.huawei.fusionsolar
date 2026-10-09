@@ -69,6 +69,37 @@ test('every battery driver with a working mode explains it', () => {
   }
 });
 
+// Until 1.2.284 the (i) named two of the seven working modes. Each mode the dropdown offers
+// now has its own line, opened by the exact label the dropdown shows, in that language's
+// quotation marks — and a mode the dropdown does not offer (the EMMA battery has four) is not
+// explained there. Sources for the wording: Huawei's LUNA2000-(5-30)-S0 user manual, "Setting
+// the Mode for the Grid-tied ESS"; SPC177 for the three LG modes.
+test('the working mode (i) explains every option its dropdown offers, and only those', () => {
+  const QUOTES = { en: ['"', '"'], de: ['„', '“'], nl: ['„', '”'] };
+  const every  = labelRow('luna2000_modbus', 'mode_storage_working').values;   // all seven
+  assert.strictEqual(every.length, 7);
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+    const row     = labelRow(id, 'mode_storage_working');
+    const offered = new Set(row.values.map((v) => v.id));
+    for (const v of every) {
+      for (const lang of LANGS) {
+        const quoted = QUOTES[lang][0] + v.label[lang] + QUOTES[lang][1];
+        assert.strictEqual(row.hint[lang].includes(quoted), offered.has(v.id),
+          `${id} (${lang}): ${quoted} is ${offered.has(v.id) ? 'offered but not explained' : 'explained but not offered'}`);
+      }
+    }
+  }
+});
+
+test('"Fully Fed to Grid" is explained as Huawei describes it — the battery also discharges', () => {
+  // Easy to get wrong by guessing from the name: below the inverter's maximum output the
+  // battery discharges, so the inverter keeps feeding in as much as it can.
+  const SENTENCE = { en: /"Fully Fed to Grid"[^\n]*discharges/, de: /„Volleinspeisung“[^\n]*entlädt/, nl: /„Volledig terugleveren”[^\n]*ontlaadt/ };
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+    for (const lang of LANGS) assert.match(labelRow(id, 'mode_storage_working').hint[lang], SENTENCE[lang], `${id} (${lang})`);
+  }
+});
+
 // The sharper half: an explanation that outlives its capability is worse than none. The
 // EMMA battery has no remote mode, so it must not be told about one.
 test('the remote mode is explained exactly where it exists', () => {
