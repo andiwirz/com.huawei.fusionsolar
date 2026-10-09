@@ -223,6 +223,8 @@ Dedicated driver for the Huawei iSitePower-M Home consumption measurement. Regis
 
 Direct Modbus TCP connection to the Huawei SDongle A (unit ID 100).
 
+**Exclude it from Homey Energy** (device → Settings → Energy → *Exclude from Energy*). Its power reading is the whole house's consumption, which Homey would otherwise count as one more consumer on top of everything else. The pairing view says so before the device is added.
+
 | Capability              | Description                                                        |
 |-------------------------|--------------------------------------------------------------------|
 | House Consumption       | Current house load / consumption power (W)                         |

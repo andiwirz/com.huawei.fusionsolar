@@ -73,6 +73,20 @@ test('6607 is only ever given as the inverter\'s own WLAN access point, never as
   assert.ok(seen >= 4, 'the port tooltips no longer mention 6607 — check what they say instead');
 });
 
+test('…and the pairing views say the same — they kept the old claim until 1.2.296', () => {
+  let seen = 0;
+  for (const driver of fs.readdirSync(path.join(ROOT, 'drivers'))) {
+    const file = path.join(ROOT, 'drivers', driver, 'pair', 'start.html');
+    if (!fs.existsSync(file)) continue;
+    for (const line of fs.readFileSync(file, 'utf8').split('\n').filter((l) => l.includes('6607'))) {
+      seen++;
+      assert.match(line, /WLAN access point|WLAN-Zugangspunkt/, `${driver}: ${line.trim()}`);
+      assert.doesNotMatch(line, /SDongle[^.(]*6607/, `${driver} pairing gives 6607 as the SDongle's port`);
+    }
+  }
+  assert.ok(seen >= 8, `only ${seen} pairing lines mention 6607`);
+});
+
 test('the end-of-discharge SoC says what Huawei says, and no default Huawei does not give', () => {
   // LUNA2000-(5-30)-S0 user manual, "Setting the Mode for the Grid-tied ESS": 0–20 %, at least
   // 15 % without PV or after 24 hours without sunlight, and a warning against 0 %. The register

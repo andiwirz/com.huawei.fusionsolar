@@ -1,4 +1,9 @@
 {
+  "1.2.296": {
+    "en": "SDongle A: the pairing view now says to exclude the SDongle from Homey Energy after adding it — its power reading is the whole house's consumption, which Homey otherwise counts as one more consumer. The pairing views of the inverter, battery, energy meter and SDongle no longer give 6607 as the SDongle's port: the SDongle uses 502, 6607 is the inverter's built-in WLAN access point.",
+    "de": "SDongle A: Der Kopplungsdialog sagt jetzt, dass der SDongle nach dem Hinzufügen aus Homey Energy ausgenommen werden muss – seine Leistung ist der Verbrauch des ganzen Hauses, und Homey zählt ihn sonst als zusätzlichen Verbraucher. Die Kopplungsdialoge von Wechselrichter, Batterie, Energiezähler und SDongle nennen 6607 nicht mehr als Port des SDongle: Der SDongle nutzt 502, 6607 ist der WLAN-Zugangspunkt im Wechselrichter.",
+    "nl": "SDongle A: het koppelvenster zegt nu dat de SDongle na het toevoegen van Homey Energie moet worden uitgesloten. De koppelvensters noemen 6607 niet meer als poort van de SDongle."
+  },
   "1.2.295": {
     "en": "Kiosk device: with a SUN2000 inverter also paired, Homey Energy counts the solar production twice unless the kiosk device is excluded from Energy. The pairing view now warns about this before the device is added, and the device shows a warning while a SUN2000 is paired and the exclusion is not seen. If the warning stays after excluding, tick \"Excluded from Energy\" in the kiosk device's settings.",
     "de": "Kiosk-Gerät: Ist auch ein SUN2000-Wechselrichter gekoppelt, zählt Homey Energy die Solarproduktion doppelt, solange das Kiosk-Gerät nicht aus Energy ausgenommen ist. Der Kopplungsdialog warnt jetzt davor, bevor das Gerät hinzugefügt wird, und das Gerät zeigt eine Warnung, solange ein SUN2000 gekoppelt ist und das Ausnehmen nicht erkannt wird. Bleibt die Warnung nach dem Ausnehmen stehen, in den Einstellungen des Kiosk-Geräts „Aus Energy ausgenommen“ ankreuzen.",

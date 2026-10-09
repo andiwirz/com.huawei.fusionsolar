@@ -113,12 +113,26 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+    .energy-warning {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      background: #fff8e6;
+      border: 1px solid #f5d48a;
+      color: #6b4a00;
+    }
   </style>
 </head>
 <body>
 
   <h2 id="title">SDongle A</h2>
   <p class="subtitle" id="subtitle">Enter the network address of your Huawei SDongle A.</p>
+
+  <!-- Always shown: the SDongle's power reading is the whole house's consumption, which Homey
+       Energy would otherwise count as one more consumer on top of everything else. -->
+  <div class="energy-warning" id="energy-warning"></div>
 
   <div class="field">
     <label id="label-name">Device name</label>
@@ -176,7 +190,7 @@
         labelName: 'Device name',
         labelAddress: 'IP Address',
         labelPort: 'Port',
-        hintPort: 'Default 502. SDongle A alternatively uses 6607.',
+        hintPort: 'Default 502. (6607 is the port of the inverter\'s built-in WLAN access point, not of the SDongle.)',
         labelModbusId: 'Modbus Unit ID',
         hintModbusId: 'Default: 100. Older firmware may use 0.',
         btnTest: 'Connect',
@@ -188,6 +202,7 @@
         labelLoad: 'Load Power',
         errNoAddress: 'Please enter an IP address.',
         successMsg: '✓ SDongle A detected',
+        energyWarning: '⚠ After adding, exclude the SDongle from Homey Energy: open the device → Settings → Energy → "Exclude from Energy". Its power reading is the whole house\'s consumption, which Homey otherwise counts as one more consumer — and Homey Energy comes out wrong.',
       },
       de: {
         title: 'SDongle A',
@@ -195,7 +210,7 @@
         labelName: 'Gerätename',
         labelAddress: 'IP-Adresse',
         labelPort: 'Port',
-        hintPort: 'Standard 502. SDongle A alternativ 6607.',
+        hintPort: 'Standard 502. (6607 ist der Port des eingebauten WLAN-Zugangspunkts im Wechselrichter, nicht der des SDongle.)',
         labelModbusId: 'Modbus Geräte-ID',
         hintModbusId: 'Standard: 100. Ältere Firmware verwendet möglicherweise 0.',
         btnTest: 'Verbinden',
@@ -207,11 +222,13 @@
         labelLoad: 'Verbrauch',
         errNoAddress: 'Bitte gib eine IP-Adresse ein.',
         successMsg: '✓ SDongle A erkannt',
+        energyWarning: '⚠ Den SDongle nach dem Hinzufügen aus Homey Energy ausnehmen: Gerät öffnen → Einstellungen → Energie → ausschliessen („Exclude from Energy“). Seine Leistung ist der Verbrauch des ganzen Hauses, und Homey zählt ihn sonst als zusätzlichen Verbraucher – Homey Energy rechnet dann falsch.',
       },
     };
 
     const lang = navigator.language.startsWith('de') ? 'de' : 'en';
     const t = i18n[lang];
+    document.getElementById('energy-warning').textContent = t.energyWarning;
 
     document.getElementById('title').textContent           = t.title;
     document.getElementById('subtitle').textContent        = t.subtitle;
