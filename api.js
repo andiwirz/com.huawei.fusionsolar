@@ -1211,7 +1211,7 @@ module.exports = {
     const { api, apiKey } = _ems;
 
     try {
-      const raw = await api._req('GET', '/manager/flow/flowcardtrigger');
+      const raw = await api.getFlowTriggerCards();
       const all = Object.values(raw || {});
 
       // Find cards from our app
@@ -1252,7 +1252,7 @@ module.exports = {
 
     try {
       if (flowId) {
-        return await api._req('GET', `/manager/flow/flow/${flowId}`);
+        return await api.getFlow(flowId);
       }
       // No flowId → return compact list of all flows for browsing
       const all = await api.getFlows();
@@ -1736,7 +1736,7 @@ module.exports = {
     // so the user can identify and pick the right card for their device
     let allCardList = [];
     try {
-      const raw = await api._req('GET', '/manager/flow/flowcardaction');
+      const raw = await api.getFlowActionCards();
       allCardList = Object.values(raw || {});
     } catch (_) {}
 
@@ -1820,7 +1820,7 @@ module.exports = {
 
     try {
       const [allRaw, device] = await Promise.all([
-        api._req('GET', '/manager/flow/flowcardcondition'),
+        api.getFlowConditionCards(),
         api.getDevice(deviceId).catch(() => null),
       ]);
 
@@ -2318,7 +2318,7 @@ module.exports = {
     // types, then an arg whose name looks like a charge target, then the sole
     // non-device argument.
     let rawCards = [];
-    try { rawCards = Object.values(await api._req('GET', '/manager/flow/flowcardaction') || {}); } catch { }
+    try { rawCards = Object.values(await api.getFlowActionCards() || {}); } catch { }
     const detectNumArg = (actionCard, actionUri) => {
       const card = rawCards.find((c) => c.id === actionCard && (c.ownerUri || c.uri) === actionUri) || rawCards.find((c) => c.id === actionCard);
       const args = (card && card.args || []).filter((a) => a.name !== 'device' && a.name !== 'droptoken');

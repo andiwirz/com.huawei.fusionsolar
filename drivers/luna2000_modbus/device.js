@@ -1392,14 +1392,15 @@ class LUNA2000ModbusDevice extends Device {
         ['storageMaxGridChargePower',      'max_grid_charge_ceiling'],   // rare half
         ['storageCapacityControlSoc',      'capacity_control_soc'],      // rare half
       ];
-      // Fields that Homey renders as blank when the value is 0 — always sync so
-      // a stored null gets populated and a stored 0 triggers a settings refresh.
-      const alwaysSync = new Set(['discharge_cutoff_capacity', 'backup_power_soc']);
+      // Stored only when the device reports something else than the setting holds — or the
+      // setting holds nothing yet. Until 1.2.279 the discharge cutoff and the backup SoC were
+      // written on every poll, some 1440 times a day, "so a stored 0 triggers a settings
+      // refresh": writing the same 0 again changes nothing about how Homey draws it.
       for (const [key, settingId] of numericSync) {
         const v = ctrl[key];
         if (v !== null && v !== undefined) {
           const current = parseFloat(this.getSetting(settingId));
-          if (alwaysSync.has(settingId) || !Number.isFinite(current) || Math.abs(v - current) > 0.5) {
+          if (!Number.isFinite(current) || Math.abs(v - current) > 0.5) {
             settingUpdates[settingId] = v;
           }
         }

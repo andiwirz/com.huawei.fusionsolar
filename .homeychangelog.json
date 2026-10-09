@@ -1,4 +1,9 @@
 {
+  "1.2.279": {
+    "en": "The backup power SoC has an icon of its own: the battery with a shield. The battery’s discharge cutoff and backup SoC are no longer written to the settings on every poll, only when they change. On the FusionSolar inverter (cloud), the inverter status no longer disappears for a moment after every app start and moves to the end of the device view.",
+    "de": "Der Backup-Energie-SoC hat ein eigenes Icon: die Batterie mit einem Schild. Minimaler Entladezustand und Backup-SoC der Batterie werden nicht mehr bei jeder Abfrage in die Einstellungen geschrieben, sondern nur noch, wenn sie sich ändern. Beim FusionSolar-Wechselrichter (Cloud) verschwindet der Status nach einem App-Start nicht mehr kurz und rutscht nicht mehr ans Ende der Geräteansicht.",
+    "nl": "De SoC voor noodstroom heeft een eigen pictogram. Ontlaadgrens en noodstroom-SoC worden alleen nog opgeslagen als ze veranderen. De status van de FusionSolar-omvormer verdwijnt niet meer na elke herstart."
+  },
   "1.2.278": {
     "en": "The battery’s backup power SoC is shown as a value, no longer as a second battery.\n\nIt is the share the battery keeps in reserve for a power cut — a setting, not a charge level — but it was drawn like the state of charge, a red empty battery at 0 %. It now sits among the readings, and the battery view shows only the real state of charge. Flows and Insights are unchanged.",
     "de": "Der Backup-Energie-SoC der Batterie wird als Messwert angezeigt, nicht mehr als zweite Batterie.\n\nEr ist der Anteil, den die Batterie für einen Stromausfall zurückhält — eine Einstellung, kein Ladestand —, wurde aber wie der Ladezustand gezeichnet, bei 0 % als rote, leere Batterie. Jetzt steht er bei den Messwerten, und die Batterie-Ansicht zeigt nur noch den echten Ladezustand. Flows und Insights bleiben unverändert.",

@@ -53,7 +53,8 @@ const DEPRECATED_CAPABILITIES = [
   'meter_power.daily',
   'meter_power_monthly',
   'meter_power.mppt_total',
-  'huawei_status',
+  // huawei_status is not here any more: it came back as an EXTRA capability, and listed in
+  // both it was removed on every start and added again on the first poll (1.2.279).
   'measure_voltage.a_u',
   'measure_voltage.b_u',
   'measure_voltage.c_u',
