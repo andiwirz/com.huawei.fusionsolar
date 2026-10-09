@@ -1,4 +1,9 @@
 {
+  "1.2.292": {
+    "en": "FusionSolar cloud meter and cloud battery: \"Meter status changed\" and \"Battery unit status changed\" now filter by the status chosen in the card, and \"Meter status is\" works, also on a plant without a DTSU666 or a Modbus battery. Until now these cards relied on the Modbus driver to answer them.",
+    "de": "FusionSolar-Cloud-Zähler und -Cloud-Batterie: „Zählerstatus hat sich geändert“ und „Batterie-Betriebsstatus hat sich geändert“ filtern jetzt nach dem in der Karte gewählten Status, und „Zählerstatus ist“ funktioniert – auch in einer Anlage ohne DTSU666 oder Modbus-Batterie. Bisher hingen diese Karten am Modbus-Treiber.",
+    "nl": "FusionSolar-cloudmeter en -cloudbatterij: de statuskaarten filteren nu op de gekozen status en \"Meterstatus is\" werkt, ook zonder DTSU666 of Modbus-batterij."
+  },
   "1.2.291": {
     "en": "Flow cards for the SUN2000 inverter, LUNA2000 battery and EMMA battery over Modbus: with two devices of the same kind (for example two inverters on one dongle), every action card now acts on the device chosen in the flow. Until now it could act on the other one and still report success. With one device of each kind nothing changes — a test holds all 42 cards to exactly what they did before.",
     "de": "Flow-Karten für SUN2000-Wechselrichter, LUNA2000-Batterie und EMMA-Akku über Modbus: Mit zwei Geräten derselben Art (etwa zwei Wechselrichter an einem Dongle) wirkt jede Aktionskarte jetzt auf das im Flow gewählte Gerät. Bisher konnte sie das andere treffen und trotzdem Erfolg melden. Mit einem Gerät pro Art ändert sich nichts – ein Test hält alle 42 Karten auf genau dem bisherigen Verhalten.",

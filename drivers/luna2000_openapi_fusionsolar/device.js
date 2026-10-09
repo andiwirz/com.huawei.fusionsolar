@@ -108,6 +108,10 @@ class FusionSolarBatteryDevice extends Device {
     // device the flow picked.
     this.homey.flow.getConditionCard('luna2000_battery_status_is')
       .registerRunListener((args) => args.device.getCapabilityValue('luna2000_battery_status') === args.status);
+    // The trigger's listener lived only in the Modbus driver: without a Modbus battery the
+    // cloud battery fired it with none, and its status dropdown filtered nothing.
+    this.homey.flow.getDeviceTriggerCard('luna2000_battery_status_changed')
+      .registerRunListener((args, state) => args.status === state.status);
   }
 
   // ─── Coordinator interface ─────────────────────────────────────────────────

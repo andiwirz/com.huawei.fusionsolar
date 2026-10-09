@@ -284,6 +284,17 @@ class FusionSolarMeterDevice extends Device {
     this.homey.flow
       .getConditionCard('grid_is_exporting')
       .registerRunListener((args) => args.device._prevExporting === true);
+
+    // The meter-status cards are shared with the DTSU666, which registered their listeners
+    // alone: on a plant with no DTSU666 the trigger fired without one — so its status
+    // dropdown filtered nothing — and the condition had none at all. The same listeners as
+    // there, reading only args and state, so whichever driver registers last answers alike.
+    this.homey.flow
+      .getDeviceTriggerCard('dtsu666_meter_status_changed')
+      .registerRunListener((args, state) => args.status === state.status);
+    this.homey.flow
+      .getConditionCard('dtsu666_meter_status_is')
+      .registerRunListener((args) => args.device.getCapabilityValue('dtsu666_meter_status') === args.status);
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
