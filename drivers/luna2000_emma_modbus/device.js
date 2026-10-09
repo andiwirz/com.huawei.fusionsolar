@@ -160,69 +160,78 @@ class LUNA2000EmmaModbusDevice extends Device {
   // ─── Flow actions ──────────────────────────────────────────────────────────
 
   _registerFlowActions() {
-    const host   = () => this.getSetting('address');
-    const port   = () => parseInt(this.getSetting('port'), 10) || 502;
-    const unitId = () => parseIntSafe(this.getSetting('modbus_id'), 0);
+    // Homey keeps one run listener per action card for the whole app, and the last device to
+    // register it wins. Until 1.2.291 these listeners closed over `this` — that device — for
+    // the address they wrote to, the limits they checked and the state they updated, so with
+    // two devices of this driver a card set for the second acted on the first. They are now
+    // built for the device each run names: `self` is args.device. With one device per driver
+    // self and this are the same device, and test/flow-action-routing.test.js holds every card
+    // to what it did before. A run that names no device — none of these cards can, each has a
+    // device argument — falls back to the registering device, which is what it always did.
+    const build = (self) => {
+      const cards = {};
+      const host   = () => self.getSetting('address');
+      const port   = () => parseInt(self.getSetting('port'), 10) || 502;
+      const unitId = () => parseIntSafe(self.getSetting('modbus_id'), 0);
 
-    const writeEnum = async (cardId, regAddress, capabilityId, mode) => {
-      const value = parseInt(mode, 10);
-      this._noteWrite(capabilityId, regAddress, value, `flow:${cardId}`);
-      this.log(`Write start  [${cardId} → reg ${regAddress}] value=${value}`);
-      this._writeInProgress = true;
-      try {
-        await writeModbusRegister(host(), port(), unitId(), regAddress, value);
-        this.log(`Write OK     [${cardId} → reg ${regAddress}]`);
-        this._updatingFromModbus = true;
-        await this._set(capabilityId, mode).catch(() => {});
-      } catch (err) {
-        this.error(`Write failed [${cardId} → reg ${regAddress}]:`, err.message);
-        throw err;
-      } finally {
-        this._updatingFromModbus = false;
-        this._writeInProgress   = false;
-      }
-    };
+      const writeEnum = async (cardId, regAddress, capabilityId, mode) => {
+        const value = parseInt(mode, 10);
+        self._noteWrite(capabilityId, regAddress, value, `flow:${cardId}`);
+        self.log(`Write start  [${cardId} → reg ${regAddress}] value=${value}`);
+        self._writeInProgress = true;
+        try {
+          await writeModbusRegister(host(), port(), unitId(), regAddress, value);
+          self.log(`Write OK     [${cardId} → reg ${regAddress}]`);
+          self._updatingFromModbus = true;
+          await self._set(capabilityId, mode).catch(() => {});
+        } catch (err) {
+          self.error(`Write failed [${cardId} → reg ${regAddress}]:`, err.message);
+          throw err;
+        } finally {
+          self._updatingFromModbus = false;
+          self._writeInProgress   = false;
+        }
+      };
 
-    this.homey.flow
-      .getActionCard('luna2000_emma_set_working_mode')
-      .registerRunListener(({ mode }) => {
+      cards['luna2000_emma_set_working_mode'] = ({ mode }) => {
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit
         writeEnum('luna2000_emma_set_working_mode', CONTROL_WRITE_MAP.storage_working_mode_settings, 'storage_working_mode_settings', mode)
-          .catch((err) => this.error('Set working mode failed:', err.message));
-      });
+          .catch((err) => self.error('Set working mode failed:', err.message));
+      };
 
-    this.homey.flow
-      .getActionCard('luna2000_emma_set_excess_pv')
-      .registerRunListener(({ mode }) => {
+      cards['luna2000_emma_set_excess_pv'] = ({ mode }) => {
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit
         writeEnum('luna2000_emma_set_excess_pv', CONTROL_WRITE_MAP.storage_excess_pv_energy_use_in_tou, 'storage_excess_pv_energy_use_in_tou', mode)
-          .catch((err) => this.error('Set excess PV mode failed:', err.message));
-      });
+          .catch((err) => self.error('Set excess PV mode failed:', err.message));
+      };
 
-    this.homey.flow
-      .getActionCard('luna2000_emma_set_max_grid_charge_power')
-      .registerRunListener(({ device, power }) => {
+      cards['luna2000_emma_set_max_grid_charge_power'] = ({ device, power }) => {
         // Register 40002 takes 0–50 kW (Huawei's EMMA table) — the card allowed 100 until 1.2.287.
         const kw  = Math.min(50, Math.max(0, parseFloat(power) || 0));
         const raw = Math.round(kw * 1000);
-        this.log(`Set max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);
-        this._writeInProgress = true;
+        self.log(`Set max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);
+        self._writeInProgress = true;
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit
         (async () => {
           try {
             await writeModbusU32(host(), port(), unitId(), 40002, raw);
-            this.log('Max grid charge power written');
-            this._updatingSettingFromModbus = true;
-            await this.setSettings({ max_grid_charge_power: kw })
-              .catch((err) => this.log('setSettings sync failed:', err.message));
+            self.log('Max grid charge power written');
+            self._updatingSettingFromModbus = true;
+            await self.setSettings({ max_grid_charge_power: kw })
+              .catch((err) => self.log('setSettings sync failed:', err.message));
           } catch (err) {
-            this.error('Set max grid charge power failed:', err.message);
+            self.error('Set max grid charge power failed:', err.message);
           } finally {
-            this._writeInProgress           = false;
-            this._updatingSettingFromModbus = false;
+            self._writeInProgress           = false;
+            self._updatingSettingFromModbus = false;
           }
         })();
-      });
+      };
+      return cards;
+    };
+    for (const id of Object.keys(build(this))) {
+      this.homey.flow.getActionCard(id).registerRunListener((args, state) => build((args && args.device) || this)[id](args, state));
+    }
   }
 
   // ─── Conditions ────────────────────────────────────────────────────────────

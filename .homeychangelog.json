@@ -1,4 +1,9 @@
 {
+  "1.2.291": {
+    "en": "Flow cards for the SUN2000 inverter, LUNA2000 battery and EMMA battery over Modbus: with two devices of the same kind (for example two inverters on one dongle), every action card now acts on the device chosen in the flow. Until now it could act on the other one and still report success. With one device of each kind nothing changes — a test holds all 42 cards to exactly what they did before.",
+    "de": "Flow-Karten für SUN2000-Wechselrichter, LUNA2000-Batterie und EMMA-Akku über Modbus: Mit zwei Geräten derselben Art (etwa zwei Wechselrichter an einem Dongle) wirkt jede Aktionskarte jetzt auf das im Flow gewählte Gerät. Bisher konnte sie das andere treffen und trotzdem Erfolg melden. Mit einem Gerät pro Art ändert sich nichts – ein Test hält alle 42 Karten auf genau dem bisherigen Verhalten.",
+    "nl": "Flowkaarten voor SUN2000, LUNA2000 en EMMA-batterij via Modbus: met twee apparaten van dezelfde soort werkt elke actiekaart nu op het in de flow gekozen apparaat. Met één apparaat per soort verandert er niets."
+  },
   "1.2.290": {
     "en": "LUNA2000 Modbus battery, \"Set grid-tied power limit\": the tooltip now says what Huawei documents for register 47079 — \"Power limit of the grid-tied point\", 0 W up to the inverter's maximum active power, supported only by certain models — instead of an effect nobody could source. With several batteries, the card writes to the one chosen in the flow.",
     "de": "LUNA2000-Modbus-Batterie, „Netzkopplungs-Leistungsgrenze setzen“: Der Tooltip sagt jetzt, was Huawei für Register 47079 dokumentiert – „Power limit of the grid-tied point“, 0 W bis zur maximalen Wirkleistung des Wechselrichters, nur bei bestimmten Modellen – statt einer Wirkung ohne Quelle. Bei mehreren Batterien schreibt die Karte auf die im Flow gewählte.",
