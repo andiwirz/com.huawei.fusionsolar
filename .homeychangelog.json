@@ -1,4 +1,9 @@
 {
+  "1.2.297": {
+    "en": "SDongle A: the device now also shows a warning while it is not excluded from Homey Energy, like the kiosk device beside a SUN2000. If the warning stays after excluding it, tick \"Excluded from Energy\" in the SDongle's settings.",
+    "de": "SDongle A: Das Gerät zeigt jetzt auch eine Warnung, solange es nicht aus Homey Energy ausgenommen ist – wie das Kiosk-Gerät neben einem SUN2000. Bleibt die Warnung nach dem Ausnehmen stehen, in den Einstellungen des SDongle „Aus Energy ausgenommen“ ankreuzen.",
+    "nl": "SDongle A: het apparaat toont nu ook een waarschuwing zolang het niet van Homey Energie is uitgesloten."
+  },
   "1.2.296": {
     "en": "SDongle A: the pairing view now says to exclude the SDongle from Homey Energy after adding it — its power reading is the whole house's consumption, which Homey otherwise counts as one more consumer. The pairing views of the inverter, battery, energy meter and SDongle no longer give 6607 as the SDongle's port: the SDongle uses 502, 6607 is the inverter's built-in WLAN access point.",
     "de": "SDongle A: Der Kopplungsdialog sagt jetzt, dass der SDongle nach dem Hinzufügen aus Homey Energy ausgenommen werden muss – seine Leistung ist der Verbrauch des ganzen Hauses, und Homey zählt ihn sonst als zusätzlichen Verbraucher. Die Kopplungsdialoge von Wechselrichter, Batterie, Energiezähler und SDongle nennen 6607 nicht mehr als Port des SDongle: Der SDongle nutzt 502, 6607 ist der WLAN-Zugangspunkt im Wechselrichter.",

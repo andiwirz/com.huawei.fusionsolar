@@ -5,6 +5,7 @@ const { withSettingsLog } = require('../../lib/change-log');
 const { parseKioskUrl, buildApiUrl, fetchKioskData, extractKpiValues } = require('../../lib/kiosk-api');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const { sun2000Names } = require('../../lib/sun2000-presence');
+const { applyEnergyWarning } = require('../../lib/energy-warning');
 
 const DEFAULT_INTERVAL_MIN = 10;
 const MIN_INTERVAL_MIN = 5;
@@ -82,36 +83,16 @@ class FusionSolarKioskDevice extends Device {
   // Beside a paired SUN2000 this device reports the same solar production to Homey Energy a
   // second time — its class is solarpanel and its meter_power the plant's yield. Homey's own
   // "Exclude from Energy" setting takes it out; the app cannot set that for the user, so it
-  // says so: a device warning, persistent until the conflict is gone.
-  //
-  // Homey keeps that setting as energy_exclude among the device's settings. Whether an app is
-  // handed it is not documented ('energy_' is reserved for Homey), so the first check logs
-  // what it sees, and the device setting excluded_from_energy stands in when it is not: the
-  // owner ticks it once the exclusion is done, and the warning goes.
-
-  _energyExcluded(settings) {
-    const v = settings.energy_exclude;
-    return typeof v === 'boolean' ? v : null;
-  }
+  // says so: a device warning until the conflict is gone (lib/energy-warning.js).
 
   async _updateEnergyWarning(settings = this.getSettings()) {
     const names = sun2000Names(this.homey);
-    const excluded = this._energyExcluded(settings);
-    if (!this._energyExcludeLogged) {
-      this._energyExcludeLogged = true;
-      this.log(`Homey Energy: "Exclude from Energy" ${excluded === null ? 'is not visible to the app' : `reads ${excluded}`}`);
-    }
-    const show = names.length > 0 && excluded !== true && settings.excluded_from_energy !== true;
-    if (show === this._energyWarningShown) return;
-    this._energyWarningShown = show;
-    if (show) {
-      this.log(`Energy warning set: SUN2000 paired as well (${names.join(', ')})`);
-      await this.setWarning(this.homey.__('kiosk.energyWarning')).catch((err) => this.error('setWarning failed:', err.message));
-    } else {
-      // Also on the first check after a start: a warning is persistent, and one left from
-      // before must not outlive the conflict.
-      await this.unsetWarning().catch((err) => this.error('unsetWarning failed:', err.message));
-    }
+    return applyEnergyWarning(this, {
+      conflict: names.length > 0,
+      message:  this.homey.__('kiosk.energyWarning'),
+      settings,
+      detail:   `SUN2000 paired as well (${names.join(', ')})`,
+    });
   }
 
   // ─── Polling ──────────────────────────────────────────────────────────────

@@ -35,3 +35,72 @@ test('the pairing view shows it at once, in both languages, before "Connect"', (
   assert.strictEqual(texts.length, 2, 'en and de');
   for (const t of texts) assert.ok(/Exclude from Energy/.test(t), t);
 });
+
+// ── the device warning (1.2.297) ─────────────────────────────────────────────────────
+//
+// The same warning the kiosk device carries beside a SUN2000 (lib/energy-warning.js), here
+// without a condition: the SDongle counts wrongly in Energy whatever else is paired.
+
+const Module = require('module');
+const origLoad = Module._load;
+Module._load = function (request, parent, isMain) {
+  if (request === 'homey') return { Device: class {} };
+  return origLoad.call(this, request, parent, isMain);
+};
+const SdongleDevice = require(path.join(ROOT, 'drivers', 'sdongle_a_modbus', 'device.js'));
+Module._load = origLoad;
+const en = require(path.join(ROOT, 'locales', 'en.json'));
+
+function sdongle(settings = {}) {
+  const d = Object.create(SdongleDevice.prototype);
+  d.calls = [];
+  d.logs = [];
+  d.settings = { address: '192.0.2.40', ...settings };
+  d.homey = { __: (k) => k.split('.').reduce((o, x) => o[x], en) };
+  d.getSettings = () => ({ ...d.settings });
+  d.getSetting = (k) => d.settings[k];
+  d.setWarning = async (m) => { d.calls.push(['set', m]); };
+  d.unsetWarning = async () => { d.calls.push(['unset']); };
+  d.log = (...a) => { d.logs.push(a.join(' ')); };
+  d.error = () => {};
+  return d;
+}
+
+test('a SDongle not excluded from Energy carries the warning — set once', async () => {
+  const d = sdongle();
+  await d._updateEnergyWarning();
+  await d._updateEnergyWarning();
+  assert.deepStrictEqual(d.calls, [['set', en.sdongle.energyWarning]]);
+  assert.ok(d.logs.some((l) => /"Exclude from Energy" is not visible to the app/.test(l)));
+});
+
+test('excluded — seen by Homey or confirmed in the settings — it goes', async () => {
+  const seen = sdongle({ energy_exclude: true });
+  await seen._updateEnergyWarning();
+  assert.deepStrictEqual(seen.calls, [['unset']]);
+
+  const confirmed = sdongle();
+  await confirmed._updateEnergyWarning();
+  await confirmed.onSettings({ newSettings: { excluded_from_energy: true }, changedKeys: ['excluded_from_energy'] });
+  assert.deepStrictEqual(confirmed.calls, [['set', en.sdongle.energyWarning], ['unset']]);
+});
+
+test('the check runs at every poll, also when a poll is still in progress', async () => {
+  const d = sdongle({ energy_exclude: false });
+  d._fetchInProgress = true;                // the poll itself returns at once
+  await d._fetchAndUpdate();
+  d.settings.energy_exclude = true;
+  await d._fetchAndUpdate();
+  assert.deepStrictEqual(d.calls, [['set', en.sdongle.energyWarning], ['unset']]);
+});
+
+test('the fallback setting exists, and the warning names it in every language', () => {
+  const app = require(path.join(ROOT, 'app.json'));
+  const flat = (l) => (l || []).flatMap((x) => (x.type === 'group' ? flat(x.children) : [x]));
+  const s = flat(app.drivers.find((x) => x.id === 'sdongle_a_modbus').settings).find((x) => x.id === 'excluded_from_energy');
+  assert.strictEqual(s.type, 'checkbox');
+  for (const l of ['en', 'de', 'nl']) {
+    const warning = require(path.join(ROOT, 'locales', `${l}.json`)).sdongle.energyWarning;
+    assert.ok(warning.includes(s.label[l]), `${l}: the warning does not name "${s.label[l]}"`);
+  }
+});

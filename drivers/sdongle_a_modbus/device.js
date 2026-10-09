@@ -8,6 +8,7 @@ const {
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
+const { applyEnergyWarning } = require('../../lib/energy-warning');
 const modbusPolling = require('../../lib/modbus-polling');
 
 const DEFAULT_INTERVAL_S = 60;
@@ -42,6 +43,7 @@ class SdonglaAModbusDevice extends Device {
     this._failureCount  = 0;
     this._lastPollStart = 0;
     await this._ensureCapabilities();
+    await this._updateEnergyWarning();
     await this._startPolling();
 
     this._fetchAndUpdate().catch((err) => {
@@ -49,7 +51,11 @@ class SdonglaAModbusDevice extends Device {
     });
   }
 
-  async onSettings({ changedKeys }) {
+  async onSettings({ newSettings, changedKeys }) {
+    // newSettings, not getSettings(): Homey stores them only after this method resolves.
+    if (changedKeys.some((k) => k === 'excluded_from_energy' || k === 'energy_exclude')) {
+      await this._updateEnergyWarning({ ...this.getSettings(), ...newSettings });
+    }
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
       await this._stopPolling();
       await this._startPolling();
@@ -65,6 +71,22 @@ class SdonglaAModbusDevice extends Device {
 
   async onDeleted() {
     await this._stopPolling();
+  }
+
+  // ─── Homey Energy ──────────────────────────────────────────────────────────
+  //
+  // measure_power here is the whole house's consumption (loadPower), and the driver has no
+  // energy block: Homey Energy counts it as one more consumer on top of everything else,
+  // whatever else is paired. A device warning until the owner excludes it from Energy
+  // (lib/energy-warning.js); the pairing view says the same before the device is added.
+
+  async _updateEnergyWarning(settings = this.getSettings()) {
+    return applyEnergyWarning(this, {
+      conflict: true,
+      message:  this.homey.__('sdongle.energyWarning'),
+      settings,
+      detail:   'its power is the house consumption',
+    });
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────
@@ -91,6 +113,8 @@ class SdonglaAModbusDevice extends Device {
   // ─── Data fetch ────────────────────────────────────────────────────────────
 
   async _fetchAndUpdate() {
+    // An exclusion Homey shows the app only through the settings is noticed here too.
+    await this._updateEnergyWarning().catch((err) => this.error('Energy warning check failed:', err.message));
     if (this._fetchInProgress) return;
     this._fetchInProgress = true;
     this._lastPollStart = Date.now();

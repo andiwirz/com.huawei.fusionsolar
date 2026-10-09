@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.296",
+  "version": "1.2.297",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -8033,6 +8033,31 @@
                 "en": "How often to read data from the SDongle A.",
                 "de": "Wie oft Daten vom SDongle A abgerufen werden.",
                 "nl": "Hoe vaak gegevens van de SDongle A worden gelezen."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Homey Energy",
+            "de": "Homey Energy",
+            "nl": "Homey Energie"
+          },
+          "children": [
+            {
+              "id": "excluded_from_energy",
+              "type": "checkbox",
+              "label": {
+                "en": "Excluded from Energy",
+                "de": "Aus Energy ausgenommen",
+                "nl": "Uitgesloten van Energie"
+              },
+              "value": false,
+              "hint": {
+                "en": "This device's power reading is the whole house's consumption, so it has to be excluded from Homey Energy (Settings → Energy → \"Exclude from Energy\"), and the device shows a warning until it is. Tick this once that is done, if the warning stays: it only hides the warning, the exclusion itself is Homey's setting.",
+                "de": "Die Leistung dieses Geräts ist der Verbrauch des ganzen Hauses; es muss deshalb aus Homey Energy ausgenommen werden (Einstellungen → Energie → „Exclude from Energy“), und bis dahin zeigt das Gerät eine Warnung. Hier ankreuzen, wenn das erledigt ist und die Warnung trotzdem stehen bleibt: Es blendet nur die Warnung aus, das Ausnehmen selbst ist Homeys Einstellung.",
+                "nl": "Het vermogen van dit apparaat is het verbruik van het hele huis; het moet daarom van Homey Energie worden uitgesloten (Instellingen → Energie → „Exclude from Energy”), en tot dan toont het apparaat een waarschuwing. Vink dit aan als dat gedaan is en de waarschuwing toch blijft: het verbergt alleen de waarschuwing, het uitsluiten zelf is de instelling van Homey."
               }
             }
           ]
