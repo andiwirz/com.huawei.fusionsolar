@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.288",
+  "version": "1.2.289",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -4526,9 +4526,9 @@
               },
               "value": true,
               "hint": {
-                "en": "Posts to the timeline when the battery status changes, when the battery refuses a setting the app wrote (the setting is put back), and when a force charge or discharge could not be started. Switching this off silences these warnings too.",
-                "de": "Meldet in der Timeline, wenn sich der Batteriestatus ändert, wenn die Batterie eine Einstellung ablehnt, die die App geschrieben hat (die Einstellung wird zurückgesetzt), und wenn eine Zwangsladung oder -entladung nicht gestartet werden konnte. Ausgeschaltet entfallen auch diese Warnungen.",
-                "nl": "Plaatst een tijdlijnmelding wanneer de batterijstatus verandert, wanneer de batterij een instelling weigert die de app schreef (de instelling wordt teruggezet), en wanneer geforceerd laden of ontladen niet kon starten. Uitgeschakeld vervallen ook deze waarschuwingen."
+                "en": "Posts to the timeline when the battery status changes, when the battery refuses a setting the app wrote (the setting is put back), when a force charge or discharge could not be started, and when the command to switch to off-grid operation was sent. Switching this off silences these warnings too.",
+                "de": "Meldet in der Timeline, wenn sich der Batteriestatus ändert, wenn die Batterie eine Einstellung ablehnt, die die App geschrieben hat (die Einstellung wird zurückgesetzt), wenn eine Zwangsladung oder -entladung nicht gestartet werden konnte, und wenn der Befehl zum Wechsel in den Inselbetrieb gesendet wurde. Ausgeschaltet entfallen auch diese Warnungen.",
+                "nl": "Plaatst een tijdlijnmelding wanneer de batterijstatus verandert, wanneer de batterij een instelling weigert die de app schreef (de instelling wordt teruggezet), wanneer geforceerd laden of ontladen niet kon starten, en wanneer het commando om naar eilandbedrijf over te schakelen is verstuurd. Uitgeschakeld vervallen ook deze waarschuwingen."
               }
             }
           ]
@@ -13040,6 +13040,7 @@
       },
       {
         "id": "luna2000_set_backup_offgrid",
+        "deprecated": true,
         "title": {
           "en": "Set backup off-grid switch",
           "de": "Backup-Inselbetrieb setzen",
@@ -13051,9 +13052,9 @@
           "nl": "Noodstroom-/eilandbedrijf instellen op [[mode]]"
         },
         "hint": {
-          "en": "Enables or disables backup / off-grid mode (register 47604). Requires backup hardware to be installed.",
-          "de": "Aktiviert oder deaktiviert den Backup-/Inselbetrieb (Register 47604). Erfordert installierte Backup-Hardware.",
-          "nl": "Schakelt noodstroom-/eilandbedrijf in of uit (register 47604). Vereist dat de noodstroomhardware is geïnstalleerd."
+          "en": "Retired — sends nothing. Its \"Disabled\" sent Huawei's command to switch to off-grid operation (register 47604 = 0), the opposite of what it said. Use \"Switch to off-grid operation\" if that is what you want.",
+          "de": "Stillgelegt – sendet nichts. Ihr „Deaktiviert“ sendete Huaweis Befehl zum Wechsel in den Inselbetrieb (Register 47604 = 0), das Gegenteil dessen, was dastand. „In den Inselbetrieb wechseln“ verwenden, wenn das gewollt ist.",
+          "nl": "Buiten gebruik – stuurt niets. Haar „Uitgeschakeld” stuurde het commando van Huawei om naar eilandbedrijf over te schakelen (register 47604 = 0), het tegendeel van wat er stond. Gebruik „Overschakelen naar eilandbedrijf” als dat de bedoeling is."
         },
         "args": [
           {
@@ -13087,6 +13088,40 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_switch_to_offgrid",
+        "title": {
+          "en": "Switch to off-grid operation",
+          "de": "In den Inselbetrieb wechseln",
+          "nl": "Overschakelen naar eilandbedrijf"
+        },
+        "titleFormatted": {
+          "en": "Switch to off-grid operation — [[confirm]]",
+          "de": "In den Inselbetrieb wechseln – [[confirm]]",
+          "nl": "Overschakelen naar eilandbedrijf – [[confirm]]"
+        },
+        "hint": {
+          "en": "⚠️ Sends Huawei's command to switch the system from grid-tied to off-grid operation (register 47604 = 0). With backup hardware the house is cut off from the grid and runs on battery and solar alone. Huawei documents no value for the way back in this register, so this app offers none. Needs a Backup Box or SmartGuard. Runs only with the confirmation ticked. Replaces \"Set backup off-grid switch\", whose \"Disabled\" sent this same command.",
+          "de": "⚠️ Sendet Huaweis Befehl, die Anlage vom Netzbetrieb in den Inselbetrieb zu schalten (Register 47604 = 0). Mit Backup-Hardware wird das Haus vom Netz getrennt und läuft nur noch mit Batterie und Solarstrom. Für den Rückweg dokumentiert Huawei in diesem Register keinen Wert, darum bietet die App keinen an. Braucht eine Backup Box oder SmartGuard. Läuft nur mit gesetzter Bestätigung. Ersetzt „Backup-Inselbetrieb setzen“, dessen „Deaktiviert“ genau diesen Befehl gesendet hat.",
+          "nl": "⚠️ Stuurt het commando van Huawei om de installatie van netbedrijf naar eilandbedrijf over te schakelen (register 47604 = 0). Met back-uphardware wordt het huis van het net losgekoppeld en draait het alleen nog op batterij en zonnestroom. Voor de weg terug documenteert Huawei in dit register geen waarde, dus biedt de app er geen. Vereist een Backup Box of SmartGuard. Werkt alleen met de bevestiging aangevinkt. Vervangt „Noodstroom-/eilandbedrijf instellen”, waarvan „Uitgeschakeld” precies dit commando stuurde."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "checkbox",
+            "name": "confirm",
+            "title": {
+              "en": "I know the house is cut off from the grid",
+              "de": "Mir ist klar, dass das Haus vom Netz getrennt wird",
+              "nl": "Ik weet dat het huis van het net wordt losgekoppeld"
+            }
           }
         ]
       },

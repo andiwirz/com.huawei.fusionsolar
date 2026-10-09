@@ -65,7 +65,10 @@
         "absent": "Energiebeheersysteem niet toegevoegd"
       },
       "chargeBlocked": "Het maximale laadvermogen staat op 0 W, de batterij mag dus niet laden. Verhoog het eerst onder „Laad- en ontlaadvermogen”.",
-      "dischargeBlocked": "Het maximale ontlaadvermogen staat op 0 W, de batterij mag dus niet ontladen. Verhoog het eerst onder „Laad- en ontlaadvermogen”."
+      "dischargeBlocked": "Het maximale ontlaadvermogen staat op 0 W, de batterij mag dus niet ontladen. Verhoog het eerst onder „Laad- en ontlaadvermogen”.",
+      "offgridNotConfirmed": "Niet verstuurd: de bevestiging dat het huis van het net wordt losgekoppeld, is niet aangevinkt.",
+      "offgridCardReplaced": "Deze kaart is buiten gebruik: haar „Uitgeschakeld” stuurde het commando van Huawei om naar eilandbedrijf over te schakelen. Er is niets verstuurd – gebruik „Overschakelen naar eilandbedrijf” als dat de bedoeling is.",
+      "offgridSent": "commando om naar eilandbedrijf over te schakelen verstuurd (register 47604)"
     },
     "modes": {
       "notReadYet": "Deze modus kan worden gewijzigd zodra de app de huidige waarde van het apparaat heeft gelezen. Probeer het over een minuut opnieuw.",

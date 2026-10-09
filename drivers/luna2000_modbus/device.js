@@ -885,22 +885,25 @@ class LUNA2000ModbusDevice extends Device {
         })();
       });
 
+    // Retired in 1.2.289. Register 47604 documents one value — 0, "switch from grid-tied to
+    // off-grid" (SPC177, p. 77) — and this card sent exactly that for "Disabled", so a flow
+    // meant to keep the house on the grid would have taken it off. It stays registered so an
+    // existing flow fails with a message instead of doing either thing; the manifest marks it
+    // deprecated, which hides it from new flows.
     this.homey.flow
       .getActionCard('luna2000_set_backup_offgrid')
-      .registerRunListener(({ device, mode }) => {
-        const value = parseInt(mode, 10);
-        this.log(`Set backup off-grid: ${value === 1 ? 'Enable' : 'Disable'} (reg 47604)`);
-        this._writeInProgress = true;
-        (async () => {
-          try {
-            await writeModbusRegister(host(), port(), unitId(), 47604, value);
-            this.log('Backup off-grid written');
-          } catch (err) {
-            this.error('Set backup off-grid failed:', err.message);
-          } finally {
-            this._writeInProgress = false;
-          }
-        })();
+      .registerRunListener(async () => {
+        throw new Error(this.homey.__('modbus.battery.offgridCardReplaced'));
+      });
+
+    // The one command Huawei documents for 47604, under its own name: only with the
+    // confirmation ticked, on the battery the flow names, and awaited, so a refused write
+    // fails the flow rather than vanishing into the log.
+    this.homey.flow
+      .getActionCard('luna2000_switch_to_offgrid')
+      .registerRunListener(async ({ device, confirm }) => {
+        if (confirm !== true) throw new Error(this.homey.__('modbus.battery.offgridNotConfirmed'));
+        await device._switchToOffgrid();
       });
 
     this.homey.flow
@@ -1504,6 +1507,29 @@ class LUNA2000ModbusDevice extends Device {
     } finally {
       this._updatingFromModbus         = false;
       this._updatingSettingFromModbus  = false;
+    }
+  }
+
+  // "Switch to off-grid operation": 0 into 47604, the only value Huawei documents for it.
+  // There is no write for the way back — Huawei names no value for it in this register.
+  async _switchToOffgrid() {
+    const host = this.getSetting('address');
+    const port = parseInt(this.getSetting('port'), 10) || 502;
+    const unit = parseIntSafe(this.getSetting('modbus_id'), 1);
+    this.log('Write start  [luna2000_switch_to_offgrid] 47604 = 0 (switch from grid-tied to off-grid)');
+    this._writeInProgress = true;
+    try {
+      await writeModbusRegister(host, port, unit, 47604, 0);
+    } catch (err) {
+      this.error('Write FAILED [luna2000_switch_to_offgrid]:', err.message);
+      throw err;
+    } finally {
+      this._writeInProgress = false;
+    }
+    this.log('Write OK     [luna2000_switch_to_offgrid]');
+    if (this.getSetting('enable_timeline_notifications') !== false) {
+      this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${this.homey.__('modbus.battery.offgridSent')}` })
+        .catch((err) => this.log('Off-grid notification failed:', err.message));
     }
   }
 

@@ -65,7 +65,10 @@
         "absent": "Energy Management device not added"
       },
       "chargeBlocked": "Max charge power is set to 0 W, so the battery may not charge. Raise it under \"Charge and discharge power\" first.",
-      "dischargeBlocked": "Max discharge power is set to 0 W, so the battery may not discharge. Raise it under \"Charge and discharge power\" first."
+      "dischargeBlocked": "Max discharge power is set to 0 W, so the battery may not discharge. Raise it under \"Charge and discharge power\" first.",
+      "offgridNotConfirmed": "Not sent: the confirmation that the house will be cut off from the grid is not ticked.",
+      "offgridCardReplaced": "This card is retired: its \"Disabled\" sent Huawei's command to switch to off-grid operation. Nothing was sent — use \"Switch to off-grid operation\" if that is what you want.",
+      "offgridSent": "command to switch to off-grid operation sent (register 47604)"
     },
     "modes": {
       "notReadYet": "This mode can be changed once the app has read its current value from the device. Please try again in a minute.",
