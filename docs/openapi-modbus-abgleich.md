@@ -1,53 +1,40 @@
 # OpenAPI gegen Modbus — Abgleich und Änderungsliste
 
-**Entwicklernotiz, kein Benutzerdokument.** Aufgenommen bei App-Version 1.2.211. Entstanden aus
-Issue #25 (Jamesquare78, Homey Energy zeigt die Batterie nicht in der Summe) und einer
-Messreihe auf einer Anlage, die **beide Pfade gleichzeitig** betreibt — Modbus über
-10.160.13.72 und OpenAPI über eu5, Station `NE=141986968`. Dadurch messen beide
-Treibersätze dieselbe Hardware im selben Moment, und Abweichungen sind eindeutig einem
-Treiber zuzuordnen.
+**Entwicklernotiz, kein Benutzerdokument.** Aufgenommen bei App-Version 1.2.211, **zuletzt
+Punkt für Punkt gegen den Code nachgeprüft bei 1.2.279** (2026-10-09). Entstanden aus Issue #25
+(Jamesquare78, Homey Energy zeigt die Batterie nicht in der Summe) und einer Messreihe auf einer
+Anlage, die **beide Pfade gleichzeitig** betreibt — Modbus über 10.160.13.72 und OpenAPI über
+eu5, Station `NE=141986968`. Dadurch messen beide Treibersätze dieselbe Hardware im selben
+Moment, und Abweichungen sind eindeutig einem Treiber zuzuordnen.
 
-**Stand nach 1.2.212** — teilweise umgesetzt. Erledigt sind:
+Die Abschnitte 2 und 3 sind die Messung von damals und bleiben als Beleg stehen. Was aus der
+Änderungsliste geworden ist, steht in der Tabelle hier — **wer aus Abschnitt 4 arbeitet, liest
+zuerst sie**, denn ein Teil davon ist inzwischen anders gelöst und darf so nicht mehr umgesetzt
+werden.
 
-| Punkt | Was |
-|---|---|
-| A1 | `active_power` und die drei Phasen im Zweig Leistungssensor (47) **und** Netzzähler (17) negiert |
-| B1 | `active_power` im Netzblock des Wechselrichters negiert |
-| B4, B5 | `meter_power` → `meter_power.grid_import`, `meter_power.exported` → `meter_power.grid_export`, alte Namen in `DEPRECATED_CAPABILITIES` |
-| C3 | `measure_battery.soh` bei 0 nicht geschrieben — die Capability wird angelegt, sobald ein echter Wert kommt, und von Geräten entfernt, die heute 0 % zeigen |
-| — | `enable_timeline_notifications` auf Wechselrichter und Batterie (im Original nicht aufgeführt); der Zähler bekommt keinen, weil `openapi_meter_status` bewusst entfernt wurde und es nichts zu melden gibt |
+## Stand bei 1.2.279
 
-Regressionstests mit den Zahlen aus Abschnitt 2: `test/openapi-grid-sign.test.js`,
-`test/openapi-parity.test.js`. Mutationsprobe 17/17.
-
-**A2 bleibt bewusst offen.** Der EMMA-Zweig hat nachweislich eine eigene Konvention bei den
-Zählern (`active_cap`/`reverse_active_cap` vertauscht), es gibt keine EMMA-Messung, und ein
-Vorzeichen auf Verdacht zu drehen macht aus einer richtigen Anzeige eine falsche. Ein Test
-hält den Zweig jetzt fest, damit die Negation nicht versehentlich hineinläuft.
-
-**Stand nach 1.2.213** — drei Felder, die in Abschnitt 4 fehlten, weil sie erst beim
-Durchgehen eines vollständigen API-Mitschnitts aufgefallen sind. Alle drei kamen in jeder
-Antwort an und wurden von niemandem gelesen:
-
-| Feld | Wird jetzt | Gegenstück |
+| Punkt | Stand | Wo |
 |---|---|---|
-| `battery_unit_info[].soh` | `measure_battery.soh` — **95 %**, gemittelt über die Module; `battery_soh` daneben steht auf 0 | Modbus hat gar keinen SoH |
-| `battery_unit_info` (Länge) | `measure_battery_modules`, `luna2000_unit1_installed`, `luna2000_unit2_installed` | Register 47000/47089, 47750–47755 |
-| `meter_status` (Typ 47 + 17) | `dtsu666_meter_status` — dieselbe Capability wie Modbus, damit die zwei Flow-Karten beide Zähler bedienen; dazu Timeline-Schalter | `dtsu666_meter_status` |
-| `stationKpi.day_use_energy` | `meter_power.consumption_today` am Zähler, vom Energiebilanz-Widget vor der eigenen Rechnung benutzt | EMMA-Zähler hat dasselbe |
+| A1 | erledigt (1.2.212): Leistung und Phasen von Leistungssensor (47) und Netzzähler (17) negiert | `test/openapi-grid-sign.test.js` |
+| A2 | **bewusst offen**: der EMMA-Zweig hat bei den Zählern eine eigene Konvention, es gibt keine EMMA-Messung, und ein Test hält den Zweig fest, damit die Negation nicht versehentlich hineinläuft | Kopfkommentar in `powermeter_openapi_fusionsolar/device.js` |
+| A3 | offen: die Phasen heissen weiter `meter_u`/`b_u`/`c_u` und `meter_i`/`b_i`/`c_i` | `powermeter_openapi_fusionsolar/device.js` ≈ Z. 49–54 |
+| A4 | teilweise (1.2.213): optionale Capabilities entstehen mit dem ersten Wert (`setOptional`). `powermeter_state_string` wird beim allerersten Abruf aber weiter geschrieben, bevor die EXTRA-Schleife sie anlegt | ebd. ≈ Z. 176 gegen 184 |
+| B1 | erledigt (1.2.212) | |
+| B2, B3, B6 | **anders gelöst — die Migration aus 4 B ist hinfällig.** Homey Energy liest seit 1.2.216 `meter_power.pv_total`, seit 1.2.262 vom DC-Zähler `mppt_total_cap` getrieben (Issue #34). Die blanke `meter_power` ist seit 1.2.212 entfernt, `inv_total`/`inv_daily` bleiben als Anzeige | `sun2000_openapi_fusionsolar/device.js`, `_writePvMeter` |
+| B4, B5 | erledigt (1.2.212) | |
+| B7 | offen: „Grid-connected" statt „On-grid". Die Codes sind dieselben wie beim Modbus-Register 32089, nur dezimal (768 = 0x0300) — seit 1.2.269 so kommentiert | `INVERTER_STATE_MAP` |
+| B8 | offen: `openapi_inverter_efficiency`, Huawei liefert konstant 100 | |
+| C1 | offen: `openapi_battery_status` statt `luna2000_battery_status` | `luna2000_openapi_fusionsolar/device.js` |
+| C2 | offen: „Full"/„Empty" fest englisch | ebd. ≈ Z. 249 und 251 |
+| C3 | erledigt (1.2.212); seit 1.2.213 kommt der SoH aus `battery_unit_info[].soh` | `test/openapi-unread-fields.test.js` |
+| D1 | offen: alle vier Hausbatterie-Treiber tragen `batteries: ["INTERNAL"]`; LUNA2000 Modbus setzt es sogar nach der Modulzahl per `setEnergy`. Vor dem Streichen klären, ob Homey es für die Hausbatterie braucht | `luna2000_modbus/device.js`, Modulzählung |
+| D2 | teilweise: abgewiesene Aufrufe (407/403/429) setzen seit 1.2.220 nicht mehr offline (Issue #28), und „ohne Daten" heisst seit 1.2.210, dass **jeder** vorhandene Typ fehlt. Offen: ein einziger ausgelassener Zyklus genügt dafür noch, ein Gerät ohne vorhandenen Typ bleibt stumm, `_devIdsByType` wird bis zum Neustart einmal geholt | `lib/openapi-coordinator.js`, `test/openapi-starved-type.test.js` |
+| Abschnitt 5 | Wechselrichter und Leistungssensor sind konform. Offen: SDongle (kein energy-Block, `measure_power` ist der Hausverbrauch) und iSitePower Home (`cumulative`, der Export fest auf 0) | |
+| Ungenutzte Felder | seither genutzt: `rated_capacity` (1.2.257, `battery_rated_capacity`), `mppt_total_cap` (1.2.262). Weiter ungenutzt: `mppt_1_cap`/`mppt_2_cap`, `power_factor`, `reactive_power`, die Erträge in Geld. Die AC-Phasenwerte des Wechselrichters sind entfernt | |
 
-Damit ist die Begründung hinfällig, mit der 1.2.212 dem Zähler den Timeline-Schalter
-verweigert hat („nichts zu melden") — `meter_status` war die ganze Zeit da.
-
-Tests: `test/openapi-unread-fields.test.js`. Mutationsprobe 20/21; der überlebende Mutant
-ist äquivalent (`parseFloat("95.0%")` hört beim Prozentzeichen von selbst auf, das
-`.replace('%','')` ist Absicherung, keine Bedingung).
-
-Alles Übrige aus Abschnitt 4 und 7 steht weiterhin offen — insbesondere B2/B3/B6 (der
-Ertrag auf die blanke `meter_power`, mit der Migration und dem Insights-Verlust), C1/C2,
-D1, A3 und A4. Ungenutzt bleiben ausserdem `rated_capacity`, `mppt_1_cap`/`mppt_2_cap`
-(Lebensdauer-Ertrag je String), die AC-Phasenwerte des Wechselrichters, `power_factor`,
-`reactive_power` und die Anlagenerträge in Geld.
+Tests aus dem ersten Stand: `test/openapi-grid-sign.test.js` und `test/openapi-parity.test.js`
+(1.2.212), `test/openapi-unread-fields.test.js` (1.2.213).
 
 ---
 
@@ -213,7 +200,12 @@ Ohne Gegenstück: `measure_frequency` (nur OpenAPI, schadet nicht), `dtsu666_met
 | B7 | `huawei_status` auf „On-grid" abbilden | „Grid-connected" | gleicher Wortlaut |
 | B8 | `openapi_inverter_efficiency` entfernen | konstant 100 | Modbus hat es nicht |
 
-**Reihenfolge der Migration bei B2/B4:** `meter_power` ist besetzt. Erst
+> **Hinfällig seit 1.2.216 — nicht ausführen.** Homey Energy liest beim OpenAPI-Wechselrichter
+> `meter_power.pv_total`, die blanke `meter_power` gibt es dort nicht mehr. Die folgende
+> Migration würde genau den Insights-Verlust einbauen, vor dem sie warnt, ohne dass es ihn noch
+> braucht. Sie bleibt nur stehen, damit klar ist, was vermieden wurde.
+
+**Reihenfolge der Migration bei B2/B4 (hinfällig):** `meter_power` ist besetzt. Erst
 `meter_power.grid_import` anlegen und den Wert übernehmen, dann `meter_power` entfernen,
 dann neu anlegen und mit dem Ertrag füllen. Die bisherige Insights-Kurve von `meter_power`
 enthält Netzbezugswerte und lässt sich nicht retten — das muss in den Changelog.
@@ -274,9 +266,9 @@ Geprüft gegen <https://apps.developer.homey.app/the-basics/devices/energy>.
 | Treiber | Klasse | energy-Block | Urteil |
 |---|---|---|---|
 | `sun2000_modbus` | `solarpanel` | `meterPowerExportedCapability: meter_power` | ✓ konform |
-| `sun2000_openapi_fusionsolar` | `solarpanel` | `meterPowerExportedCapability: meter_power.inv_total` | ✗ blanke `meter_power` trägt den Netzbezug |
+| `sun2000_openapi_fusionsolar` | `solarpanel` | `meterPowerExportedCapability: meter_power.pv_total` | ✓ seit 1.2.216 (damals: `inv_total`, blanke `meter_power` mit dem Netzbezug) |
 | `dtsu666_modbus` | `sensor` | `cumulative` + imported/exported | ✓ konform |
-| `powermeter_openapi_fusionsolar` | `sensor` | `cumulative` + imported/exported | ✗ Vorzeichen verdreht |
+| `powermeter_openapi_fusionsolar` | `sensor` | `cumulative` + imported/exported | ✓ seit 1.2.212 (damals: Vorzeichen verdreht) |
 | `luna2000_modbus` | `battery` | `homeBattery` + imported/exported + `batteries` | ✓ bis auf `batteries` |
 | `luna2000_openapi_fusionsolar` | `battery` | dito | ✓ bis auf `batteries` |
 | `sdongle_a_modbus` | `sensor` | kein Block | ✗ meldet den Hausverbrauch als eigenen Verbrauch |
@@ -316,24 +308,28 @@ Solange beide Pfade gleichzeitig gepaart sind, ist die Energieansicht wertlos:
 |---|---|---|---|
 | Solarpanel | Wechselrichter + Inverter (OpenAPI) | beide `false` | 7033 + 7028 = **14 061 W** |
 | Hausbatterie | Huawei Batterie + LUNA2000 (OpenAPI) | beide `false` | 0 + 0 |
-| Cumulative Zähler | Energiezähler + Leistungssensor | beide `false` | −4631 **+** 4650 = **+19 W** |
+| Cumulative Zähler | Energiezähler + Leistungssensor | beide `false` | −4631 **+** 4650 = **+19 W** (bei der Messung) |
 
-Solar zählt doppelt, und die zwei Netzzähler löschen einander wegen des Vorzeichenfehlers
-fast aus. Fürs Vergleichen in Ordnung, für den Dauerbetrieb nicht — eine Seite gehört auf
+Bei der Messung zählte Solar doppelt, und die zwei Netzzähler löschten einander wegen des
+Vorzeichenfehlers fast aus. Seit A1 (1.2.212) tragen beide dasselbe Vorzeichen — sie heben sich
+nicht mehr auf, sie **zählen doppelt** (−4631 − 4650 = −9281 W). Der Schluss bleibt: fürs
+Vergleichen in Ordnung, für den Dauerbetrieb nicht — eine Seite gehört auf
 `energy_exclude: true`.
 
 ---
 
 ## 7 · Reihenfolge
 
-1. **A1/A2, B1** — Vorzeichen. Die einzigen Änderungen, die Zahlen verfälschen, und je eine
-   Zeile.
-2. **B2–B6** — `meter_power` des Wechselrichters. Braucht die Migration aus Abschnitt 4 B.
-3. **C1–C3** — Batterie-Fassade. Risikoarm.
-4. **D2** — Verfügbarkeitsregel.
-5. **D1** — `batteries: ["INTERNAL"]`.
-6. **A3, B7, B8** — Namen und Wortlaute.
-7. SDongle und iSitePower Home aus Energy nehmen (Abschnitt 5).
+Stand 1.2.279 — erledigt sind die Vorzeichen (A1, B1), der Ertragszähler des Wechselrichters
+(anders gelöst, siehe Tabelle oben) und C3. Was bleibt, nach Wirkung geordnet:
 
-Für Punkt 1 und 2 gehören Regressionstests mit den Zahlen aus Abschnitt 2 dazu — die
-Messung ist reproduzierbar, weil beide Pfade dieselbe Anlage lesen.
+1. **D2, der Rest** — ein einziger ausgelassener Zyklus setzt ein Gerät mit gültigen Daten
+   offline. Mehrere Zyklen in Folge verlangen, und das Gerät ohne vorhandenen Typ nicht stumm
+   lassen.
+2. **SDongle und iSitePower Home aus Energy nehmen** (Abschnitt 5) — beide melden den
+   Hausverbrauch ein zweites Mal.
+3. **C1/C2** — Batterie-Fassade. Risikoarm.
+4. **A4-Rest, A3, B7, B8** — die Zustandszeile beim ersten Abruf, Namen und Wortlaute.
+5. **D1** — erst nach Klärung, ob Homey `batteries` für die Hausbatterie braucht.
+
+A2 bleibt bewusst offen, bis eine EMMA-Messung vorliegt.
