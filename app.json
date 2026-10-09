@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.287",
+  "version": "1.2.288",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -5835,9 +5835,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -6256,9 +6256,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -6644,9 +6644,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -6932,9 +6932,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -7276,9 +7276,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -7578,9 +7578,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]
@@ -7853,9 +7853,9 @@
               "min": 5,
               "max": 60,
               "hint": {
-                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
+                "en": "How often the data is fetched from Huawei, in minutes (5–60). Huawei updates it about every 5 minutes, so a shorter interval would bring nothing new; a longer one saves API calls. All OpenAPI devices of the same plant share one fetch, and the shortest interval set on any of them applies.",
+                "de": "Wie oft die Daten bei Huawei abgerufen werden, in Minuten (5–60). Huawei aktualisiert sie etwa alle 5 Minuten, öfter brächte nichts Neues; seltener spart API-Aufrufe. Alle OpenAPI-Geräte derselben Anlage teilen sich einen Abruf, und es gilt der kürzeste Wert, der bei einem von ihnen eingestellt ist.",
+                "nl": "Hoe vaak de gegevens bij Huawei worden opgehaald, in minuten (5–60). Huawei ververst ze ongeveer elke 5 minuten, vaker levert niets nieuws op; minder vaak spaart API-aanroepen. Alle OpenAPI-apparaten van dezelfde installatie delen één ophaalronde, en de kortste ingestelde waarde geldt."
               }
             }
           ]

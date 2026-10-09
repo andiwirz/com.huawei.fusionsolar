@@ -359,9 +359,9 @@ class SmartChargerOcppDevice extends Device {
     if (newSettings.charger_model === '7ks' && String(newSettings.number_of_phases) === '3') {
       throw new Error('SCharger-7KS-S0 only supports Mono-Phase wiring — please set "Number of phases" to 1.');
     }
-    if (newSettings.charger_model === '22kt' && String(newSettings.number_of_phases) === '1') {
-      throw new Error('SCharger-22KT-S0 requires Tri-Phase wiring — please set "Number of phases" to 3.');
-    }
+    // The 22KT-S0 is not refused on one phase: Huawei's manual lists it for TN/TT three-phase,
+    // TN/TT single-phase and IT single-phase, and its own entry here says "Mono-Phase or
+    // Tri-Phase". Until 1.2.288 a single-phase 22KT could not save its settings at all.
 
     if (changedKeys.includes('auto_start_charging')) {
       this._startIdleGuard();
