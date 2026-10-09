@@ -971,7 +971,9 @@ class LUNA2000ModbusDevice extends Device {
 
     this.homey.flow
       .getConditionCard('luna2000_battery_status_is')
-      .registerRunListener((args) => this.getCapabilityValue('luna2000_battery_status') === args.status);
+      // The device the flow picked, not the one that registered the card: since 1.2.281 the
+      // cloud battery shares this card, and only one listener survives per card.
+      .registerRunListener((args) => args.device.getCapabilityValue('luna2000_battery_status') === args.status);
 
     this.homey.flow
       .getConditionCard('luna2000_working_mode_is')

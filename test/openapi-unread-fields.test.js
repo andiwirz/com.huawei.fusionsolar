@@ -68,6 +68,7 @@ function fakeBattery({ caps = [] } = {}) {
   d._set = async (c, v) => { if (v !== null && v !== undefined && d.caps.has(c)) d.values[c] = v; };
   d._setOptional = BatteryDevice.prototype._setOptional.bind(d);
   d.homey = {
+    __: (k) => ({ 'modbus.battery.state.full': 'Full', 'modbus.battery.state.empty': 'Empty' }[k] || k),
     notifications: { createNotification: async () => {} },
     flow: { getDeviceTriggerCard: () => ({ trigger: async () => {} }) },
   };

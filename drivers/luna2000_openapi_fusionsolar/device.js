@@ -19,7 +19,7 @@ const EXTRA_CAPABILITIES = [
   'measure_power.dischargesetting', // max discharge power (W)
   'meter_power.today_batt_input',   // charged today (kWh)
   'meter_power.today_batt_output',  // discharged today (kWh)
-  'openapi_battery_status',         // running state string
+  'luna2000_battery_status',        // running state string — the same capability as Modbus (1.2.281)
   'openapi_battery_mode',           // charge/discharge mode string
   'measure_voltage.battery',        // battery bus voltage (V)
   'meter_power.charged',            // total lifetime charged (kWh)
@@ -33,14 +33,20 @@ const DEPRECATED_CAPABILITIES = [
   'meter_power.batt_rated',
   'openapi_battery_run_state',
   'openapi_working_mode_control',
+  // Replaced by luna2000_battery_status in 1.2.281, so the Modbus battery's status cards serve
+  // this device too. A string without Insights: nothing is lost in the move.
+  'openapi_battery_status',
 ];
 
+// battery_status, in the words of luna2000_modbus: Huawei uses the same codes for the cloud
+// field and for Modbus register 37762, and the shared status cards list these exact values.
+// Until 1.2.281 this driver said "Faulty" and "Hibernating" for 3 and 4.
 const BATTERY_STATUS_MAP = {
   0: 'Offline',
   1: 'Standby',
   2: 'Running',
-  3: 'Faulty',
-  4: 'Hibernating',
+  3: 'Fault',
+  4: 'Sleep mode',
 };
 
 const BATTERY_MODE_MAP = {
@@ -98,6 +104,10 @@ class FusionSolarBatteryDevice extends Device {
       .registerRunListener((args) => (args.device.getCapabilityValue('measure_battery') ?? 0) > args.soc);
     this.homey.flow.getConditionCard('luna2000_soc_below')
       .registerRunListener((args) => (args.device.getCapabilityValue('measure_battery') ?? 0) < args.soc);
+    // Shared with luna2000_modbus since 1.2.281 — the same listener on both sides, reading the
+    // device the flow picked.
+    this.homey.flow.getConditionCard('luna2000_battery_status_is')
+      .registerRunListener((args) => args.device.getCapabilityValue('luna2000_battery_status') === args.status);
   }
 
   // ─── Coordinator interface ─────────────────────────────────────────────────
@@ -226,14 +236,18 @@ class FusionSolarBatteryDevice extends Device {
     const battStatusVal = num(maps[0].battery_status);
     if (battStatusVal !== null) {
       const statusLabel = BATTERY_STATUS_MAP[battStatusVal] ?? `State ${battStatusVal}`;
-      await this._set('openapi_battery_status', statusLabel);
-      // Announced the way luna2000_modbus announces its unit status. The first reading
-      // after a restart is not a change, so nothing is posted until the battery actually
-      // moves between Running, Standby, Faulty and the rest.
-      if (this._prevBatteryStatus !== null && statusLabel !== this._prevBatteryStatus
-          && this.getSetting('enable_timeline_notifications') !== false) {
-        this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${statusLabel}` })
-          .catch((err) => this.log('Timeline notification failed:', err.message));
+      await this._set('luna2000_battery_status', statusLabel);
+      // Announced the way luna2000_modbus announces its unit status, through the same card.
+      // The first reading after a restart is not a change, so nothing fires until the battery
+      // actually moves between Running, Standby, Fault and the rest.
+      if (this._prevBatteryStatus !== null && statusLabel !== this._prevBatteryStatus) {
+        this.homey.flow.getDeviceTriggerCard('luna2000_battery_status_changed')
+          .trigger(this, { status: statusLabel }, { status: statusLabel })
+          .catch((err) => this.log('Flow trigger luna2000_battery_status_changed failed:', err.message));
+        if (this.getSetting('enable_timeline_notifications') !== false) {
+          this.homey.notifications.createNotification({ excerpt: `${this.getName()}: ${statusLabel}` })
+            .catch((err) => this.log('Timeline notification failed:', err.message));
+        }
       }
       this._prevBatteryStatus = statusLabel;
     }
@@ -246,9 +260,9 @@ class FusionSolarBatteryDevice extends Device {
       let battLabel;
       let battLabelAlways = false;
       if (soc >= 100) {
-        battLabel = 'Full'; battLabelAlways = true;
+        battLabel = this.homey.__('modbus.battery.state.full'); battLabelAlways = true;
       } else if (soc < 5 && Math.abs(battPower) <= IDLE_W) {
-        battLabel = 'Empty'; battLabelAlways = true;
+        battLabel = this.homey.__('modbus.battery.state.empty'); battLabelAlways = true;
       } else {
         battLabel = battPower < 0 ? '🔻' : '🔺';
       }

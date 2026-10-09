@@ -816,7 +816,7 @@ power) and Notifications.
 | Grid export started                      | Power Meter Modbus/EMMA         | `power` (W)                                          | Fires when switching from import to export                               |
 | Grid import started                      | Power Meter Modbus/EMMA         | `power` (W)                                          | Fires when switching from export to import                               |
 | Inverter status changed                  | Inverter SUN2000 Modbus         | `status`                                             | Fires when the inverter operating state changes (timeline notification)  |
-| Battery status changed                   | LUNA2000 Modbus                 | `status`                                             | Fires when the battery state changes (timeline notification)             |
+| Battery status changed                   | LUNA2000 Modbus / OpenAPI       | `status`                                             | Fires when the battery state changes (timeline notification)             |
 | Meter status changed                     | Power Meter DTSU666 Modbus / OpenAPI | `status`                                        | Fires when the meter state changes (timeline notification)               |
 | Charging session started                 | Smart Charger (OCPP)            | `amps`, `phases`, `phase_label`, `message`           | Fires when a vehicle starts charging (power confirmed > 100 W)          |
 | Charging session stopped                 | Smart Charger (OCPP)            | `energy_wh`, `energy_formatted`, `duration`, `amps`, `phases`, `message` | Fires when a vehicle stops charging (StopTransaction received) |
@@ -841,7 +841,7 @@ power) and Notifications.
 | Battery SoC is below threshold            | LUNA2000 Modbus/EMMA/OpenAPI    | True if current SoC (%) is strictly below the configured value                     |
 | Battery is charging                       | LUNA2000 Modbus                 | True when the battery is actively charging                                          |
 | Battery is discharging                    | LUNA2000 Modbus                 | True when the battery is actively discharging                                       |
-| Battery status is                         | LUNA2000 Modbus                 | Checks the current battery operating state string                                   |
+| Battery status is                         | LUNA2000 Modbus / OpenAPI       | Checks the current battery operating state string                                   |
 | Storage working mode is                   | LUNA2000 Modbus/EMMA            | Checks the current storage working mode                                             |
 | Excess PV use is                          | LUNA2000 Modbus/EMMA            | Checks whether excess PV is set to feed-in or charge battery                        |
 | Remote charge/discharge mode is           | LUNA2000 Modbus                 | Checks the current remote dispatch control mode                                     |

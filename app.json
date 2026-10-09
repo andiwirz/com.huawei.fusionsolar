@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.280",
+  "version": "1.2.281",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -8675,7 +8675,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=luna2000_modbus"
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_openapi_fusionsolar"
           },
           {
             "type": "dropdown",
@@ -14248,7 +14248,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=luna2000_modbus"
+            "filter": "driver_id=luna2000_modbus||driver_id=luna2000_openapi_fusionsolar"
           },
           {
             "type": "dropdown",

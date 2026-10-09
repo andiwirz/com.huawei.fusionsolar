@@ -33,7 +33,8 @@ module.exports = {
 
     // Status: prefer luna2000_battery_status, derive from power if not available
     let status = cap(luna, 'luna2000_battery_status', null)
-              ?? cap(lunaOa, 'openapi_battery_status', null)
+              ?? cap(lunaOa, 'luna2000_battery_status', null)    // since 1.2.281
+              ?? cap(lunaOa, 'openapi_battery_status', null)     // until the device has moved over
               ?? cap(ispBatt, 'openapi_battery_status', null);
     if (status === null && powerW !== null) {
       if (powerW > 50)       status = 'charging';

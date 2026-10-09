@@ -44,6 +44,7 @@ function fakeBattery({ timeline = true, caps = [] } = {}) {
   d.getCapabilityValue = (c) => (c in d.values ? d.values[c] : null);
   d._set = async (c, v) => { if (v !== null && v !== undefined && d.caps.has(c)) d.values[c] = v; };
   d.homey = {
+    __: (k) => ({ 'modbus.battery.state.full': 'Full', 'modbus.battery.state.empty': 'Empty' }[k] || k),
     notifications: { createNotification: async ({ excerpt }) => { d.notes.push(excerpt); } },
     flow: { getDeviceTriggerCard: () => ({ trigger: async () => {} }) },
   };
@@ -127,18 +128,18 @@ test('the health row is not in the unconditional add list any more', () => {
 // switch. The cloud drivers had neither the announcement nor the switch.
 
 test('a battery status change is announced once', async () => {
-  const d = fakeBattery({ caps: ['openapi_battery_status'] });
+  const d = fakeBattery({ caps: ['luna2000_battery_status'] });
   await pollBatt(d, { battery_status: 2 });                       // Running — first reading
   assert.deepStrictEqual(d.notes, [],
     'the first reading after a restart was announced as though it were a change');
-  await pollBatt(d, { battery_status: 3 });                       // Faulty
-  assert.deepStrictEqual(d.notes, ['Battery: Faulty']);
+  await pollBatt(d, { battery_status: 3 });                       // Fault — Huawei's code 3, in the Modbus driver's words
+  assert.deepStrictEqual(d.notes, ['Battery: Fault']);
   await pollBatt(d, { battery_status: 3 });
   assert.strictEqual(d.notes.length, 1, 'an unchanged status is announced again every poll');
 });
 
 test('the battery switch turns the announcement off', async () => {
-  const d = fakeBattery({ timeline: false, caps: ['openapi_battery_status'] });
+  const d = fakeBattery({ timeline: false, caps: ['luna2000_battery_status'] });
   await pollBatt(d, { battery_status: 2 });
   await pollBatt(d, { battery_status: 3 });
   assert.deepStrictEqual(d.notes, [], 'the setting is declared but nothing reads it');
