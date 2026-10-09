@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.284",
+  "version": "1.2.285",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -1928,7 +1928,7 @@
               "hint": {
                 "en": "The full FusionSolar Kiosk URL ending in ?kk=... — valid for 1 year. To renew: Monitoring → select plant → Kiosk View → copy URL.",
                 "de": "Die vollständige FusionSolar Kiosk URL mit ?kk=... — gültig für 1 Jahr. Erneuern: Überwachung → Anlage wählen → Kiosk-Ansicht → URL kopieren.",
-                "nl": "De volledige FusionSolar Kiosk-URL die eindigt op ?kk=... — één jaar geldig. Vernieuwen: Monitoring → installatie kiezen → Kiosk View → URL kopiëren."
+                "nl": "De volledige FusionSolar Kiosk-URL die eindigt op ?kk=... — 1 jaar geldig. Vernieuwen: Monitoring → installatie kiezen → Kiosk View → URL kopiëren."
               },
               "highlight": true
             },
@@ -2512,9 +2512,9 @@
                 }
               ],
               "hint": {
-                "en": "If set to SCharger-7KS-S0 and 'Number of phases' is set to 3, saving is rejected with an error.",
-                "de": "Wenn auf SCharger-7KS-S0 gesetzt und 'Anzahl der Phasen' auf 3, wird das Speichern mit einem Fehler abgelehnt.",
-                "nl": "Als dit is ingesteld op SCharger-7KS-S0 en 'Aantal fasen' op 3, wordt opslaan geweigerd."
+                "en": "Which Huawei charger this is — it is not read from the charger. With \"SCharger-7KS-S0 (Mono-Phase only)\" or \"SCharger-22KT-S0 (Mono-Phase or Tri-Phase)\" the app reckons with Huawei spreading the charging power across all connected phases, and refuses a charging current that would then fall below 6 A per phase. The 7KS-S0 is single-phase only: with \"Number of phases\" at 3 the save is refused. \"Other / not sure\" checks the 6 A only for the phases requested.",
+                "de": "Welche Huawei-Ladestation das ist – wird nicht von ihr ausgelesen. Mit „SCharger-7KS-S0 (nur Mono-Phase)“ oder „SCharger-22KT-S0 (Mono-Phase oder Tri-Phase)“ rechnet die App damit, dass Huawei die Ladeleistung immer auf alle angeschlossenen Phasen verteilt, und lehnt einen Ladestrom ab, der dabei unter 6 A pro Phase fiele. Der 7KS-S0 ist nur einphasig: Mit „Anzahl der Phasen“ auf 3 wird das Speichern abgelehnt. „Andere / nicht sicher“ prüft die 6 A nur für die angeforderten Phasen.",
+                "nl": "Welke Huawei-laadpaal dit is – wordt niet van de laadpaal uitgelezen. Met „SCharger-7KS-S0 (alleen Mono-Phase)” of „SCharger-22KT-S0 (Mono-Phase of Tri-Phase)” houdt de app er rekening mee dat Huawei het laadvermogen altijd over alle aangesloten fasen verdeelt, en weigert een laadstroom die daardoor onder 6 A per fase zou komen. De 7KS-S0 is alleen eenfasig: met „Aantal fasen” op 3 wordt het opslaan geweigerd. „Anders / niet zeker” controleert de 6 A alleen voor de gevraagde fasen."
               }
             },
             {
@@ -2546,9 +2546,9 @@
                 }
               ],
               "hint": {
-                "en": "How your charger is wired — Mono-Phase or Tri-Phase. Never auto-detected — check your charger installation and set this to match.",
-                "de": "Wie deine Ladestation verkabelt ist — Mono-Phase oder Tri-Phase. Wird nie automatisch erkannt — überprüfe die Installation und stelle es entsprechend ein.",
-                "nl": "Hoe je lader is aangesloten — Mono-Phase of Tri-Phase. Nooit automatisch gedetecteerd — controleer de installatie en stel dit dienovereenkomstig in."
+                "en": "How your charger is wired — Mono-Phase or Tri-Phase. Never auto-detected — check your charger installation and set this to match. The app uses it to turn power into charging current (power = current × 230 V × phases).",
+                "de": "Wie deine Ladestation verkabelt ist — Mono-Phase oder Tri-Phase. Wird nie automatisch erkannt — überprüfe die Installation und stelle es entsprechend ein. Die App rechnet damit Leistung in Ladestrom um (Leistung = Strom × 230 V × Phasen).",
+                "nl": "Hoe je lader is aangesloten — Mono-Phase of Tri-Phase. Nooit automatisch gedetecteerd — controleer de installatie en stel dit dienovereenkomstig in. De app rekent er vermogen mee om naar laadstroom (vermogen = stroom × 230 V × fasen)."
               }
             }
           ]
@@ -3295,9 +3295,9 @@
               "min": 1,
               "max": 65535,
               "hint": {
-                "en": "Default 502. SDongle typically uses 6607.",
-                "de": "Standard 502. SDongle verwendet typischerweise 6607.",
-                "nl": "Standaard 502. SDongle gebruikt meestal 6607."
+                "en": "Default 502, also for the SDongle. 6607 only when connecting through the inverter's built-in WLAN access point (then usually IP 192.168.200.1 and unit ID 0).",
+                "de": "Standard 502, auch beim SDongle. 6607 nur, wenn die Verbindung über den eingebauten WLAN-Zugangspunkt des Wechselrichters läuft (dann meist IP 192.168.200.1 und Geräte-ID 0).",
+                "nl": "Standaard 502, ook bij de SDongle. 6607 alleen als je verbindt via het ingebouwde wifi-toegangspunt van de omvormer (dan meestal IP 192.168.200.1 en apparaat-ID 0)."
               }
             },
             {
@@ -3359,9 +3359,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "How the inverter limits what it feeds into the grid (register 47415). The \"Limited by Power\" modes need a power meter, and use the limits set below. If your house connection depends on a feed-in limit, check this after every change. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Wie der Wechselrichter begrenzt, was er ins Netz einspeist (Register 47415). Die Modi „Leistungsbegrenzt“ brauchen einen Stromzähler und verwenden die Grenzen weiter unten. Hängt dein Hausanschluss an einer Einspeisegrenze, prüfe ihn nach jeder Änderung. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Hoe de omvormer begrenst wat hij aan het net levert (register 47415). De modi „Vermogensbegrensd” hebben een energiemeter nodig en gebruiken de limieten hieronder. Hangt je aansluiting af van een terugleverlimiet, controleer dit dan na elke wijziging. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "How the inverter limits what it feeds into the grid (register 47415). Written to the device only when you press Save; the device tile shows the mode but cannot change it. If your house connection depends on a feed-in limit, check this after every change.\n\"Unlimited\" — Huawei's default: no limit, the inverter feeds in whatever is left over.\n\"DI Active Scheduling\": follows the signals on the inverter's digital inputs (DI), for example from the grid operator's ripple control receiver.\n\"Zero Power Grid Connection\": regulates so that nothing is fed into the grid at the connection point.\n\"Limited by Power (kW)\" and \"Limited by Power (%)\": cap the feed-in at the connection point at \"Max feed-in power (W)\" or \"Max feed-in power (%)\" below.\nThese three need a power meter at the grid connection (Smart Power Sensor); without one, only the output limit further down helps.",
+                "de": "Wie der Wechselrichter begrenzt, was er ins Netz einspeist (Register 47415). Wird erst beim Speichern auf das Gerät geschrieben; die Gerätekachel zeigt den Modus an, kann ihn aber nicht ändern. Hängt dein Hausanschluss an einer Einspeisegrenze, prüfe ihn nach jeder Änderung.\n„Unbegrenzt“ – Huaweis Standard: keine Begrenzung, der Wechselrichter speist ein, was übrig bleibt.\n„DI Aktive Planung“: folgt den Signalen an den Digitaleingängen (DI) des Wechselrichters, etwa vom Rundsteuerempfänger des Netzbetreibers.\n„Nulleinspeisung“: regelt so, dass am Netzanschluss nichts eingespeist wird.\n„Leistungsbegrenzt (kW)“ und „Leistungsbegrenzt (%)“: begrenzen die Einspeisung am Netzanschluss auf „Maximale Einspeiseleistung (W)“ bzw. „Maximale Einspeiseleistung (%)“ weiter unten.\nDiese drei brauchen einen Stromzähler am Netzanschluss (Smart Power Sensor); ohne ihn hilft nur die Ausgangsbegrenzung weiter unten.",
+                "nl": "Hoe de omvormer begrenst wat hij aan het net levert (register 47415). Wordt pas naar het apparaat geschreven als je op Opslaan drukt; de apparaattegel toont de modus, maar kan hem niet wijzigen. Hangt je aansluiting af van een terugleverlimiet, controleer dit dan na elke wijziging.\n„Onbeperkt” – standaard bij Huawei: geen begrenzing, de omvormer levert terug wat overblijft.\n„DI Actieve planning”: volgt de signalen op de digitale ingangen (DI) van de omvormer, bijvoorbeeld van de rimpelspanningsontvanger van de netbeheerder.\n„Nul-invoeding”: regelt zo dat er op het aansluitpunt niets aan het net wordt geleverd.\n„Vermogensbegrensd (kW)” en „Vermogensbegrensd (%)”: begrenzen de teruglevering op het aansluitpunt tot „Maximaal terugleververmogen (W)” of „Maximaal terugleververmogen (%)” hieronder.\nDeze drie hebben een energiemeter op de netaansluiting nodig (Smart Power Sensor); zonder meter helpt alleen de uitgangsbegrenzing verderop."
               },
               "values": [
                 {
@@ -4009,9 +4009,9 @@
               "min": 1,
               "max": 65535,
               "hint": {
-                "en": "Default 502. SDongle typically uses 6607.",
-                "de": "Standard 502. SDongle verwendet typischerweise 6607.",
-                "nl": "Standaard 502. SDongle gebruikt meestal 6607."
+                "en": "Default 502, also for the SDongle. 6607 only when connecting through the inverter's built-in WLAN access point (then usually IP 192.168.200.1 and unit ID 0).",
+                "de": "Standard 502, auch beim SDongle. 6607 nur, wenn die Verbindung über den eingebauten WLAN-Zugangspunkt des Wechselrichters läuft (dann meist IP 192.168.200.1 und Geräte-ID 0).",
+                "nl": "Standaard 502, ook bij de SDongle. 6607 alleen als je verbindt via het ingebouwde wifi-toegangspunt van de omvormer (dan meestal IP 192.168.200.1 en apparaat-ID 0)."
               }
             },
             {
@@ -4146,9 +4146,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "Where surplus solar goes while the working mode is Time of Use: into the grid, or into the battery. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung“ ist: ins Netz oder in die Batterie. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus Time of Use is: naar het net of naar de batterij. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "Where surplus solar goes while the working mode is \"Time of Use (LUNA2000)\" (register 47299). Written to the device only when you press Save; the device tile shows the mode but cannot change it.\n\"Charge Battery\": surplus charges the battery first; only once it is full, or charging at full power, does the rest go into the grid.\n\"Feed to Grid\": surplus goes into the grid first; only what exceeds the inverter's maximum output charges the battery. Meant for a feed-in tariff higher than the electricity price — the battery then serves mainly as a reserve.",
+                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung (LUNA2000)“ ist (Register 47299). Wird erst beim Speichern auf das Gerät geschrieben; die Gerätekachel zeigt den Modus an, kann ihn aber nicht ändern.\n„Batterie laden“: Der Überschuss lädt zuerst die Batterie; erst wenn sie voll ist oder mit voller Leistung lädt, geht der Rest ins Netz.\n„Ins Netz einspeisen“: Der Überschuss geht zuerst ins Netz; nur was die maximale Ausgangsleistung des Wechselrichters übersteigt, lädt die Batterie. Gedacht für eine Einspeisevergütung, die höher ist als der Strompreis – die Batterie dient dann vor allem als Reserve.",
+                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus „Time of Use (LUNA2000)” is (register 47299). Wordt pas naar het apparaat geschreven als je op Opslaan drukt; de apparaattegel toont de modus, maar kan hem niet wijzigen.\n„Batterij laden”: het overschot laadt eerst de batterij; pas als die vol is of op vol vermogen laadt, gaat de rest naar het net.\n„Terugleveren aan net”: het overschot gaat eerst naar het net; alleen wat boven het maximale vermogen van de omvormer uitkomt, laadt de batterij. Bedoeld voor een terugleververgoeding die hoger is dan de stroomprijs – de batterij dient dan vooral als reserve."
               },
               "values": [
                 {
@@ -4179,9 +4179,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "Who may command the battery from outside — a different question from the working mode, which is why both exist. Keep \"Local Control\" unless a third-party scheduler really is talking to the inverter: any other value overrides the working mode, and without such a scheduler the battery then behaves unpredictably. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Wer die Batterie von aussen befehlen darf — eine andere Frage als der Betriebsmodus, deshalb gibt es beide. „Lokale Steuerung“ beibehalten, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht: Jeder andere Wert setzt den Betriebsmodus ausser Kraft, und ohne solchen Regler verhält sich die Batterie danach unvorhersehbar. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Wie de batterij van buitenaf mag aansturen — een andere vraag dan de bedrijfsmodus, daarom bestaan ze allebei. Houd „Lokale sturing” aan, tenzij er echt een externe regelaar met de omvormer praat: elke andere waarde heft de bedrijfsmodus op, en zonder zo'n regelaar gedraagt de batterij zich daarna onvoorspelbaar. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "Who may command the battery from outside (register 47589) — a different question from the working mode, which is why both exist. Keep \"Local Control\" unless a third-party scheduler really is talking to the inverter: any other value overrides the working mode, and without such a scheduler the battery then behaves unpredictably. Written to the device only when you press Save. The device tile shows this mode but cannot change it.\n\"Remote: Max Self-Consumption\", \"Remote: Fully Fed to Grid\" and \"Remote: Time of Use\" run the battery in the working mode of the same name, but on command from outside; \"Remote: AI Control\" hands it to Huawei's AI energy management, \"Remote: Three-party Scheduling\" to an outside platform.",
+                "de": "Wer die Batterie von aussen befehlen darf (Register 47589) — eine andere Frage als der Betriebsmodus, deshalb gibt es beide. „Lokale Steuerung“ beibehalten, solange nicht wirklich ein Fremdregler mit dem Wechselrichter spricht: Jeder andere Wert setzt den Betriebsmodus ausser Kraft, und ohne solchen Regler verhält sich die Batterie danach unvorhersehbar. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.\n„Fern: Max Eigenverbrauch“, „Fern: Volleinspeisung“ und „Fern: Zeitabhängige Nutzung“ lassen die Batterie im gleichnamigen Betriebsmodus laufen, aber auf Befehl von aussen; „Fern: KI-Steuerung“ überlässt sie Huaweis KI-Energiemanagement, „Fern: Drittanbieter-Steuerung“ einer fremden Plattform.",
+                "nl": "Wie de batterij van buitenaf mag aansturen (register 47589) — een andere vraag dan de bedrijfsmodus, daarom bestaan ze allebei. Houd „Lokale sturing” aan, tenzij er echt een externe regelaar met de omvormer praat: elke andere waarde heft de bedrijfsmodus op, en zonder zo'n regelaar gedraagt de batterij zich daarna onvoorspelbaar. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen.\n„Afstand: Max eigenverbruik”, „Afstand: Volledig terugleveren” en „Afstand: Time of Use” laten de batterij in de gelijknamige bedrijfsmodus draaien, maar op commando van buitenaf; „Afstand: KI-sturing” laat haar over aan het AI-energiebeheer van Huawei, „Afstand: Derden-sturing” aan een extern platform."
               },
               "values": [
                 {
@@ -4407,9 +4407,9 @@
               "max": 20,
               "step": 1,
               "hint": {
-                "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %, default 15 %. If PV modules are connected, the configured value applies. If none are connected and the value is below 15 %, 15 % applies. Synced from the inverter on every poll.",
-                "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %, Standard 15 %. Sind PV-Module angeschlossen, gilt der eingestellte Wert. Sind keine angeschlossen und liegt der Wert unter 15 %, gelten 15 %. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
-                "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %, standaard 15 %. Zijn er PV-modules aanwezig, dan geldt de ingestelde waarde. Zijn er geen PV-modules aanwezig en ligt de ingestelde waarde onder 15 %, dan wordt 15 % aangehouden. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
+                "en": "Minimum SoC the battery discharges to (register 47082). Range: 0–20 %. Without PV modules, or when the system has not seen sunlight for at least 24 hours, at least 15 % applies. Huawei advises against 0 %: a battery left empty loses capacity for good. Synced from the inverter on every poll.",
+                "de": "Minimaler Ladezustand, bis zu dem die Batterie entladen wird (Register 47082). Bereich: 0–20 %. Ohne PV-Module, oder wenn die Anlage seit mindestens 24 Stunden keine Sonne erkannt hat, gelten mindestens 15 %. Huawei rät von 0 % ab: Bleibt die Batterie leer, verliert sie dauerhaft Kapazität. Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
+                "nl": "Minimale laadtoestand waartoe de batterij wordt ontladen (register 47082). Bereik: 0–20 %. Zonder PV-modules, of als de installatie al minstens 24 uur geen zon heeft gezien, geldt minstens 15 %. Huawei raadt 0 % af: een batterij die leeg blijft, verliest blijvend capaciteit. Wordt bij elke uitlezing met de omvormer gesynchroniseerd."
               }
             },
             {
@@ -4450,9 +4450,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "Lets the battery cover load peaks so the power drawn from the grid stays under a limit (register 47954). The limits per time period are set in the FusionSolar app — this app does not write them, so set them there first. \"Apparent power limit\" works only in systems with several inverters. Written to the device only when you press Save.",
-                "de": "Lässt die Batterie Lastspitzen abdecken, damit der Netzbezug unter einer Grenze bleibt (Register 47954). Die Grenzen pro Zeitraum werden in der FusionSolar-App gesetzt — diese App schreibt sie nicht, deshalb zuerst dort einstellen. „Scheinleistungsbegrenzung“ funktioniert nur in Anlagen mit mehreren Wechselrichtern. Wird erst beim Speichern auf das Gerät geschrieben.",
-                "nl": "Laat de batterij belastingspieken opvangen, zodat de afname uit het net onder een grens blijft (register 47954). De grenzen per periode worden in de FusionSolar-app ingesteld — deze app schrijft ze niet, stel ze daar dus eerst in. „Begrenzing schijnbaar vermogen” werkt alleen in installaties met meerdere omvormers. Wordt pas naar het apparaat geschreven als je op Opslaan drukt."
+                "en": "Lets the battery cover load peaks so the power drawn from the grid stays under a limit (register 47954). The limits per time period are set in the FusionSolar app — this app does not write them, so set them there first. \"Disabled\" switches it off. \"Active power limit\" keeps the active power drawn from the grid (kW) under the limit; \"Apparent power limit (several inverters only)\" does the same for the apparent power (kVA) and works only in systems with several inverters. Written to the device only when you press Save.",
+                "de": "Lässt die Batterie Lastspitzen abdecken, damit der Netzbezug unter einer Grenze bleibt (Register 47954). Die Grenzen pro Zeitraum werden in der FusionSolar-App gesetzt — diese App schreibt sie nicht, deshalb zuerst dort einstellen. „Deaktiviert“ schaltet sie aus. „Wirkleistungsbegrenzung“ hält die aus dem Netz bezogene Wirkleistung (kW) unter der Grenze; „Scheinleistungsbegrenzung (nur mit mehreren Wechselrichtern)“ tut dasselbe für die Scheinleistung (kVA) und funktioniert nur in Anlagen mit mehreren Wechselrichtern. Wird erst beim Speichern auf das Gerät geschrieben.",
+                "nl": "Laat de batterij belastingspieken opvangen, zodat de afname uit het net onder een grens blijft (register 47954). De grenzen per periode worden in de FusionSolar-app ingesteld — deze app schrijft ze niet, stel ze daar dus eerst in. „Uitgeschakeld” zet haar uit. „Begrenzing werkzaam vermogen” houdt het werkzaam vermogen dat uit het net wordt afgenomen (kW) onder de grens; „Begrenzing schijnbaar vermogen (alleen bij meerdere omvormers)” doet hetzelfde voor het schijnbaar vermogen (kVA) en werkt alleen in installaties met meerdere omvormers. Wordt pas naar het apparaat geschreven als je op Opslaan drukt."
               },
               "values": [
                 {
@@ -4830,9 +4830,9 @@
               },
               "value": "0",
               "hint": {
-                "en": "Where surplus solar goes while the working mode is Time of Use: into the grid, or into the battery. Written to the device only when you press Save. The device tile shows this mode but cannot change it.",
-                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung“ ist: ins Netz oder in die Batterie. Wird erst beim Speichern auf das Gerät geschrieben. Die Gerätekachel zeigt diesen Modus an, kann ihn aber nicht ändern.",
-                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus Time of Use is: naar het net of naar de batterij. Wordt pas naar het apparaat geschreven als je op Opslaan drukt. De apparaattegel toont deze modus, maar kan hem niet wijzigen."
+                "en": "Where surplus solar goes while the working mode is \"Time of Use (LUNA2000)\" (EMMA register 40001). Written to the device only when you press Save; the device tile shows the mode but cannot change it.\n\"Charge Battery\": surplus charges the battery first; only once it is full, or charging at full power, does the rest go into the grid.\n\"Feed to Grid\": surplus goes into the grid first; only what exceeds the inverter's maximum output charges the battery. Meant for a feed-in tariff higher than the electricity price — the battery then serves mainly as a reserve.",
+                "de": "Wohin Solarüberschuss geht, solange der Betriebsmodus „Zeitabhängige Nutzung (LUNA2000)“ ist (EMMA-Register 40001). Wird erst beim Speichern auf das Gerät geschrieben; die Gerätekachel zeigt den Modus an, kann ihn aber nicht ändern.\n„Batterie laden“: Der Überschuss lädt zuerst die Batterie; erst wenn sie voll ist oder mit voller Leistung lädt, geht der Rest ins Netz.\n„Ins Netz einspeisen“: Der Überschuss geht zuerst ins Netz; nur was die maximale Ausgangsleistung des Wechselrichters übersteigt, lädt die Batterie. Gedacht für eine Einspeisevergütung, die höher ist als der Strompreis – die Batterie dient dann vor allem als Reserve.",
+                "nl": "Waar het zonne-overschot heen gaat zolang de bedrijfsmodus „Time of Use (LUNA2000)” is (EMMA-register 40001). Wordt pas naar het apparaat geschreven als je op Opslaan drukt; de apparaattegel toont de modus, maar kan hem niet wijzigen.\n„Batterij laden”: het overschot laadt eerst de batterij; pas als die vol is of op vol vermogen laadt, gaat de rest naar het net.\n„Terugleveren aan net”: het overschot gaat eerst naar het net; alleen wat boven het maximale vermogen van de omvormer uitkomt, laadt de batterij. Bedoeld voor een terugleververgoeding die hoger is dan de stroomprijs – de batterij dient dan vooral als reserve."
               },
               "values": [
                 {
@@ -5088,8 +5088,8 @@
               "value": "",
               "hint": {
                 "en": "IP address of the SUN2000 inverter or SDongle the DTSU666 is connected to.",
-                "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem der DTSU666 angeschlossen ist.",
-                "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de DTSU666 is aangesloten."
+                "de": "IP-Adresse des Wechselrichters SUN2000 oder des SDongle, an dem der DTSU666 angeschlossen ist.",
+                "nl": "IP-adres van de SUN2000-omvormer of de SDongle waarop de DTSU666 is aangesloten."
               },
               "highlight": true
             },
@@ -5105,9 +5105,9 @@
               "min": 1,
               "max": 65535,
               "hint": {
-                "en": "Default 502. SDongle typically uses 6607.",
-                "de": "Standard 502. SDongle verwendet typischerweise 6607.",
-                "nl": "Standaard 502. SDongle gebruikt meestal 6607."
+                "en": "Default 502, also for the SDongle. 6607 only when connecting through the inverter's built-in WLAN access point (then usually IP 192.168.200.1 and unit ID 0).",
+                "de": "Standard 502, auch beim SDongle. 6607 nur, wenn die Verbindung über den eingebauten WLAN-Zugangspunkt des Wechselrichters läuft (dann meist IP 192.168.200.1 und Geräte-ID 0).",
+                "nl": "Standaard 502, ook bij de SDongle. 6607 alleen als je verbindt via het ingebouwde wifi-toegangspunt van de omvormer (dan meestal IP 192.168.200.1 en apparaat-ID 0)."
               }
             },
             {
@@ -5123,8 +5123,8 @@
               "max": 247,
               "hint": {
                 "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
-                "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
-                "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
+                "de": "Dieselbe Modbus Geräte-ID wie beim Wechselrichter SUN2000 (Standard: 1).",
+                "nl": "Dezelfde Modbus apparaat-ID als de SUN2000-omvormer (standaard: 1)."
               }
             },
             {
@@ -5744,9 +5744,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -5759,9 +5759,9 @@
               },
               "value": "https://eu5.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -5771,6 +5771,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -5783,6 +5788,11 @@
                 "de": "System Code",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -5792,6 +5802,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -5838,8 +5853,8 @@
               "value": true,
               "hint": {
                 "en": "Show a timeline notification when the inverter status changes.",
-                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Inverterstatus ändert.",
-                "nl": "Toont een tijdlijnmelding wanneer de inverterstatus verandert."
+                "de": "Zeigt eine Timeline-Benachrichtigung, wenn sich der Status des Wechselrichters ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de status van de omvormer verandert."
               }
             }
           ]
@@ -6150,9 +6165,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6165,9 +6180,9 @@
               },
               "value": "https://eu5.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6177,6 +6192,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -6189,6 +6209,11 @@
                 "de": "System Code",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -6198,6 +6223,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -6523,9 +6553,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6538,9 +6568,9 @@
               },
               "value": "https://eu5.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6550,6 +6580,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -6562,6 +6597,11 @@
                 "de": "System Code",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -6571,6 +6611,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -6796,9 +6841,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6811,9 +6856,9 @@
               },
               "value": "https://intl.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -6823,6 +6868,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -6835,6 +6885,11 @@
                 "de": "Systemcode",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -6844,6 +6899,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -7125,9 +7185,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7140,9 +7200,9 @@
               },
               "value": "https://intl.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7152,6 +7212,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -7164,6 +7229,11 @@
                 "de": "Systemcode",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -7173,6 +7243,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -7412,9 +7487,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7427,9 +7502,9 @@
               },
               "value": "https://intl.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7439,6 +7514,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -7451,6 +7531,11 @@
                 "de": "Systemcode",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -7460,6 +7545,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -7672,9 +7762,9 @@
                 }
               ],
               "hint": {
-                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Regional FusionSolar server. For an address that is not listed, choose \"Other (use Server URL below)\" and enter it under \"Server URL\". Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse „Andere (Server URL unten verwenden)“ wählen und sie unter „Server URL“ eintragen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Voor een adres dat er niet bij staat: kies „Anders (Server-URL hieronder gebruiken)” en vul het in bij „Server-URL”. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7687,9 +7777,9 @@
               },
               "value": "https://intl.fusionsolar.huawei.com",
               "hint": {
-                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+                "en": "Only used when \"Server\" is set to \"Other (use Server URL below)\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn „Server“ auf „Andere (Server URL unten verwenden)“ steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als „Server” op „Anders (Server-URL hieronder gebruiken)” staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
@@ -7699,6 +7789,11 @@
                 "en": "Username",
                 "de": "Benutzername",
                 "nl": "Gebruikersnaam"
+              },
+              "hint": {
+                "en": "User name of the FusionSolar Northbound API account, as entered when pairing. A change applies to every OpenAPI device of the same plant.",
+                "de": "Benutzername des Northbound-API-Kontos von FusionSolar, wie beim Koppeln eingegeben. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Gebruikersnaam van het FusionSolar Northbound-API-account, zoals bij het koppelen ingevoerd. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               },
               "value": "",
               "highlight": true
@@ -7711,6 +7806,11 @@
                 "de": "Systemcode",
                 "nl": "Systeemcode"
               },
+              "hint": {
+                "en": "The password of the Northbound API account — FusionSolar calls it the system code. A change applies to every OpenAPI device of the same plant.",
+                "de": "Das Passwort des Northbound-API-Kontos – FusionSolar nennt es System Code. Eine Änderung gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Het wachtwoord van het Northbound-API-account – FusionSolar noemt het systeemcode. Een wijziging geldt voor alle OpenAPI-apparaten van dezelfde installatie."
+              },
               "value": ""
             },
             {
@@ -7720,6 +7820,11 @@
                 "en": "Station Code",
                 "de": "Anlagencode",
                 "nl": "Installatiecode"
+              },
+              "hint": {
+                "en": "The plant's code at FusionSolar (looks like NE=12345678), chosen when pairing. Changing it moves only this device to another plant.",
+                "de": "Kennung der Anlage bei FusionSolar (sieht aus wie NE=12345678), beim Koppeln gewählt. Eine Änderung verbindet nur dieses Gerät mit einer anderen Anlage.",
+                "nl": "De code van de installatie bij FusionSolar (ziet eruit als NE=12345678), bij het koppelen gekozen. Een wijziging verbindt alleen dit apparaat met een andere installatie."
               },
               "value": ""
             },
@@ -7861,9 +7966,9 @@
               "min": 1,
               "max": 65535,
               "hint": {
-                "en": "Default 502. SDongle A alternatively uses 6607.",
-                "de": "Standard 502. SDongle A alternativ 6607.",
-                "nl": "Standaard 502. SDongle A gebruikt daarnaast 6607."
+                "en": "Default 502. (6607 is the port of the inverter's built-in WLAN access point, not of the SDongle.)",
+                "de": "Standard 502. (6607 ist der Port des eingebauten WLAN-Zugangspunkts im Wechselrichter, nicht der des SDongle.)",
+                "nl": "Standaard 502. (6607 is de poort van het ingebouwde wifi-toegangspunt van de omvormer, niet van de SDongle.)"
               }
             },
             {
@@ -8028,9 +8133,9 @@
                 "nl": "Tijdlijn-meldingen"
               },
               "hint": {
-                "en": "Post to the Homey Timeline when EMS starts or stops a device, or when the battery SOC crosses a threshold.",
-                "de": "Im Homey-Timeline posten wenn EMS ein Gerät ein- oder ausschaltet oder der Batterie-SOC einen Schwellenwert erreicht.",
-                "nl": "Plaats een bericht op de Homey-tijdlijn wanneer EMS een apparaat in- of uitschakelt, of wanneer het laadniveau van de batterij een drempel passeert."
+                "en": "Post to the Homey Timeline when EMS starts or stops a device, when the battery is full or low, when the price forecast has not been updated for hours, and when an EMS cycle overruns.",
+                "de": "Postet in die Homey-Timeline, wenn EMS ein Gerät startet oder stoppt, wenn die Batterie voll oder niedrig ist, wenn die Preisprognose seit Stunden nicht aktualisiert wurde und wenn ein EMS-Durchlauf überlastet ist.",
+                "nl": "Plaatst een bericht op de Homey-tijdlijn wanneer EMS een apparaat start of stopt, wanneer de batterij vol of bijna leeg is, wanneer de prijsprognose al uren niet is bijgewerkt en wanneer een EMS-ronde overbelast raakt."
               },
               "value": true
             }
