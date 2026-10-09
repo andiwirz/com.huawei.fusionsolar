@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.285",
+  "version": "1.2.286",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -3462,9 +3462,9 @@
               "max": 100000,
               "step": 1,
               "hint": {
-                "en": "Maximum AC output of the inverter in watts (register 40126). This is a ceiling — actual production stays at the natural PV level when sun is weaker, and is throttled to this value only when sun would otherwise produce more. Set to 0 to fully shut down the inverter. Works WITHOUT a Smart Power Sensor. Set above rated power × 1.1 to effectively disable the limit. Synced from the inverter every 5 poll cycles.",
-                "de": "Maximale AC-Ausgangsleistung des Wechselrichters in Watt (Register 40126). Dies ist eine Obergrenze — die tatsächliche Erzeugung folgt der PV-Leistung wenn sie geringer ist, und wird nur auf diesen Wert begrenzt wenn die Sonne sonst mehr liefern würde. Auf 0 setzen schaltet den Wechselrichter komplett ab. Funktioniert OHNE Smart Power Sensor. Über Nennleistung × 1.1 setzen hebt die Begrenzung effektiv auf. Wird alle 5 Abfragezyklen synchronisiert.",
-                "nl": "Maximaal AC-uitgangsvermogen van de omvormer in watt (register 40126). Dit is een bovengrens — de werkelijke opbrengst volgt gewoon de PV-opbrengst zolang die lager is, en wordt alleen tot deze waarde teruggeregeld wanneer de zon anders meer zou leveren. Op 0 zetten schakelt de omvormer volledig uit. Werkt ZONDER Smart Power Sensor. Boven nominaal vermogen × 1,1 instellen heft de begrenzing feitelijk op. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
+                "en": "Maximum AC output of the inverter in watts (register 40126). This is a ceiling — actual production stays at the natural PV level when sun is weaker, and is throttled to this value only when sun would otherwise produce more. Set to 0 to fully shut down the inverter. Works WITHOUT a Smart Power Sensor. Rated power × 1.1 lifts the limit; the inverter may refuse a higher value. Synced from the inverter every 5 poll cycles.",
+                "de": "Maximale AC-Ausgangsleistung des Wechselrichters in Watt (Register 40126). Dies ist eine Obergrenze — die tatsächliche Erzeugung folgt der PV-Leistung wenn sie geringer ist, und wird nur auf diesen Wert begrenzt wenn die Sonne sonst mehr liefern würde. Auf 0 setzen schaltet den Wechselrichter komplett ab. Funktioniert OHNE Smart Power Sensor. Nennleistung × 1.1 hebt die Begrenzung auf; einen höheren Wert kann der Wechselrichter ablehnen. Wird alle 5 Abfragezyklen synchronisiert.",
+                "nl": "Maximaal AC-uitgangsvermogen van de omvormer in watt (register 40126). Dit is een bovengrens — de werkelijke opbrengst volgt gewoon de PV-opbrengst zolang die lager is, en wordt alleen tot deze waarde teruggeregeld wanneer de zon anders meer zou leveren. Op 0 zetten schakelt de omvormer volledig uit. Werkt ZONDER Smart Power Sensor. Nominaal vermogen × 1,1 heft de begrenzing op; een hogere waarde kan de omvormer weigeren. Wordt elke 5 uitleescycli met de omvormer gesynchroniseerd."
               }
             },
             {
@@ -8179,9 +8179,9 @@
           "nl": "Vermogensafgifte gewijzigd"
         },
         "hint": {
-          "en": "Fires when the plant's current power output changes. Use the Power token to react to the new value.",
-          "de": "Wird ausgelöst, wenn sich die aktuelle Leistungsabgabe der Anlage ändert. Das Token Leistung enthält den neuen Wert.",
-          "nl": "Wordt geactiveerd wanneer het actuele vermogen van de installatie verandert. Gebruik het token Vermogen om op de nieuwe waarde te reageren."
+          "en": "Fires on every successful kiosk update (every 10 minutes by default) with the plant's current power — also when it has not changed. The Power token holds the value.",
+          "de": "Wird bei jeder erfolgreichen Kiosk-Abfrage (standardmässig alle 10 Minuten) mit der aktuellen Leistung der Anlage ausgelöst – auch wenn sie sich nicht geändert hat. Das Token Leistung enthält den Wert.",
+          "nl": "Wordt bij elke geslaagde kiosk-update (standaard elke 10 minuten) geactiveerd met het actuele vermogen van de installatie – ook als het niet is veranderd. Het token Vermogen bevat de waarde."
         },
         "args": [
           {
@@ -8210,9 +8210,9 @@
           "nl": "Dagopbrengst bijgewerkt"
         },
         "hint": {
-          "en": "Fires when the plant's daily energy yield is updated. Note: Huawei caches data for ~30 minutes, so updates may be infrequent.",
-          "de": "Wird ausgelöst, wenn der Tagesertrag der Anlage aktualisiert wird. Huawei cached Daten ~30 Minuten, daher kann das Intervall variieren.",
-          "nl": "Wordt geactiveerd wanneer de dagopbrengst van de installatie wordt bijgewerkt. Let op: Huawei bewaart gegevens ongeveer 30 minuten in de cache, dus dit gebeurt niet vaak."
+          "en": "Fires on every successful kiosk update with the plant's daily yield. Huawei refreshes that figure only about every 30 minutes, so consecutive values are often the same.",
+          "de": "Wird bei jeder erfolgreichen Kiosk-Abfrage mit dem Tagesertrag der Anlage ausgelöst. Huawei aktualisiert den Wert nur etwa alle 30 Minuten, aufeinanderfolgende Werte sind daher oft gleich.",
+          "nl": "Wordt bij elke geslaagde kiosk-update geactiveerd met de dagopbrengst van de installatie. Huawei ververst die waarde maar ongeveer elke 30 minuten, opeenvolgende waarden zijn dus vaak gelijk."
         },
         "args": [
           {
@@ -8241,9 +8241,9 @@
           "nl": "Vermogensafgifte gewijzigd"
         },
         "hint": {
-          "en": "Fires when the inverter's active power output changes. Reads the current value from the SUN2000 via Modbus.",
-          "de": "Wird ausgelöst, wenn sich die Wirkleistungsabgabe des Wechselrichters ändert. Der Wert wird über Modbus vom SUN2000 gelesen.",
-          "nl": "Wordt geactiveerd wanneer het actieve vermogen van de omvormer verandert. De actuele waarde wordt via Modbus van de SUN2000 gelezen."
+          "en": "Fires when the solar power the device reports changes: the PV input power (register 32064) on a SUN2000 via Modbus, the PV power read from the EMMA (register 30354) on an inverter connected through EMMA.",
+          "de": "Wird ausgelöst, wenn sich die gemeldete Solarleistung ändert: beim SUN2000 über Modbus die PV-Eingangsleistung (Register 32064), bei einem Wechselrichter über EMMA die PV-Leistung der EMMA (Register 30354).",
+          "nl": "Wordt geactiveerd wanneer het gemelde zonnevermogen verandert: bij een SUN2000 via Modbus het PV-ingangsvermogen (register 32064), bij een omvormer via EMMA het PV-vermogen van de EMMA (register 30354)."
         },
         "args": [
           {
@@ -8548,9 +8548,9 @@
           "nl": "Vermogensafgifte gewijzigd"
         },
         "hint": {
-          "en": "Fires when the inverter's active power output changes. Reads the current value via the FusionSolar OpenAPI.",
-          "de": "Wird ausgelöst, wenn sich die Wirkleistungsabgabe des Wechselrichters ändert. Der Wert wird über die FusionSolar OpenAPI abgerufen.",
-          "nl": "Wordt geactiveerd wanneer het actieve vermogen van de omvormer verandert. De actuele waarde wordt via de FusionSolar OpenAPI opgehaald."
+          "en": "Fires on every FusionSolar OpenAPI update with the inverter's AC active power — also when the value has not changed.",
+          "de": "Wird bei jeder Aktualisierung über die FusionSolar OpenAPI mit der AC-Wirkleistung des Wechselrichters ausgelöst – auch wenn sich der Wert nicht geändert hat.",
+          "nl": "Wordt bij elke update via de FusionSolar OpenAPI geactiveerd met het AC-werkzaam vermogen van de omvormer – ook als de waarde niet is veranderd."
         },
         "args": [
           {
@@ -8673,7 +8673,7 @@
         },
         "hint": {
           "en": "Fires when the meter switches from importing to exporting — i.e. when surplus PV power starts flowing back to the grid.",
-          "de": "Wird ausgelöst, wenn der Zähler von Netzbezug auf Einspeisung wechselt — d.h. wenn überschüssige PV-Energie ins Netz fließt.",
+          "de": "Wird ausgelöst, wenn der Zähler von Netzbezug auf Einspeisung wechselt — d.h. wenn überschüssige PV-Energie ins Netz fliesst.",
           "nl": "Wordt geactiveerd wanneer de meter overgaat van afname naar teruglevering — dus wanneer overtollige PV-energie naar het net begint te stromen."
         },
         "args": [
@@ -8734,9 +8734,9 @@
           "nl": "SoC voor noodstroom gewijzigd"
         },
         "hint": {
-          "en": "Fires whenever the backup power reserve (register 47102) changes — whether you changed it here, in FusionSolar, or on the inverter itself. The token holds the new percentage, which is what you need to keep another setting a fixed margin above it.",
-          "de": "Wird ausgelöst, sobald sich die Backup-Reserve (Register 47102) ändert — gleich, ob du sie hier, in FusionSolar oder am Wechselrichter geändert hast. Das Token enthält den neuen Prozentwert, mit dem sich eine andere Einstellung stets in festem Abstand darüber halten lässt.",
-          "nl": "Wordt geactiveerd zodra de gereserveerde noodstroomcapaciteit (register 47102) verandert, of je die nu hier, in FusionSolar of op de omvormer zelf hebt gewijzigd. Het token bevat het nieuwe percentage."
+          "en": "Fires whenever the backup power reserve (register 47102 on a LUNA2000 via the inverter, 30373 via EMMA) changes — whether you changed it here, in FusionSolar, or on the inverter itself. The token holds the new percentage, which is what you need to keep another setting a fixed margin above it.",
+          "de": "Wird ausgelöst, sobald sich die Backup-Reserve (Register 47102 beim LUNA2000 über den Wechselrichter, 30373 über EMMA) ändert — gleich, ob du sie hier, in FusionSolar oder am Wechselrichter geändert hast. Das Token enthält den neuen Prozentwert, mit dem sich eine andere Einstellung stets in festem Abstand darüber halten lässt.",
+          "nl": "Wordt geactiveerd zodra de gereserveerde noodstroomcapaciteit (register 47102 bij een LUNA2000 via de omvormer, 30373 via EMMA) verandert, of je die nu hier, in FusionSolar of op de omvormer zelf hebt gewijzigd. Het token bevat het nieuwe percentage. Daarmee houd je een andere instelling steeds op een vaste afstand erboven."
         },
         "args": [
           {
@@ -8858,7 +8858,7 @@
         },
         "hint": {
           "en": "Fires when the grid meter's online/offline status changes. Select a specific status to trigger only on that transition.",
-          "de": "Wird ausgelöst, wenn sich der Online/Offline-Status des Netzwerkzählers ändert. Wähle einen Status, um nur bei einem bestimmten Übergang auszulösen.",
+          "de": "Wird ausgelöst, wenn sich der Online/Offline-Status des Netzzählers ändert. Wähle einen Status, um nur bei einem bestimmten Übergang auszulösen.",
           "nl": "Wordt geactiveerd wanneer de online-/offlinestatus van de netmeter verandert. Kies een specifieke status om alleen bij die overgang te activeren."
         },
         "titleFormatted": {
@@ -9089,9 +9089,9 @@
           "nl": "Laden van het voertuig gestart"
         },
         "hint": {
-          "en": "Fires when the EV charger detects that charging of a vehicle has begun.",
-          "de": "Wird ausgelöst, wenn die Wallbox erkennt, dass das Laden eines Fahrzeugs begonnen hat.",
-          "nl": "Wordt geactiveerd wanneer de laadpaal detecteert dat het laden van een voertuig is begonnen."
+          "en": "Fires when the app sees voltage appear on the charger's output (above 10 V on any phase). The charger has no register for its charging state, so this is how a session is recognised.",
+          "de": "Wird ausgelöst, wenn die App am Ausgang der Wallbox Spannung erkennt (über 10 V auf einer Phase). Die Wallbox hat kein Register für ihren Ladezustand; daran wird eine Sitzung erkannt.",
+          "nl": "Wordt geactiveerd wanneer de app spanning ziet op de uitgang van de laadpaal (boven 10 V op een fase). De laadpaal heeft geen register voor zijn laadstatus; zo wordt een sessie herkend."
         },
         "args": [
           {
@@ -9109,9 +9109,9 @@
           "nl": "Laden van het voertuig gestopt"
         },
         "hint": {
-          "en": "Fires when the EV charger detects that charging of a vehicle has ended.",
-          "de": "Wird ausgelöst, wenn die Wallbox erkennt, dass das Laden eines Fahrzeugs beendet wurde.",
-          "nl": "Wordt geactiveerd wanneer de laadpaal detecteert dat het laden van een voertuig is beëindigd."
+          "en": "Fires when the voltage on the charger's output disappears (10 V or less on every phase). The charger has no register for its charging state, so this is how the end of a session is recognised.",
+          "de": "Wird ausgelöst, wenn die Spannung am Ausgang der Wallbox verschwindet (auf allen Phasen höchstens 10 V). Die Wallbox hat kein Register für ihren Ladezustand; daran wird das Ende einer Sitzung erkannt.",
+          "nl": "Wordt geactiveerd wanneer de spanning op de uitgang van de laadpaal verdwijnt (op alle fasen hooguit 10 V). De laadpaal heeft geen register voor zijn laadstatus; zo wordt het einde van een sessie herkend."
         },
         "args": [
           {
@@ -9187,9 +9187,9 @@
           "nl": "EV laden gestart (OCPP)"
         },
         "hint": {
-          "en": "Fires when the OCPP charger reports a StartTransaction.",
-          "de": "Wird ausgelöst wenn der OCPP Charger eine StartTransaction meldet.",
-          "nl": "Wordt geactiveerd wanneer de OCPP lader een StartTransaction meldt."
+          "en": "Fires once power actually flows (above 100 W) after the charger has started a transaction, or right away when a start card releases a car that was waiting. Not fired when the car draws nothing, nor when charging continues after a pause — that is \"Charging resumed (OCPP)\".",
+          "de": "Wird ausgelöst, sobald nach dem Start einer Transaktion tatsächlich Strom fliesst (über 100 W), oder sofort, wenn eine Startkarte ein wartendes Auto freigibt. Nicht, wenn das Auto keinen Strom zieht, und nicht beim Fortsetzen nach einer Pause – dafür gibt es „Laden fortgesetzt (OCPP)“.",
+          "nl": "Wordt geactiveerd zodra er na de start van een transactie echt stroom loopt (boven 100 W), of meteen wanneer een startkaart een wachtende auto vrijgeeft. Niet als de auto niets afneemt, en niet bij het hervatten na een pauze – daarvoor is er „Laden hervat (OCPP)”."
         },
         "args": [
           {
@@ -9263,9 +9263,9 @@
           "nl": "EV laden gestopt (OCPP)"
         },
         "hint": {
-          "en": "Fires when the OCPP charger reports a StopTransaction.",
-          "de": "Wird ausgelöst wenn der OCPP Charger eine StopTransaction meldet.",
-          "nl": "Wordt geactiveerd wanneer de OCPP lader een StopTransaction meldt."
+          "en": "Fires when the charger reports the end of a transaction (OCPP StopTransaction). Not fired for a pause, nor for a start that aborts within 2 seconds and is retried; a paused session that is then stopped or unplugged fires it once, with the totals of the whole session.",
+          "de": "Wird ausgelöst, wenn die Ladestation das Ende einer Transaktion meldet (OCPP StopTransaction). Nicht bei einer Pause und nicht bei einem Start, der innert 2 Sekunden abbricht und wiederholt wird; eine pausierte Sitzung, die dann gestoppt oder ausgesteckt wird, löst sie einmal aus, mit den Summen der ganzen Sitzung.",
+          "nl": "Wordt geactiveerd wanneer de laadpaal het einde van een transactie meldt (OCPP StopTransaction). Niet bij een pauze, en niet bij een start die binnen 2 seconden afbreekt en opnieuw wordt geprobeerd; een gepauzeerde sessie die daarna wordt gestopt of losgekoppeld, activeert hem één keer, met de totalen van de hele sessie."
         },
         "args": [
           {
@@ -9367,7 +9367,7 @@
         },
         "hint": {
           "en": "Fires when a car plugs in and auto-start charging is disabled. Use this to start charging manually from a flow.",
-          "de": "Wird ausgelöst wenn ein Auto angeschlossen wird und das automatische Laden deaktiviert ist. Damit kann der Ladevorgang manuell per Flow gestartet werden.",
+          "de": "Wird ausgelöst, wenn ein Auto angeschlossen wird und das automatische Laden deaktiviert ist. Damit kann der Ladevorgang manuell per Flow gestartet werden.",
           "nl": "Wordt geactiveerd wanneer een auto wordt aangesloten en automatisch starten is uitgeschakeld. Gebruik dit om het laden handmatig vanuit een flow te starten."
         },
         "args": [
@@ -9386,9 +9386,9 @@
           "nl": "EV-lader status gewijzigd (OCPP)"
         },
         "hint": {
-          "en": "Fires whenever the OCPP charger changes state (idle / connected / charging / error).",
-          "de": "Wird ausgelöst wenn der OCPP Charger seinen Status ändert (idle / connected / charging / error).",
-          "nl": "Wordt geactiveerd wanneer de OCPP lader van status verandert (idle / connected / charging / error)."
+          "en": "Fires on every status report from the charger (OCPP StatusNotification), mapped to idle / connected / charging / error — the state can be the same as before.",
+          "de": "Wird bei jeder Statusmeldung der Ladestation ausgelöst (OCPP StatusNotification), abgebildet auf idle / connected / charging / error – der Zustand kann derselbe sein wie zuvor.",
+          "nl": "Wordt bij elke statusmelding van de laadpaal geactiveerd (OCPP StatusNotification), vertaald naar idle / connected / charging / error – de status kan dezelfde zijn als ervoor."
         },
         "args": [
           {
@@ -9418,7 +9418,7 @@
         },
         "hint": {
           "en": "Fires when the cable is physically unplugged from the charger (rawStatus=Available).",
-          "de": "Wird ausgelöst wenn das Kabel physisch vom Charger getrennt wird (rawStatus=Available).",
+          "de": "Wird ausgelöst, wenn das Kabel physisch vom Charger getrennt wird (rawStatus=Available).",
           "nl": "Wordt geactiveerd wanneer de kabel fysiek van de lader wordt losgekoppeld (rawStatus=Available)."
         },
         "args": [
@@ -9457,9 +9457,9 @@
           "nl": "Lader offline gegaan (OCPP)"
         },
         "hint": {
-          "en": "Fires when no OCPP message has been received from the charger for 3 minutes.",
-          "de": "Wird ausgelöst wenn seit 3 Minuten keine OCPP-Nachricht vom Charger empfangen wurde.",
-          "nl": "Wordt geactiveerd wanneer gedurende 3 minuten geen OCPP-bericht van de lader is ontvangen."
+          "en": "Fires when no OCPP message has been received from the charger for 3 minutes. Not fired for 5 minutes after a reboot command.",
+          "de": "Wird ausgelöst, wenn seit 3 Minuten keine OCPP-Nachricht von der Ladestation empfangen wurde. Nicht in den 5 Minuten nach einem Neustart-Befehl.",
+          "nl": "Wordt geactiveerd wanneer er 3 minuten geen OCPP-bericht van de laadpaal is ontvangen. Niet in de 5 minuten na een herstartopdracht."
         },
         "args": [
           {
@@ -9488,9 +9488,9 @@
           "nl": "Lader weer online (OCPP)"
         },
         "hint": {
-          "en": "Fires when the charger reconnects after having been offline.",
-          "de": "Wird ausgelöst wenn der Charger nach einem Offline-Zustand wieder eine Verbindung aufbaut.",
-          "nl": "Wordt geactiveerd wanneer de lader opnieuw verbinding maakt na offline te zijn geweest."
+          "en": "Fires when the charger reconnects after \"Charger went offline (OCPP)\" has fired.",
+          "de": "Wird ausgelöst, wenn die Ladestation wieder verbunden ist, nachdem „Ladestation offline gegangen (OCPP)“ ausgelöst hat.",
+          "nl": "Wordt geactiveerd wanneer de laadpaal weer verbinding maakt nadat „Lader offline gegaan (OCPP)” is geactiveerd."
         },
         "args": [
           {
@@ -9520,7 +9520,7 @@
         },
         "hint": {
           "en": "Fires when charging is paused via the masked-stop mechanism.",
-          "de": "Wird ausgelöst wenn der Ladevorgang über den maskierten Stop pausiert wird.",
+          "de": "Wird ausgelöst, wenn der Ladevorgang über den maskierten Stop pausiert wird.",
           "nl": "Wordt geactiveerd wanneer het laden wordt gepauzeerd via het gemaskeerde stopmechanisme."
         },
         "args": [
@@ -9560,8 +9560,8 @@
         },
         "hint": {
           "en": "Fires when power is flowing again after a pause (power-verified).",
-          "de": "Wird ausgelöst wenn nach einer Pause wieder Strom fließt (leistungsverifiziert).",
-          "nl": "Wordt geactiveerd wanneer er na een pauze weer stroom stroomt (vermogensverifiseerd)."
+          "de": "Wird ausgelöst, wenn nach einer Pause wieder Strom fliesst (leistungsverifiziert).",
+          "nl": "Wordt geactiveerd wanneer er na een pauze weer stroom stroomt (vermogensgeverifieerd)."
         },
         "args": [
           {
@@ -9618,7 +9618,7 @@
         },
         "hint": {
           "en": "Fires when the charging current limit is changed during an active session.",
-          "de": "Wird ausgelöst wenn das Ladelimit während einer aktiven Sitzung geändert wird.",
+          "de": "Wird ausgelöst, wenn das Ladelimit während einer aktiven Sitzung geändert wird.",
           "nl": "Wordt geactiveerd wanneer de laadstroom limiet wordt gewijzigd tijdens een actieve sessie."
         },
         "args": [
@@ -9769,9 +9769,9 @@
           "nl": "EMS wil de laadstroom aanpassen voor [[charger_device_id]]"
         },
         "hint": {
-          "en": "Fires when the EMS needs to change an EV charger's current. Paste the Charger Device ID from the EMS settings. Use [amps], [phase1], [phase2], [phase3] tokens in the charger action.",
-          "de": "Wird ausgelöst wenn das EMS den Ladestrom anpassen möchte. Charger Geräte-ID aus das EMS-Einstellungen einfügen.",
-          "nl": "Wordt geactiveerd wanneer het EMS de laadstroom van een laadpaal wil wijzigen. Plak de laadpaal apparaat-ID uit de EMS-instellingen. Gebruik de tokens [amps], [phase1], [phase2], [phase3] in de actie van de laadpaal."
+          "en": "Fires when the EMS wants to change an EV charger's current. Paste the Charger Device ID from the EMS settings. Use the [amps], [phase1], [phase2], [phase3] tokens in the charger action: [amps] is the current per phase, [phase2] and [phase3] are 0 when charging on one phase, and 0 A means stop charging.",
+          "de": "Wird ausgelöst, wenn das EMS den Ladestrom einer Ladestation ändern möchte. Die Lader-Geräte-ID aus den EMS-Einstellungen einfügen. In der Aktion der Ladestation die Tokens [amps], [phase1], [phase2], [phase3] verwenden: [amps] ist der Strom pro Phase, [phase2] und [phase3] sind beim einphasigen Laden 0, und 0 A heisst Laden stoppen.",
+          "nl": "Wordt geactiveerd wanneer het EMS de laadstroom van een laadpaal wil wijzigen. Plak de laadpaal-apparaat-ID uit de EMS-instellingen. Gebruik de tokens [amps], [phase1], [phase2], [phase3] in de actie van de laadpaal: [amps] is de stroom per fase, [phase2] en [phase3] zijn 0 bij eenfasig laden, en 0 A betekent laden stoppen."
         },
         "args": [
           {
@@ -9845,9 +9845,9 @@
           "nl": "EMS wil het laden starten voor [[charger_device_id]]"
         },
         "hint": {
-          "en": "Fires when the EMS detects the charger is idle (power = 0 W) and wants to start a charging session.",
-          "de": "Wird ausgelöst wenn das EMS erkennt, dass der Charger idle ist (Leistung = 0 W) und der Ladevorgang gestartet werden soll.",
-          "nl": "Wordt geactiveerd wanneer het EMS ziet dat de laadpaal stilstaat (vermogen = 0 W) en een laadsessie wil starten."
+          "en": "Fires when the EMS starts giving current to a charger that is not charging (drawing under 500 W) and a charging session should begin. Fired once more if the car still draws nothing after 90 s.",
+          "de": "Wird ausgelöst, wenn das EMS einer Ladestation Strom zuteilen will, die nicht lädt (unter 500 W), und ein Ladevorgang beginnen soll. Zieht das Auto nach 90 s noch nichts, wird sie ein zweites Mal ausgelöst.",
+          "nl": "Wordt geactiveerd wanneer het EMS stroom wil toewijzen aan een laadpaal die niet laadt (onder 500 W) en een laadsessie moet beginnen. Wordt nog één keer geactiveerd als de auto na 90 s nog niets afneemt."
         },
         "args": [
           {
@@ -9885,9 +9885,9 @@
           "nl": "EMS wil warmtepomp [[heat_pump_device_id]] starten"
         },
         "hint": {
-          "en": "Fires when the EMS wants to turn the heat pump on (off-peak hours active or sufficient solar surplus).",
-          "de": "Wird ausgelöst wenn das EMS die Wärmepumpe einschalten möchte (Nebenzeit aktiv oder ausreichend Solar-Überschuss).",
-          "nl": "Wordt geactiveerd wanneer het EMS de warmtepomp wil inschakelen (daltarief actief of voldoende zonne-overschot)."
+          "en": "Fires when the EMS wants to turn the heat pump on (enough solar surplus).",
+          "de": "Wird ausgelöst, wenn das EMS die Wärmepumpe einschalten möchte (genug Solarüberschuss).",
+          "nl": "Wordt geactiveerd wanneer het EMS de warmtepomp wil inschakelen (voldoende zonne-overschot)."
         },
         "args": [
           {
@@ -9926,7 +9926,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the heat pump off (battery priority or no surplus).",
-          "de": "Wird ausgelöst wenn das EMS die Wärmepumpe ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
+          "de": "Wird ausgelöst, wenn das EMS die Wärmepumpe ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
           "nl": "Wordt geactiveerd wanneer het EMS de warmtepomp wil uitschakelen (voorrang voor de batterij of geen overschot)."
         },
         "args": [
@@ -9966,7 +9966,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the boiler/heater on (sufficient solar surplus available).",
-          "de": "Wird ausgelöst wenn das EMS den Boiler/Heizstab einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
+          "de": "Wird ausgelöst, wenn das EMS den Boiler/Heizstab einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
           "nl": "Wordt geactiveerd wanneer het EMS de boiler/verwarming wil inschakelen (voldoende zonne-overschot beschikbaar)."
         },
         "args": [
@@ -10006,7 +10006,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the boiler/heater off (battery priority or no surplus).",
-          "de": "Wird ausgelöst wenn das EMS den Boiler/Heizstab ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
+          "de": "Wird ausgelöst, wenn das EMS den Boiler/Heizstab ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
           "nl": "Wordt geactiveerd wanneer het EMS de boiler/verwarming wil uitschakelen (voorrang voor de batterij of geen overschot)."
         },
         "args": [
@@ -10046,7 +10046,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the pool pump on (sufficient solar surplus available).",
-          "de": "Wird ausgelöst wenn das EMS die Pool-Pumpe einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
+          "de": "Wird ausgelöst, wenn das EMS die Pool-Pumpe einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
           "nl": "Wordt geactiveerd wanneer het EMS de zwembadpomp wil inschakelen (voldoende zonne-overschot beschikbaar)."
         },
         "args": [
@@ -10086,7 +10086,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the pool pump off (battery priority or no surplus).",
-          "de": "Wird ausgelöst wenn das EMS die Pool-Pumpe ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
+          "de": "Wird ausgelöst, wenn das EMS die Pool-Pumpe ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
           "nl": "Wordt geactiveerd wanneer het EMS de zwembadpomp wil uitschakelen (voorrang voor de batterij of geen overschot)."
         },
         "args": [
@@ -10126,7 +10126,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the dehumidifier on (sufficient solar surplus available).",
-          "de": "Wird ausgelöst wenn das EMS den Luftentfeuchter einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
+          "de": "Wird ausgelöst, wenn das EMS den Luftentfeuchter einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
           "nl": "Wordt geactiveerd wanneer het EMS de ontvochtiger wil inschakelen (voldoende zonne-overschot beschikbaar)."
         },
         "args": [
@@ -10166,7 +10166,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the air conditioner on (sufficient solar surplus available).",
-          "de": "Wird ausgelöst wenn das EMS die Klimaanlage einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
+          "de": "Wird ausgelöst, wenn das EMS die Klimaanlage einschalten möchte (ausreichend Solar-Überschuss verfügbar).",
           "nl": "Wordt geactiveerd wanneer het EMS de airco wil inschakelen (voldoende zonne-overschot beschikbaar)."
         },
         "args": [
@@ -10206,7 +10206,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the dehumidifier off (battery priority or no surplus).",
-          "de": "Wird ausgelöst wenn das EMS den Luftentfeuchter ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
+          "de": "Wird ausgelöst, wenn das EMS den Luftentfeuchter ausschalten möchte (Batterie-Priorität oder kein Überschuss).",
           "nl": "Wordt geactiveerd wanneer het EMS de ontvochtiger wil uitschakelen (voorrang voor de batterij of geen overschot)."
         },
         "args": [
@@ -10246,7 +10246,7 @@
         },
         "hint": {
           "en": "Fires when the EMS wants to turn the air conditioner off (surplus gone or battery too low).",
-          "de": "Wird ausgelöst wenn das EMS die Klimaanlage ausschalten möchte (kein Überschuss mehr oder Batterie zu tief).",
+          "de": "Wird ausgelöst, wenn das EMS die Klimaanlage ausschalten möchte (kein Überschuss mehr oder Batterie zu tief).",
           "nl": "Wordt geactiveerd wanneer het EMS de airco wil uitschakelen (geen overschot meer of accu te laag)."
         },
         "args": [
@@ -10287,7 +10287,7 @@
         "hint": {
           "en": "Fires when the battery SOC first reaches the upper point of \"Battery: surplus split\" (EMS settings → Home Batteries) — 95 % when no split is set up. It only notifies. Use it, for example, to start force-discharging the battery into the EV charger.",
           "de": "Wird ausgelöst, wenn der Batterie-SOC erstmals den oberen Punkt von „Batterie: Aufteilung des Überschusses“ erreicht (EMS-Einstellungen → Hausbatterien) — 95 %, wenn keine Aufteilung eingerichtet ist. Meldet nur. Nutzbar etwa, um die Batterie in den EV-Lader zu entladen.",
-          "nl": "Wordt geactiveerd als de accu-SOC voor het eerst het bovenste punt van „Accu: verdeling van het overschot” bereikt (EMS-instellingen → Thuisbatterijen) — 95 % als er geen verdeling is ingesteld. Meldt alleen."
+          "nl": "Wordt geactiveerd als de accu-SOC voor het eerst het bovenste punt van „Accu: verdeling van het overschot” bereikt (EMS-instellingen → Thuisbatterijen) — 95 % als er geen verdeling is ingesteld. Meldt alleen. Bruikbaar bijvoorbeeld om de batterij geforceerd te ontladen in de laadpaal."
         },
         "args": [
           {
@@ -10336,7 +10336,7 @@
         "hint": {
           "en": "Fires when the battery SOC drops below the lower point of \"Battery: surplus split\" (EMS settings → Home Batteries) — 80 % when no split is set up. It only notifies; switching the devices off is what the lower point itself does. Use it, for example, to stop force-discharging.",
           "de": "Wird ausgelöst, wenn der Batterie-SOC unter den unteren Punkt von „Batterie: Aufteilung des Überschusses“ fällt (EMS-Einstellungen → Hausbatterien) — 80 %, wenn keine Aufteilung eingerichtet ist. Meldet nur; die Geräte abschalten tut der untere Punkt selbst. Nutzbar etwa, um die Zwangsentladung zu stoppen.",
-          "nl": "Wordt geactiveerd als de accu-SOC onder het onderste punt van „Accu: verdeling van het overschot” daalt (EMS-instellingen → Thuisbatterijen) — 80 % als er geen verdeling is ingesteld. Meldt alleen; de apparaten uitschakelen doet het onderste punt zelf."
+          "nl": "Wordt geactiveerd als de accu-SOC onder het onderste punt van „Accu: verdeling van het overschot” daalt (EMS-instellingen → Thuisbatterijen) — 80 % als er geen verdeling is ingesteld. Meldt alleen; de apparaten uitschakelen doet het onderste punt zelf. Bruikbaar bijvoorbeeld om het geforceerd ontladen te stoppen."
         },
         "args": [
           {
@@ -10577,6 +10577,11 @@
           "de": "EMS: Wechselrichter — Einspeisebegrenzung aktivieren",
           "nl": "EMS: omvormer — terugleverbegrenzing inschakelen"
         },
+        "hint": {
+          "en": "Fires for every inverter set up in the EMS when the Export Limit Coordinator (EMS settings) starts limiting feed-in: at once and for good with \"Never feed in (zero export)\", otherwise only while more than 100 W is exported and the battery has reached \"Activate at SOC\" (default 95 %) or the price is below the set threshold. Link it to \"Enable/disable grid export limit\" or \"Enable zero export (Nulleinspeisung)\" of the inverter.",
+          "de": "Wird für jeden im EMS eingetragenen Wechselrichter ausgelöst, wenn der Einspeiselimit-Koordinator (EMS-Einstellungen) die Einspeisung zu begrenzen beginnt: mit „Nie einspeisen (Nulleinspeisung)“ sofort und dauerhaft, sonst nur bei mehr als 100 W Einspeisung, wenn die Batterie „Aktivieren bei SOC“ erreicht hat (Standard 95 %) oder der Strompreis unter der Schwelle liegt. Mit „Einspeisung begrenzen ein-/ausschalten“ oder „Nulleinspeisung aktivieren“ des Wechselrichters verbinden.",
+          "nl": "Wordt geactiveerd voor elke in het EMS ingestelde omvormer wanneer de Exportlimiet-coördinator (EMS-instellingen) de teruglevering gaat begrenzen: met „Nooit terugleveren (nul-teruglevering)” meteen en blijvend, anders alleen bij meer dan 100 W teruglevering, als de batterij „Activeren bij SOC” heeft bereikt (standaard 95 %) of de prijs onder de drempel ligt. Koppel hem aan „Terugleverbegrenzing in-/uitschakelen” of „Nul-teruglevering inschakelen” van de omvormer."
+        },
         "titleFormatted": {
           "en": "EMS: inverter [[inverter_device_id]] — enable export limit",
           "de": "EMS: Wechselrichter [[inverter_device_id]] — Einspeisebegrenzung aktivieren",
@@ -10611,6 +10616,11 @@
           "en": "EMS: inverter — disable export limit",
           "de": "EMS: Wechselrichter — Einspeisebegrenzung deaktivieren",
           "nl": "EMS: omvormer — terugleverbegrenzing uitschakelen"
+        },
+        "hint": {
+          "en": "Fires for every inverter set up in the EMS when the coordinator lifts the limit: at the earliest 5 minutes after it was set, once the price is no longer below the threshold and either nothing is exported any more or the battery has fallen below \"Deactivate at SOC\" (default 90 %). Also fires when the coordinator is switched off while a limit is active; never while \"Never feed in (zero export)\" is on.",
+          "de": "Wird für jeden im EMS eingetragenen Wechselrichter ausgelöst, wenn der Koordinator die Begrenzung aufhebt: frühestens 5 Minuten nach dem Setzen, sobald der Preis nicht mehr unter der Schwelle liegt und entweder nichts mehr eingespeist wird oder die Batterie unter „Deaktivieren bei SOC“ gefallen ist (Standard 90 %). Auch beim Ausschalten des Koordinators, solange eine Begrenzung aktiv ist; nie, solange „Nie einspeisen (Nulleinspeisung)“ eingeschaltet ist.",
+          "nl": "Wordt geactiveerd voor elke in het EMS ingestelde omvormer wanneer de coördinator de begrenzing opheft: op zijn vroegst 5 minuten na het instellen, zodra de prijs niet meer onder de drempel ligt en er ofwel niets meer wordt teruggeleverd ofwel de batterij onder „Deactiveren bij SOC” is gezakt (standaard 90 %). Ook bij het uitschakelen van de coördinator terwijl een begrenzing actief is; nooit zolang „Nooit terugleveren (nul-teruglevering)” aan staat."
         },
         "titleFormatted": {
           "en": "EMS: inverter [[inverter_device_id]] — disable export limit",
@@ -10768,9 +10778,9 @@
           "nl": "EMS: auto-doellading instellen"
         },
         "hint": {
-          "en": "Fires when the EMS target charge for a car changes. Use the Target SOC token to set the charge limit on your vehicle.",
-          "de": "Wird ausgelöst, wenn sich das EMS-Ziel-Ladestand eines Autos ändert. Nutze das Ziel-SOC-Token, um das Ladelimit am Fahrzeug zu setzen.",
-          "nl": "Wordt geactiveerd wanneer de EMS-doellading van een auto verandert. Gebruik het doel-SOC-token om de laadlimiet op je voertuig in te stellen."
+          "en": "Fires each time a car target is set through \"Set car target charge (%)\" or the EMS Device widget — also when the value is unchanged. Use the Target SOC token to set the charge limit on your vehicle.",
+          "de": "Wird bei jedem Setzen eines Ziel-Ladestands über „Ziel-Ladestand setzen (%)“ oder das EMS-Geräte-Widget ausgelöst – auch bei gleichem Wert. Nutze das Ziel-SOC-Token, um das Ladelimit am Fahrzeug zu setzen.",
+          "nl": "Wordt geactiveerd telkens als een doellading wordt ingesteld via „Auto-doellading instellen (%)” of de EMS-apparaatwidget – ook bij dezelfde waarde. Gebruik het doel-SOC-token om de laadlimiet op je voertuig in te stellen."
         },
         "args": [
           {
@@ -11164,9 +11174,9 @@
           "nl": "Lader herstarten ([[type]]) (OCPP)"
         },
         "hint": {
-          "en": "Sends a Reset command to the charger. Soft reboot gracefully stops the session; Hard reboot cuts power immediately.",
-          "de": "Sendet einen Reset-Befehl an die Ladestation. Soft beendet die Sitzung ordentlich; Hard trennt sofort die Stromzufuhr.",
-          "nl": "Stuurt een Reset-opdracht naar de lader. Soft stopt de sessie netjes; Hard verbreekt onmiddellijk de stroom."
+          "en": "Sends a Reset command to the charger. Soft reboot gracefully stops the session; Hard restarts at once, without ending the session properly first.",
+          "de": "Sendet einen Reset-Befehl an die Ladestation. Soft beendet die Sitzung ordentlich; Hard startet sofort neu, ohne die Sitzung vorher ordentlich zu beenden.",
+          "nl": "Stuurt een Reset-opdracht naar de lader. Soft stopt de sessie netjes; Hard herstart meteen, zonder de sessie eerst netjes te beëindigen."
         },
         "args": [
           {
@@ -11216,9 +11226,9 @@
           "nl": "Regelmodus actief vermogen instellen op [[mode]]"
         },
         "hint": {
-          "en": "Sets the active power control mode of the SUN2000 inverter via Modbus (register 47415).",
-          "de": "Setzt den Wirkleistungs-Steuermodus des SUN2000 Wechselrichters über Modbus (Register 47415).",
-          "nl": "Stelt de regelmodus voor actief vermogen van de SUN2000-omvormer in via Modbus (register 47415)."
+          "en": "Sets the active power control mode of the SUN2000 inverter via Modbus (register 47415) — how it limits what it feeds into the grid. If your house connection depends on a feed-in limit, check it after every change.\n\"Unlimited\" — Huawei's default: no limit, the inverter feeds in whatever is left over.\n\"DI Active Scheduling\": follows the signals on the inverter's digital inputs (DI), for example from the grid operator's ripple control receiver.\n\"Zero Power Grid Connection\": regulates so that nothing is fed into the grid at the connection point.\n\"Limited by Power (kW)\" and \"Limited by Power (%)\": cap the feed-in at the connection point at what \"Set max feed-in power\" or \"Set max feed-in power (%)\" set.\nThese three need a power meter at the grid connection (Smart Power Sensor); without one, only \"Set inverter output limit (W)\" and \"Set inverter output limit (%)\" help.",
+          "de": "Setzt den Wirkleistungs-Steuermodus des SUN2000-Wechselrichters über Modbus (Register 47415) – wie er begrenzt, was er ins Netz einspeist. Hängt dein Hausanschluss an einer Einspeisegrenze, prüfe ihn nach jeder Änderung.\n„Unbegrenzt“ – Huaweis Standard: keine Begrenzung, der Wechselrichter speist ein, was übrig bleibt.\n„DI Aktive Planung“: folgt den Signalen an den Digitaleingängen (DI) des Wechselrichters, etwa vom Rundsteuerempfänger des Netzbetreibers.\n„Nulleinspeisung“: regelt so, dass am Netzanschluss nichts eingespeist wird.\n„Leistungsbegrenzt (kW)“ und „Leistungsbegrenzt (%)“: begrenzen die Einspeisung am Netzanschluss auf das, was „Maximale Einspeiseleistung setzen“ bzw. „Maximale Einspeiseleistung (%) setzen“ gesetzt haben.\nDiese drei brauchen einen Stromzähler am Netzanschluss (Smart Power Sensor); ohne ihn helfen nur „Wechselrichter-Ausgangsbegrenzung setzen (W)“ und „Wechselrichter-Ausgangsbegrenzung setzen (%)“.",
+          "nl": "Stelt de regelmodus voor werkzaam vermogen van de SUN2000-omvormer in via Modbus (register 47415) – hoe hij begrenst wat hij aan het net levert. Hangt je aansluiting af van een terugleverlimiet, controleer dit dan na elke wijziging.\n„Onbegrensd” – standaard bij Huawei: geen begrenzing, de omvormer levert terug wat overblijft.\n„DI actieve aansturing”: volgt de signalen op de digitale ingangen (DI) van de omvormer, bijvoorbeeld van de rimpelspanningsontvanger van de netbeheerder.\n„Nul-teruglevering”: regelt zo dat er op het aansluitpunt niets aan het net wordt geleverd.\n„Begrensd op vermogen (kW)” en „Begrensd op vermogen (%)”: begrenzen de teruglevering op het aansluitpunt tot wat „Maximaal terugleververmogen instellen” of „Maximaal terugleververmogen instellen (%)” hebben ingesteld.\nDeze drie hebben een energiemeter op de netaansluiting nodig (Smart Power Sensor); zonder meter helpen alleen „Uitgangsbegrenzing omvormer instellen (W)” en „Uitgangsbegrenzing omvormer instellen (%)”."
         },
         "args": [
           {
@@ -11292,9 +11302,9 @@
           "nl": "Terugleverbegrenzing [[onoff]]"
         },
         "hint": {
-          "en": "Enables (mode: Limited by Power, register 47415=6) or disables (mode: Unlimited, register 47415=0) the grid export limit. Set the watt limit separately using 'Set max feed-in power'.",
-          "de": "Aktiviert (Modus: Leistungsbegrenzt, Register 47415=6) oder deaktiviert (Modus: Unbegrenzt, Register 47415=0) die Einspeisegrenze. Den Wattwert separat mit 'Maximale Einspeiseleistung setzen' festlegen.",
-          "nl": "Schakelt de terugleverbegrenzing in (modus: Begrensd op vermogen, register 47415=6) of uit (modus: Onbegrensd, register 47415=0). Stel de waardegrens apart in met 'Maximaal terugleververmogen instellen'."
+          "en": "Enables (mode: Limited by Power, register 47415=6) or disables (mode: Unlimited, register 47415=0) the grid export limit. Set the watt limit separately using 'Set max feed-in power'. Needs a power meter at the grid connection (e.g. DTSU666); without one the inverter ignores it — use \"Set inverter output limit (W)\" instead.",
+          "de": "Aktiviert (Modus: Leistungsbegrenzt, Register 47415=6) oder deaktiviert (Modus: Unbegrenzt, Register 47415=0) die Einspeisegrenze. Den Wattwert separat mit 'Maximale Einspeiseleistung setzen' festlegen. Braucht einen Stromzähler am Netzanschluss (z. B. DTSU666); ohne ihn ignoriert der Wechselrichter die Einstellung – dann „Wechselrichter-Ausgangsbegrenzung setzen (W)“ verwenden.",
+          "nl": "Schakelt de terugleverbegrenzing in (modus: Begrensd op vermogen, register 47415=6) of uit (modus: Onbegrensd, register 47415=0). Stel de waardegrens apart in met 'Maximaal terugleververmogen instellen'. Heeft een energiemeter op de netaansluiting nodig (bijv. DTSU666); zonder meter negeert de omvormer het – gebruik dan „Uitgangsbegrenzing omvormer instellen (W)”."
         },
         "args": [
           {
@@ -11344,9 +11354,9 @@
           "nl": "Maximaal terugleververmogen instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the maximum grid feed-in power of the SUN2000 inverter via Modbus (register 47416). Set to 0 to block all export.",
-          "de": "Setzt die maximale Einspeiseleistung des SUN2000 Wechselrichters über Modbus (Register 47416). Auf 0 setzen, um die Einspeisung zu unterbinden.",
-          "nl": "Stelt het maximale terugleververmogen van de SUN2000-omvormer in via Modbus (register 47416). Op 0 zetten blokkeert alle teruglevering."
+          "en": "Sets the maximum grid feed-in power of the SUN2000 inverter via Modbus (register 47416). Set to 0 to block all export. Takes effect only in the mode \"Limited by Power (kW)\" — switch it on with \"Enable/disable grid export limit\". Needs a power meter at the grid connection (e.g. DTSU666); without one the inverter ignores it — use \"Set inverter output limit (W)\" instead.",
+          "de": "Setzt die maximale Einspeiseleistung des SUN2000 Wechselrichters über Modbus (Register 47416). Auf 0 setzen, um die Einspeisung zu unterbinden. Wirkt nur im Modus „Leistungsbegrenzt (kW)“ – den mit „Einspeisung begrenzen ein-/ausschalten“ einschalten. Braucht einen Stromzähler am Netzanschluss (z. B. DTSU666); ohne ihn ignoriert der Wechselrichter die Einstellung – dann „Wechselrichter-Ausgangsbegrenzung setzen (W)“ verwenden.",
+          "nl": "Stelt het maximale terugleververmogen van de SUN2000-omvormer in via Modbus (register 47416). Op 0 zetten blokkeert alle teruglevering. Werkt alleen in de modus „Begrensd op vermogen (kW)” – zet die aan met „Terugleverbegrenzing in-/uitschakelen”. Heeft een energiemeter op de netaansluiting nodig (bijv. DTSU666); zonder meter negeert de omvormer het – gebruik dan „Uitgangsbegrenzing omvormer instellen (W)”."
         },
         "args": [
           {
@@ -11386,9 +11396,9 @@
           "nl": "Uitgang van de omvormer begrenzen tot [[power]] W"
         },
         "hint": {
-          "en": "Sets the maximum AC output of the inverter in watts (register 40126). This is a ceiling, not a setpoint — actual production follows the natural PV level when sun is weaker, and is only throttled when sun would otherwise produce more. Set to 0 to fully shut down. Set above rated power × 1.1 to effectively disable the limit. Works WITHOUT a Smart Power Sensor.",
-          "de": "Setzt die maximale AC-Ausgangsleistung des Wechselrichters in Watt (Register 40126). Dies ist eine Obergrenze, kein Sollwert — die Erzeugung folgt der natürlichen PV-Leistung wenn sie geringer ist, und wird nur begrenzt wenn die Sonne sonst mehr liefern würde. Auf 0 setzen schaltet ab. Über Nennleistung × 1.1 hebt die Begrenzung effektiv auf. Funktioniert OHNE Smart Power Sensor.",
-          "nl": "Stelt het maximale AC-uitgangsvermogen van de omvormer in watt in (register 40126). Dit is een bovengrens, geen instelwaarde — de opbrengst volgt gewoon de PV-opbrengst zolang die lager is, en wordt alleen teruggeregeld wanneer de zon anders meer zou leveren. Op 0 zetten schakelt volledig uit. Boven nominaal vermogen × 1,1 instellen heft de begrenzing feitelijk op. Werkt ZONDER Smart Power Sensor."
+          "en": "Sets the maximum AC output of the inverter in watts (register 40126). This is a ceiling, not a setpoint — actual production follows the natural PV level when sun is weaker, and is only throttled when sun would otherwise produce more. Set to 0 to fully shut down. To lift the limit, use \"Remove inverter output limit\" (it writes rated power × 1.1). Works WITHOUT a Smart Power Sensor.",
+          "de": "Setzt die maximale AC-Ausgangsleistung des Wechselrichters in Watt (Register 40126). Dies ist eine Obergrenze, kein Sollwert — die Erzeugung folgt der natürlichen PV-Leistung wenn sie geringer ist, und wird nur begrenzt wenn die Sonne sonst mehr liefern würde. Auf 0 setzen schaltet ab. Zum Aufheben „Wechselrichter-Ausgangsbegrenzung aufheben“ verwenden (schreibt Nennleistung × 1.1). Funktioniert OHNE Smart Power Sensor.",
+          "nl": "Stelt het maximale AC-uitgangsvermogen van de omvormer in watt in (register 40126). Dit is een bovengrens, geen instelwaarde — de opbrengst volgt gewoon de PV-opbrengst zolang die lager is, en wordt alleen teruggeregeld wanneer de zon anders meer zou leveren. Op 0 zetten schakelt volledig uit. Gebruik „Uitgangsbegrenzing omvormer opheffen” om de begrenzing op te heffen (schrijft nominaal vermogen × 1,1). Werkt ZONDER Smart Power Sensor."
         },
         "args": [
           {
@@ -11495,9 +11505,9 @@
           "nl": "Maximaal terugleververmogen instellen op [[percentage]] %"
         },
         "hint": {
-          "en": "Sets the maximum grid feed-in power as a percentage of rated power via Modbus (register 47418). Set to 0 to block all export.",
-          "de": "Setzt die maximale Einspeiseleistung als Prozentsatz der Nennleistung über Modbus (Register 47418). Auf 0 setzen, um die Einspeisung zu unterbinden.",
-          "nl": "Stelt het maximale terugleververmogen in als percentage van het nominale vermogen, via Modbus (register 47418). Op 0 zetten blokkeert alle teruglevering."
+          "en": "Sets the maximum grid feed-in power as a percentage of rated power via Modbus (register 47418). Set to 0 to block all export. Also switches the active power control mode to \"Limited by Power (%)\" (register 47415 = 7), replacing a watt limit. Needs a power meter at the grid connection (e.g. DTSU666); without one the inverter ignores it — use \"Set inverter output limit (%)\" instead.",
+          "de": "Setzt die maximale Einspeiseleistung als Prozentsatz der Nennleistung über Modbus (Register 47418). Auf 0 setzen, um die Einspeisung zu unterbinden. Stellt dabei den Wirkleistungs-Steuermodus auf „Leistungsbegrenzt (%)“ (Register 47415 = 7) und ersetzt eine Watt-Begrenzung. Braucht einen Stromzähler am Netzanschluss (z. B. DTSU666); ohne ihn ignoriert der Wechselrichter die Einstellung – dann „Wechselrichter-Ausgangsbegrenzung setzen (%)“ verwenden.",
+          "nl": "Stelt het maximale terugleververmogen in als percentage van het nominale vermogen, via Modbus (register 47418). Op 0 zetten blokkeert alle teruglevering. Zet daarbij de regelmodus op „Begrensd op vermogen (%)” (register 47415 = 7) en vervangt zo een begrenzing in watt. Heeft een energiemeter op de netaansluiting nodig (bijv. DTSU666); zonder meter negeert de omvormer het – gebruik dan „Uitgangsbegrenzing omvormer instellen (%)”."
         },
         "args": [
           {
@@ -11537,9 +11547,9 @@
           "nl": "Nul-teruglevering inschakelen voor [[device]]"
         },
         "hint": {
-          "en": "Activates zero export: sets active power control mode to 'Max feed-in power' (register 47415 = 6) and sets the feed-in limit to 0 W (register 47416 = 0). The inverter will continue producing power for self-consumption but will not export any surplus to the grid. The feed-in mode and limit in force before are remembered, so 'Disable zero export' can put them back.",
-          "de": "Aktiviert die Nulleinspeisung: setzt den Wirkleistungs-Steuermodus auf 'Max. Einspeiseleistung' (Register 47415 = 6) und setzt das Einspeise-Limit auf 0 W (Register 47416 = 0). Der Wechselrichter produziert weiterhin Strom für den Eigenverbrauch, speist jedoch keinen Überschuss ins Netz ein. Der vorher gültige Modus samt Grenze wird gemerkt, damit 'Nulleinspeisung deaktivieren' ihn wiederherstellen kann.",
-          "nl": "Activeert nul-teruglevering: zet de regelmodus voor actief vermogen op 'Max. terugleververmogen' (register 47415 = 6) en de terugleverlimiet op 0 W (register 47416 = 0). De omvormer blijft stroom opwekken voor eigen verbruik, maar levert geen overschot meer terug aan het net. De modus en limiet die daarvoor golden worden onthouden, zodat 'Nul-teruglevering uitschakelen' ze kan terugzetten."
+          "en": "Activates zero export: sets active power control mode to \"Limited by Power (kW)\" (register 47415 = 6) and sets the feed-in limit to 0 W (register 47416 = 0). The inverter will continue producing power for self-consumption but will not export any surplus to the grid. The feed-in mode and limit in force before are remembered, so 'Disable zero export' can put them back. Needs a power meter at the grid connection (e.g. DTSU666); without one the inverter ignores it — use \"Set inverter output limit (W)\" instead.",
+          "de": "Aktiviert die Nulleinspeisung: setzt den Wirkleistungs-Steuermodus auf „Leistungsbegrenzt (kW)“ (Register 47415 = 6) und setzt das Einspeise-Limit auf 0 W (Register 47416 = 0). Der Wechselrichter produziert weiterhin Strom für den Eigenverbrauch, speist jedoch keinen Überschuss ins Netz ein. Der vorher gültige Modus samt Grenze wird gemerkt, damit 'Nulleinspeisung deaktivieren' ihn wiederherstellen kann. Braucht einen Stromzähler am Netzanschluss (z. B. DTSU666); ohne ihn ignoriert der Wechselrichter die Einstellung – dann „Wechselrichter-Ausgangsbegrenzung setzen (W)“ verwenden.",
+          "nl": "Activeert nul-teruglevering: zet de regelmodus voor actief vermogen op „Begrensd op vermogen (kW)” (register 47415 = 6) en de terugleverlimiet op 0 W (register 47416 = 0). De omvormer blijft stroom opwekken voor eigen verbruik, maar levert geen overschot meer terug aan het net. De modus en limiet die daarvoor golden worden onthouden, zodat 'Nul-teruglevering uitschakelen' ze kan terugzetten. Heeft een energiemeter op de netaansluiting nodig (bijv. DTSU666); zonder meter negeert de omvormer het – gebruik dan „Uitgangsbegrenzing omvormer instellen (W)”."
         },
         "args": [
           {
@@ -11562,9 +11572,9 @@
           "nl": "Nul-teruglevering uitschakelen voor [[device]]"
         },
         "hint": {
-          "en": "Deactivates zero export: puts back the feed-in mode and limit that were in force before 'Enable zero export' ran (registers 47416 and 47415) — a standing feed-in limit stays a limit. If no earlier state is known, for instance because zero export was switched on outside this app, it returns to 'No limit' (register 47415 = 0).",
-          "de": "Deaktiviert die Nulleinspeisung: stellt den Modus samt Grenze wieder her, der vor 'Nulleinspeisung aktivieren' galt (Register 47416 und 47415) — eine stehende Einspeisegrenze bleibt eine Grenze. Ist kein früherer Zustand bekannt, etwa weil die Nulleinspeisung ausserhalb dieser App eingeschaltet wurde, geht er auf 'Keine Begrenzung' (Register 47415 = 0).",
-          "nl": "Schakelt nul-teruglevering uit: zet de modus en limiet terug die golden vóór 'Nul-teruglevering inschakelen' (registers 47416 en 47415) — een vaste terugleverlimiet blijft een limiet. Is er geen eerdere toestand bekend, bijvoorbeeld omdat nul-teruglevering buiten deze app is ingeschakeld, dan gaat hij naar 'Geen begrenzing' (register 47415 = 0)."
+          "en": "Deactivates zero export: puts back the feed-in mode and limit that were in force before 'Enable zero export' ran (registers 47416 and 47415) — a standing feed-in limit stays a limit. If no earlier state is known, for instance because zero export was switched on outside this app, it returns to \"Unlimited\" (register 47415 = 0).",
+          "de": "Deaktiviert die Nulleinspeisung: stellt den Modus samt Grenze wieder her, der vor 'Nulleinspeisung aktivieren' galt (Register 47416 und 47415) — eine stehende Einspeisegrenze bleibt eine Grenze. Ist kein früherer Zustand bekannt, etwa weil die Nulleinspeisung ausserhalb dieser App eingeschaltet wurde, geht er auf „Unbegrenzt“ (Register 47415 = 0).",
+          "nl": "Schakelt nul-teruglevering uit: zet de modus en limiet terug die golden vóór 'Nul-teruglevering inschakelen' (registers 47416 en 47415) — een vaste terugleverlimiet blijft een limiet. Is er geen eerdere toestand bekend, bijvoorbeeld omdat nul-teruglevering buiten deze app is ingeschakeld, dan gaat hij naar „Onbegrensd” (register 47415 = 0)."
         },
         "args": [
           {
@@ -11731,9 +11741,9 @@
           "nl": "Bedrijfsmodus opslag instellen op [[mode]]"
         },
         "hint": {
-          "en": "What the inverter does on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there. For price- or forecast-driven charging use the Energy Management device instead of this card. (Modbus register 40000.)",
-          "de": "Was der Wechselrichter von sich aus tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Für preis- oder prognosegesteuertes Laden die Energieverwaltung nutzen statt dieser Karte. (Modbus-Register 40000.)",
-          "nl": "Wat de omvormer uit zichzelf doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Voor prijs- of prognosegestuurd laden gebruik je het Energiebeheer-apparaat in plaats van deze kaart. (Modbus-register 40000.)"
+          "en": "What the system does with the battery on its own (EMMA register 40000). For charging by price or forecast, use the Energy Management device instead of this card.\n\"Maximise Self-Consumption\" — the normal choice: surplus solar charges the battery; when the sun is not enough, or at night, the battery supplies the house.\n\"Time of Use (TOU)\": follows charge and discharge time windows stored in the system. In a charge window the battery charges, from the grid too; in a discharge window it supplies the house; outside the windows it does not discharge. Where surplus solar goes is set by \"Excess PV energy (Time of Use)\". This app does not write the windows — set them in the FusionSolar app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning.\n\"Fully Fed to Grid\": as much solar as possible into the grid. The battery charges only with what exceeds the inverter's maximum output, and discharges as soon as the sun falls below it, so the inverter keeps feeding in as much as it can.\n\"Third-party Scheduling\": only an outside platform decides charging and discharging. Choose it only if one is connected — otherwise nothing controls the battery.",
+          "de": "Was die Anlage von sich aus mit der Batterie tut (EMMA-Register 40000). Für preis- oder prognosegesteuertes Laden die Energieverwaltung nutzen statt dieser Karte.\n„Eigenverbrauch maximieren“ – der Normalfall: Solarüberschuss lädt die Batterie; reicht die Sonne nicht oder ist es Nacht, versorgt die Batterie das Haus.\n„Zeitabhängige Nutzung (TOU)“ – in Huaweis App „Time of Use“: folgt Lade- und Entladezeitfenstern, die in der Anlage gespeichert sind. In Ladefenstern lädt die Batterie, auch aus dem Netz; in Entladefenstern versorgt sie das Haus; ausserhalb der Fenster entlädt sie nicht. Wohin Solarüberschuss geht, regelt „PV-Überschuss (Zeitabhängige Nutzung)“. Diese App schreibt die Zeitfenster nicht – zuerst in der FusionSolar-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen.\n„Volleinspeisung“: möglichst viel Solarstrom ins Netz. Die Batterie lädt nur, was die maximale Ausgangsleistung des Wechselrichters übersteigt, und entlädt, sobald die Sonne darunter liegt, damit der Wechselrichter weiter möglichst viel einspeist.\n„Drittanbieter-Steuerung“: Laden und Entladen bestimmt allein eine fremde Plattform. Nur wählen, wenn eine angeschlossen ist – sonst steuert niemand die Batterie.",
+          "nl": "Wat de installatie uit zichzelf met de batterij doet (EMMA-register 40000). Gebruik voor laden op prijs of prognose het apparaat Energiebeheer in plaats van deze kaart.\n„Eigen verbruik maximaliseren” – de normale keuze: zonne-overschot laadt de batterij; is er te weinig zon of is het nacht, dan voedt de batterij het huis.\n„Tijdgebonden gebruik (TOU)”: volgt laad- en ontlaadvensters die in de installatie zijn opgeslagen. In een laadvenster laadt de batterij, ook uit het net; in een ontlaadvenster voedt ze het huis; buiten de vensters ontlaadt ze niet. Waar zonne-overschot heen gaat, regelt „PV-overschot (Time of Use)”. Deze app schrijft de vensters niet – stel ze eerst in via de FusionSolar-app, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen.\n„Volledig terugleveren”: zoveel mogelijk zonnestroom naar het net. De batterij laadt alleen met wat boven het maximale vermogen van de omvormer uitkomt, en ontlaadt zodra de zon daaronder zakt, zodat de omvormer zoveel mogelijk blijft terugleveren.\n„Aansturing door derden”: alleen een extern platform bepaalt laden en ontladen. Kies dit alleen als er een is aangesloten – anders stuurt niemand de batterij."
         },
         "args": [
           {
@@ -11851,9 +11861,9 @@
           "nl": "Max. laadvermogen uit het net instellen op [[power]] kW"
         },
         "hint": {
-          "en": "Sets the maximum power the LUNA2000 battery may draw from the grid for charging via EMMA Modbus (register 40002). Useful for time-of-use tariff automations.",
-          "de": "Setzt die maximale Leistung, mit der die LUNA2000-Batterie über das Netz geladen werden darf, über EMMA Modbus (Register 40002). Nützlich für Zeitarif-Automatisierungen.",
-          "nl": "Stelt in met hoeveel vermogen de LUNA2000-batterij maximaal uit het net mag laden, via EMMA Modbus (register 40002). Handig voor automatiseringen op basis van tijdgebonden tarieven."
+          "en": "Sets the maximum power the LUNA2000 battery may draw from the grid for charging via EMMA Modbus (register 40002). Huawei defines it for the working mode \"Time of Use (TOU)\".",
+          "de": "Setzt die maximale Leistung, mit der die LUNA2000-Batterie über das Netz geladen werden darf, über EMMA Modbus (Register 40002). Huawei definiert sie für den Betriebsmodus „Zeitabhängige Nutzung (TOU)“.",
+          "nl": "Stelt in met hoeveel vermogen de LUNA2000-batterij maximaal uit het net mag laden, via EMMA Modbus (register 40002). Huawei definieert het voor de bedrijfsmodus „Tijdgebonden gebruik (TOU)”."
         },
         "args": [
           {
@@ -11893,9 +11903,9 @@
           "nl": "Bedrijfsmodus opslag instellen op [[mode]]"
         },
         "hint": {
-          "en": "What the inverter does on its own. \"Maximise Self-Consumption\" is the normal choice. \"Time of Use\" follows a schedule stored inside the inverter, and this app does not write that schedule — set it in the FusionSolar installer app first, or the battery follows whatever is already stored there. For price- or forecast-driven charging use the Energy Management device instead of this card. (Modbus register 47086.)",
-          "de": "Was der Wechselrichter von sich aus tut. „Eigenverbrauch maximieren“ ist der Normalfall. „Zeitabhängige Nutzung“ (in Huaweis App „Time of Use“) folgt einem Zeitplan im Wechselrichter, den diese App nicht schreibt — den zuerst in der FusionSolar-Installateur-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Für preis- oder prognosegesteuertes Laden die Energieverwaltung nutzen statt dieser Karte. (Modbus-Register 47086.)",
-          "nl": "Wat de omvormer uit zichzelf doet. „Eigenverbruik maximaliseren” is de normale keuze. „Time of Use” (in de app van Huawei) volgt een schema dat in de omvormer is opgeslagen, en deze app schrijft dat schema niet — stel het eerst in via de FusionSolar-installateursapp, anders volgt de batterij wat daar al staat. Voor prijs- of prognosegestuurd laden gebruik je het Energiebeheer-apparaat in plaats van deze kaart. (Modbus-register 47086.)"
+          "en": "What the inverter does with the battery on its own (register 47086). For charging by price or forecast, use the Energy Management device instead of this card.\n\"Maximise Self-Consumption\" — the normal choice: surplus solar charges the battery; when the sun is not enough, or at night, the battery supplies the house.\n\"Time of Use (LUNA2000)\": follows charge and discharge time windows stored in the inverter. In a charge window the battery charges, from the grid too if \"Charge battery from grid\" is on; in a discharge window it supplies the house; outside the windows it does not discharge. Where surplus solar goes is set by \"Excess PV energy (Time of Use)\". This app does not write the windows — set them in the FusionSolar app first, or the battery follows whatever is already stored there, which is why it can start discharging on a sunny morning.\n\"Fully Fed to Grid\": as much solar as possible into the grid. The battery charges only with what exceeds the inverter's maximum output, and discharges as soon as the sun falls below it, so the inverter keeps feeding in as much as it can.\n\"Third-party Scheduling\": only an outside platform decides charging and discharging. Choose it only if one is connected — otherwise nothing controls the battery.\n\"Fixed Charge/Discharge\" and \"Time of Use (LG)\" belong to LG batteries (LG RESU): their time windows — fixed charge and discharge powers, or electricity prices — exist only there, according to Huawei. For \"Adaptive\" Huawei writes only \"Fixed charge/discharge / Maximise self consumption\", without explanation. Do not choose any of the three with a LUNA2000.",
+          "de": "Was der Wechselrichter von sich aus mit der Batterie tut (Register 47086). Für preis- oder prognosegesteuertes Laden die Energieverwaltung nutzen statt dieser Karte.\n„Eigenverbrauch maximieren“ – der Normalfall: Solarüberschuss lädt die Batterie; reicht die Sonne nicht oder ist es Nacht, versorgt die Batterie das Haus.\n„Zeitabhängige Nutzung (LUNA2000)“ – in Huaweis App „Time of Use“: folgt Lade- und Entladezeitfenstern, die im Wechselrichter gespeichert sind. In Ladefenstern lädt die Batterie, auch aus dem Netz, wenn „Batterie aus dem Netz laden“ eingeschaltet ist; in Entladefenstern versorgt sie das Haus; ausserhalb der Fenster entlädt sie nicht. Wohin Solarüberschuss geht, regelt „PV-Überschuss (Zeitabhängige Nutzung)“. Diese App schreibt die Zeitfenster nicht – zuerst in der FusionSolar-App setzen, sonst folgt die Batterie dem, was dort ohnehin gespeichert ist. Genau deshalb kann sie an einem sonnigen Morgen zu entladen beginnen.\n„Volleinspeisung“: möglichst viel Solarstrom ins Netz. Die Batterie lädt nur, was die maximale Ausgangsleistung des Wechselrichters übersteigt, und entlädt, sobald die Sonne darunter liegt, damit der Wechselrichter weiter möglichst viel einspeist.\n„Drittanbieter-Steuerung“: Laden und Entladen bestimmt allein eine fremde Plattform. Nur wählen, wenn eine angeschlossen ist – sonst steuert niemand die Batterie.\n„Festes Laden/Entladen“ und „Zeitabhängige Nutzung (LG)“ gehören zu LG-Batterien (LG RESU): Ihre Zeitfenster – feste Lade- und Entladeleistungen bzw. Strompreise – gibt es laut Huawei nur dort. Zu „Adaptiv“ schreibt Huawei nur „Fixed charge/discharge / Maximise self consumption“, ohne Erklärung. Alle drei mit einer LUNA2000 nicht wählen.",
+          "nl": "Wat de omvormer uit zichzelf met de batterij doet (register 47086). Gebruik voor laden op prijs of prognose het apparaat Energiebeheer in plaats van deze kaart.\n„Eigen verbruik maximaliseren” – de normale keuze: zonne-overschot laadt de batterij; is er te weinig zon of is het nacht, dan voedt de batterij het huis.\n„Tijdgebonden gebruik (LUNA2000)”: volgt laad- en ontlaadvensters die in de omvormer zijn opgeslagen. In een laadvenster laadt de batterij, ook uit het net als „Batterij laden uit het net” aan staat; in een ontlaadvenster voedt ze het huis; buiten de vensters ontlaadt ze niet. Waar zonne-overschot heen gaat, regelt „PV-overschot (Time of Use)”. Deze app schrijft de vensters niet – stel ze eerst in via de FusionSolar-app, anders volgt de batterij wat daar al staat. Daarom kan ze op een zonnige ochtend gaan ontladen.\n„Volledig terugleveren”: zoveel mogelijk zonnestroom naar het net. De batterij laadt alleen met wat boven het maximale vermogen van de omvormer uitkomt, en ontlaadt zodra de zon daaronder zakt, zodat de omvormer zoveel mogelijk blijft terugleveren.\n„Aansturing door derden”: alleen een extern platform bepaalt laden en ontladen. Kies dit alleen als er een is aangesloten – anders stuurt niemand de batterij.\n„Vast laden/ontladen” en „Tijdgebonden gebruik (LG)” horen bij LG-batterijen (LG RESU): hun tijdvensters – vaste laad- en ontlaadvermogens of elektriciteitsprijzen – bestaan volgens Huawei alleen daar. Bij „Adaptief” schrijft Huawei alleen „Fixed charge/discharge / Maximise self consumption”, zonder uitleg. Kies geen van de drie met een LUNA2000."
         },
         "args": [
           {
@@ -12121,9 +12131,9 @@
           "nl": "Geforceerd laden/ontladen instellen op [[mode]]"
         },
         "hint": {
-          "en": "Force the LUNA2000 battery to charge, discharge, or stop. The battery returns to its normal working mode after the command completes.",
-          "de": "LUNA2000-Batterie zum Laden, Entladen oder Stoppen zwingen. Die Batterie kehrt nach Abschluss in den normalen Betriebsmodus zurück.",
-          "nl": "Dwingt de LUNA2000-batterij te laden, te ontladen of te stoppen. Na afloop keert de batterij terug naar haar normale bedrijfsmodus."
+          "en": "Force the LUNA2000 battery to charge, discharge, or stop. The battery returns to its normal working mode after the command completes. Writes register 47100 only: the power, target SoC and duration are whatever is already set on the inverter.",
+          "de": "LUNA2000-Batterie zum Laden, Entladen oder Stoppen zwingen. Die Batterie kehrt nach Abschluss in den normalen Betriebsmodus zurück. Schreibt nur Register 47100: Leistung, Ziel-SoC und Dauer sind die Werte, die im Wechselrichter bereits eingestellt sind.",
+          "nl": "Dwingt de LUNA2000-batterij te laden, te ontladen of te stoppen. Na afloop keert de batterij terug naar haar normale bedrijfsmodus. Schrijft alleen register 47100: vermogen, doel-SoC en duur zijn de waarden die al in de omvormer zijn ingesteld."
         },
         "args": [
           {
@@ -12181,9 +12191,9 @@
           "nl": "Laden met [[power]] W tot [[target_soc]] % starten"
         },
         "hint": {
-          "en": "Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47247, 47101, 47100).",
-          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47247, 47101, 47100).",
-          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47247, 47101, 47100)."
+          "en": "Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47247, 47101, 47100). The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47247, 47101, 47100). Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47247, 47101, 47100). Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12240,9 +12250,9 @@
           "nl": "Ontladen met [[power]] W tot [[target_soc]] % starten"
         },
         "hint": {
-          "en": "Starts force discharging the LUNA2000 at the given power until the target SoC is reached (registers 47249, 47101, 47100).",
-          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47249, 47101, 47100).",
-          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47249, 47101, 47100)."
+          "en": "Starts force discharging the LUNA2000 at the given power until the target SoC is reached (registers 47249, 47101, 47100). The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung bis der Ziel-SoC erreicht ist (Register 47249, 47101, 47100). Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen tot de doel-SoC is bereikt (registers 47249, 47101, 47100). Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12359,9 +12369,9 @@
           "nl": "Laden met [[power]] W gedurende [[duration]] minuten starten"
         },
         "hint": {
-          "en": "Starts force charging the LUNA2000 at the given power for the specified duration (registers 47247, 47083, 47100). The battery firmware stops automatically when the timer expires.",
-          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47247, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers.",
-          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47247, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is."
+          "en": "Starts force charging the LUNA2000 at the given power for the specified duration (registers 47247, 47083, 47100). The battery firmware stops automatically when the timer expires. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47247, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd laden van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47247, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12418,9 +12428,9 @@
           "nl": "Ontladen met [[power]] W gedurende [[duration]] minuten starten"
         },
         "hint": {
-          "en": "Starts force discharging the LUNA2000 at the given power for the specified duration (registers 47249, 47083, 47100). The battery firmware stops automatically when the timer expires.",
-          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47249, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers.",
-          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47249, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is."
+          "en": "Starts force discharging the LUNA2000 at the given power for the specified duration (registers 47249, 47083, 47100). The battery firmware stops automatically when the timer expires. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Startet das Zwangsentladen der LUNA2000 mit der angegebenen Leistung für die angegebene Dauer (Register 47249, 47083, 47100). Die Batterie-Firmware stoppt automatisch nach Ablauf des Timers. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Start het geforceerd ontladen van de LUNA2000 met het opgegeven vermogen gedurende de opgegeven tijd (registers 47249, 47083, 47100). De firmware van de batterij stopt automatisch zodra de tijd verstreken is. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12477,9 +12487,9 @@
           "nl": "Vermogen voor geforceerd laden instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the maximum charge power limit for force charging (register 47247). Does not start force charging — use 'Start force charge' or 'Set force charge/discharge' for that.",
-          "de": "Setzt das Ladeleistungslimit für das Zwangsladen (Register 47247). Startet kein Zwangsladen — verwende dafür 'Zwangsladen starten' oder 'Zwangsladen/Entladen steuern'.",
-          "nl": "Stelt de bovengrens voor het laadvermogen bij geforceerd laden in (register 47247). Start het geforceerd laden niet — gebruik daarvoor 'Geforceerd laden starten' of 'Geforceerd laden/ontladen aansturen'."
+          "en": "Sets the maximum charge power limit for force charging (register 47247). Does not start force charging — use \"Start charging until SoC %\", \"Start charging for minutes\" or \"Set force charge/discharge\" for that. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Setzt das Ladeleistungslimit für das Zwangsladen (Register 47247). Startet kein Zwangsladen — verwende dafür „Laden bis SoC % starten“, „Laden für Minuten starten“ oder „Zwangsladen/Entladen steuern“. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Stelt de bovengrens voor het laadvermogen bij geforceerd laden in (register 47247). Start het geforceerd laden niet — gebruik daarvoor „Laden tot SoC % starten”, „Laden gedurende minuten starten” of „Geforceerd laden/ontladen aansturen”. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -12519,9 +12529,9 @@
           "nl": "Maximaal laadvermogen instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the maximum battery charge power (register 47075, UINT32). The value is also visible in device settings and synced back on the next control poll.",
-          "de": "Setzt die maximale Batterieladeleistung (Register 47075, UINT32). Der Wert ist auch in den Geräteeinstellungen sichtbar und wird beim nächsten Control-Poll zurückgelesen.",
-          "nl": "Stelt het maximale laadvermogen van de batterij in (register 47075, UINT32). De waarde is ook zichtbaar in de apparaatinstellingen en wordt bij de volgende regeluitlezing teruggelezen."
+          "en": "Sets the maximum battery charge power (register 47075, UINT32). The device setting and tile follow at once, and the value is read back on every poll.",
+          "de": "Setzt die maximale Batterieladeleistung (Register 47075, UINT32). Geräteeinstellung und Kachel folgen sofort, und der Wert wird bei jeder Abfrage zurückgelesen.",
+          "nl": "Stelt het maximale laadvermogen van de batterij in (register 47075, UINT32). De apparaatinstelling en de tegel volgen meteen, en de waarde wordt bij elke uitlezing teruggelezen."
         },
         "args": [
           {
@@ -12561,9 +12571,9 @@
           "nl": "Maximaal ontlaadvermogen instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the maximum battery discharge power (register 47077, UINT32). The value is also visible in device settings and synced back on the next control poll.",
-          "de": "Setzt die maximale Batterieentladeleistung (Register 47077, UINT32). Der Wert ist auch in den Geräteeinstellungen sichtbar und wird beim nächsten Control-Poll zurückgelesen.",
-          "nl": "Stelt het maximale ontlaadvermogen van de batterij in (register 47077, UINT32). De waarde is ook zichtbaar in de apparaatinstellingen en wordt bij de volgende regeluitlezing teruggelezen."
+          "en": "Sets the maximum battery discharge power (register 47077, UINT32). The device setting and tile follow at once, and the value is read back on every poll.",
+          "de": "Setzt die maximale Batterieentladeleistung (Register 47077, UINT32). Geräteeinstellung und Kachel folgen sofort, und der Wert wird bei jeder Abfrage zurückgelesen.",
+          "nl": "Stelt het maximale ontlaadvermogen van de batterij in (register 47077, UINT32). De apparaatinstelling en de tegel volgen meteen, en de waarde wordt bij elke uitlezing teruggelezen."
         },
         "args": [
           {
@@ -12907,9 +12917,9 @@
           "nl": "Maximaal laadvermogen uit het net instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the hard upper limit for grid-charging power (register 47244, UINT32). Unlike the schedule-based grid charge power (register 47242), this cap applies at all times.",
-          "de": "Setzt die absolute Obergrenze für die Ladeleistung aus dem Netz (Register 47244, UINT32). Im Gegensatz zur zeitplanbasierten Netzladeleistung (Register 47242) gilt diese Grenze jederzeit.",
-          "nl": "Stelt de absolute bovengrens in voor het laadvermogen uit het net (register 47244, UINT32). Anders dan het schemagebonden laadvermogen (register 47242) geldt deze grens altijd."
+          "en": "Sets the ceiling for charging from the grid (register 47244, UINT32) — the upper limit that \"Set grid charge power\" (register 47242) cannot exceed.",
+          "de": "Setzt die Obergrenze fürs Laden aus dem Netz (Register 47244, UINT32) – die Grenze, die „Netzladeleistung setzen“ (Register 47242) nicht überschreiten kann.",
+          "nl": "Stelt de bovengrens in voor laden uit het net (register 47244, UINT32) – de grens die „Laadvermogen uit het net instellen” (register 47242) niet kan overschrijden."
         },
         "args": [
           {
@@ -12949,9 +12959,9 @@
           "nl": "Vermogen voor geforceerd ontladen instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the power for forced discharging (register 47249, UINT32). Use before or instead of the combined 'Start force discharge' card when you need independent power control.",
-          "de": "Setzt die Leistung für die Zwangsentladung (Register 47249, UINT32). Vor oder anstelle der kombinierten 'Zwangsentladung starten'-Karte verwenden, wenn eine unabhängige Leistungssteuerung benötigt wird.",
-          "nl": "Stelt het vermogen voor geforceerd ontladen in (register 47249, UINT32). Gebruik deze kaart vóór of in plaats van de gecombineerde kaart 'Geforceerd ontladen starten' wanneer u het vermogen apart wilt regelen."
+          "en": "Sets the power for forced discharging (register 47249, UINT32). Does not start discharging — use \"Start discharging until SoC %\", \"Start discharging for minutes\" or \"Set force charge/discharge\" for that. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0.",
+          "de": "Setzt die Leistung für die Zwangsentladung (Register 47249, UINT32). Startet keine Entladung – dafür „Entladen bis SoC % starten“, „Entladen für Minuten starten“ oder „Zwangsladen/Entladen steuern“ verwenden. Die Leistung wird auf die maximale Lade- bzw. Entladeleistung der Batterie begrenzt (Register 47075/47077); steht diese auf 0, wird die Karte abgelehnt.",
+          "nl": "Stelt het vermogen voor geforceerd ontladen in (register 47249, UINT32). Start het ontladen niet – gebruik daarvoor „Ontladen tot SoC % starten”, „Ontladen gedurende minuten starten” of „Geforceerd laden/ontladen aansturen”. Het vermogen wordt begrensd tot het maximale laad- of ontlaadvermogen van de batterij (registers 47075/47077); staat dat op 0, dan wordt de kaart geweigerd."
         },
         "args": [
           {
@@ -13181,6 +13191,11 @@
           "de": "Jetzt laden mit 16A",
           "nl": "Nu laden op 16A"
         },
+        "hint": {
+          "en": "Charges at 16 A right away, whatever the default current: resumes a paused session at 16 A, raises a running session to 16 A, or starts a new one (also releasing a car that waits for a start). Fails if the charger is offline or no car is plugged in.",
+          "de": "Lädt sofort mit 16 A, unabhängig vom Standardstrom: setzt eine pausierte Sitzung mit 16 A fort, hebt eine laufende auf 16 A an oder startet eine neue (gibt auch ein wartendes Auto frei). Schlägt fehl, wenn die Ladestation offline oder kein Auto eingesteckt ist.",
+          "nl": "Laadt meteen met 16 A, ongeacht de standaardstroom: hervat een gepauzeerde sessie met 16 A, verhoogt een lopende sessie naar 16 A of start een nieuwe (geeft ook een wachtende auto vrij). Mislukt als de laadpaal offline is of er geen auto is aangesloten."
+        },
         "args": [
           {
             "name": "device",
@@ -13195,6 +13210,11 @@
           "en": "Enable or disable EMS",
           "de": "EMS aktivieren oder deaktivieren",
           "nl": "EMS in- of uitschakelen"
+        },
+        "hint": {
+          "en": "Switches the Energy Management on or off — the same as the device's on/off switch. While off it keeps showing readings but starts, stops and adjusts nothing; devices it started stay as they are, and its mode reads Disabled.",
+          "de": "Schaltet die Energieverwaltung ein oder aus – wie der Ein/Aus-Schalter des Geräts. Ausgeschaltet zeigt sie weiter Messwerte, schaltet und regelt aber nichts; von ihr gestartete Geräte bleiben, wie sie sind, und der Modus lautet „Deaktiviert“.",
+          "nl": "Schakelt het Energiebeheer in of uit – net als de aan/uit-schakelaar van het apparaat. Uitgeschakeld toont het nog metingen, maar start, stopt en regelt het niets; door het gestarte apparaten blijven zoals ze zijn, en de modus is Uitgeschakeld."
         },
         "titleFormatted": {
           "en": "Set EMS to [[enabled]]",
@@ -13242,6 +13262,11 @@
         "en": "Enable or disable EMS control for a device",
         "de": "EMS-Steuerung für ein Gerät ein- oder ausschalten",
         "nl": "EMS-regeling voor een apparaat in- of uitschakelen"
+      },
+      "hint": {
+        "en": "Takes one charger or device out of EMS control, or hands it back — the same switch as in the EMS settings and the EMS Device widget, and saved there. While it is out, the EMS neither starts nor stops it. Fails if the device is no longer set up in the EMS.",
+        "de": "Nimmt eine Ladestation oder ein Gerät aus der EMS-Steuerung oder gibt es zurück – derselbe Schalter wie in den EMS-Einstellungen und im EMS-Geräte-Widget, und dort gespeichert. Solange es ausgenommen ist, schaltet das EMS es weder ein noch aus. Schlägt fehl, wenn das Gerät nicht mehr im EMS eingerichtet ist.",
+        "nl": "Haalt een laadpaal of apparaat uit de EMS-sturing of geeft het terug – dezelfde schakelaar als in de EMS-instellingen en de EMS-apparaatwidget, en daar opgeslagen. Zolang het eruit is, schakelt het EMS het niet in of uit. Mislukt als het apparaat niet meer in het EMS is ingesteld."
       },
       "titleFormatted": {
         "en": "Set EMS control for [[target]] to [[enabled]]",
@@ -13354,7 +13379,7 @@
         "hint": {
           "en": "Feeds an hourly price array (e.g. the \"Prices\" token from \"Power by the Hour\"'s New prices received trigger, or any similar day-ahead price app) into the EMS for price-optimised EV charging (chargers set to \"Solar & price-optimised\"). Link this once from your price app's forecast trigger — no separate schedule needed.",
           "de": "Speist ein stündliches Preis-Array (z.B. den \"Prices\"-Token vom \"New prices received\"-Trigger von \"Power by the Hour\", oder einer ähnlichen Day-Ahead-Preis-App) ins EMS für preisoptimiertes EV-Laden (Lader im Modus \"Solar & preisoptimiert\"). Einmalig mit dem Prognose-Trigger deiner Preis-App verknüpfen — kein separater Zeitplan nötig.",
-          "nl": "Voedt een uur-array met prijzen (bijv. de \"Prices\"-token van de New prices received-trigger van \"Power by the Hour\", of een vergelijkbare day-ahead-prijsapp) naar het EMS voor prijsgeoptimaliseerd laden (laders ingesteld op \"Zon & prijsgeoptimaliseerd\"). Eenmalig koppelen aan de voorspellingstrigger van je prijsapp."
+          "nl": "Voedt een uur-array met prijzen (bijv. de \"Prices\"-token van de New prices received-trigger van \"Power by the Hour\", of een vergelijkbare day-ahead-prijsapp) naar het EMS voor prijsgeoptimaliseerd laden (laders ingesteld op \"Zon & prijsgeoptimaliseerd\"). Eenmalig koppelen aan de voorspellingstrigger van je prijsapp. Geen apart schema nodig."
         },
         "args": [
           {
@@ -13496,9 +13521,9 @@
           "nl": "Lader !{{laadt|laadt niet}}"
         },
         "hint": {
-          "en": "True while current is actually flowing to the car, as opposed to the cable merely being connected.",
-          "de": "Wahr, solange tatsächlich Strom ins Auto fliesst — im Unterschied zu einem bloss eingesteckten Kabel.",
-          "nl": "Waar zolang er werkelijk stroom naar de auto loopt, in tegenstelling tot een enkel aangesloten kabel."
+          "en": "True while the charger reports the status Charging — what the charger says, not measured power — as opposed to the cable merely being connected.",
+          "de": "Wahr, solange die Ladestation den Status „Charging“ meldet – nach ihrer Angabe, nicht nach gemessener Leistung – im Unterschied zu einem bloss eingesteckten Kabel.",
+          "nl": "Waar zolang de laadpaal de status „Charging” meldt – volgens de laadpaal, niet volgens gemeten vermogen – in tegenstelling tot een enkel aangesloten kabel."
         },
         "args": [
           {
@@ -13789,9 +13814,9 @@
           "nl": "Zonnevermogen is !{{langer dan|niet langer dan}} [[duration]] min boven [[power]] W"
         },
         "hint": {
-          "en": "True when solar power has been continuously above the specified wattage for at least the given number of minutes.",
-          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer überschreitet.",
-          "nl": "Waar wanneer het zonnevermogen onafgebroken boven de opgegeven waarde ligt, gedurende ten minste het opgegeven aantal minuten."
+          "en": "True when solar power has been continuously above the specified wattage for at least the given number of minutes. What \"solar power\" is depends on the device: PV input power on a SUN2000 via Modbus, the EMMA's PV power via EMMA, AC active power on a cloud inverter (which on a hybrid inverter includes battery discharge). The app keeps about 2 hours of readings: a longer duration is never true, and after an app restart the card needs that much history first.",
+          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer überschreitet. Was „Solarleistung“ ist, hängt vom Gerät ab: beim SUN2000 über Modbus die PV-Eingangsleistung, über EMMA die PV-Leistung der EMMA, beim Cloud-Wechselrichter die AC-Wirkleistung (bei einem Hybrid-Wechselrichter samt Batterieentladung). Die App behält etwa 2 Stunden Messwerte: Eine längere Dauer ist nie wahr, und nach einem Neustart der App braucht die Karte erst so viel Verlauf.",
+          "nl": "Waar wanneer het zonnevermogen onafgebroken boven de opgegeven waarde ligt, gedurende ten minste het opgegeven aantal minuten. Wat „zonnevermogen” is, hangt van het apparaat af: bij een SUN2000 via Modbus het PV-ingangsvermogen, via EMMA het PV-vermogen van de EMMA, bij een cloud-omvormer het AC-werkzaam vermogen (bij een hybride omvormer inclusief batterijontlading). De app bewaart ongeveer 2 uur aan metingen: een langere duur is nooit waar, en na een herstart van de app heeft de kaart eerst zoveel geschiedenis nodig."
         },
         "args": [
           {
@@ -13842,9 +13867,9 @@
           "nl": "Zonnevermogen is !{{langer dan|niet langer dan}} [[duration]] min onder [[power]] W"
         },
         "hint": {
-          "en": "True when solar power has been continuously below the specified wattage for at least the given number of minutes.",
-          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer unterschreitet.",
-          "nl": "Waar wanneer het zonnevermogen onafgebroken onder de opgegeven waarde ligt, gedurende ten minste het opgegeven aantal minuten."
+          "en": "True when solar power has been continuously below the specified wattage for at least the given number of minutes. What \"solar power\" is depends on the device: PV input power on a SUN2000 via Modbus, the EMMA's PV power via EMMA, AC active power on a cloud inverter (which on a hybrid inverter includes battery discharge). The app keeps about 2 hours of readings: a longer duration is never true, and after an app restart the card needs that much history first.",
+          "de": "Wahr, wenn die Solarleistung den angegebenen Wert ununterbrochen für mindestens die eingestellte Dauer unterschreitet. Was „Solarleistung“ ist, hängt vom Gerät ab: beim SUN2000 über Modbus die PV-Eingangsleistung, über EMMA die PV-Leistung der EMMA, beim Cloud-Wechselrichter die AC-Wirkleistung (bei einem Hybrid-Wechselrichter samt Batterieentladung). Die App behält etwa 2 Stunden Messwerte: Eine längere Dauer ist nie wahr, und nach einem Neustart der App braucht die Karte erst so viel Verlauf.",
+          "nl": "Waar wanneer het zonnevermogen onafgebroken onder de opgegeven waarde ligt, gedurende ten minste het opgegeven aantal minuten. Wat „zonnevermogen” is, hangt van het apparaat af: bij een SUN2000 via Modbus het PV-ingangsvermogen, via EMMA het PV-vermogen van de EMMA, bij een cloud-omvormer het AC-werkzaam vermogen (bij een hybride omvormer inclusief batterijontlading). De app bewaart ongeveer 2 uur aan metingen: een langere duur is nooit waar, en na een herstart van de app heeft de kaart eerst zoveel geschiedenis nodig."
         },
         "args": [
           {
@@ -14019,9 +14044,9 @@
           "nl": "SoC voor noodstroom is !{{boven|niet boven}} [[soc]] %"
         },
         "hint": {
-          "en": "True when the backup power reserve (register 47102) is above the given threshold. Read from the inverter on every poll, so it follows a change made anywhere.",
-          "de": "Wahr, wenn die Backup-Reserve (Register 47102) über dem angegebenen Schwellwert liegt. Wird bei jeder Abfrage vom Wechselrichter gelesen und folgt damit einer Änderung von überall her.",
-          "nl": "Waar wanneer de gereserveerde noodstroomcapaciteit (register 47102) boven de opgegeven drempel ligt. Wordt bij elke uitlezing van de omvormer gelezen."
+          "en": "True when the backup power reserve (register 47102 on a LUNA2000 via the inverter, 30373 via EMMA) is above the given threshold. Read on every poll, so it follows a change made anywhere.",
+          "de": "Wahr, wenn die Backup-Reserve (Register 47102 beim LUNA2000 über den Wechselrichter, 30373 über EMMA) über dem angegebenen Schwellwert liegt. Wird bei jeder Abfrage gelesen und folgt damit einer Änderung von überall her.",
+          "nl": "Waar wanneer de gereserveerde noodstroomcapaciteit (register 47102 bij een LUNA2000 via de omvormer, 30373 via EMMA) boven de opgegeven drempel ligt. Wordt bij elke uitlezing gelezen en volgt dus een wijziging van waar dan ook."
         },
         "args": [
           {
@@ -14061,9 +14086,9 @@
           "nl": "SoC voor noodstroom is !{{onder|niet onder}} [[soc]] %"
         },
         "hint": {
-          "en": "True when the backup power reserve (register 47102) is below the given threshold. Read from the inverter on every poll, so it follows a change made anywhere.",
-          "de": "Wahr, wenn die Backup-Reserve (Register 47102) unter dem angegebenen Schwellwert liegt. Wird bei jeder Abfrage vom Wechselrichter gelesen und folgt damit einer Änderung von überall her.",
-          "nl": "Waar wanneer de gereserveerde noodstroomcapaciteit (register 47102) onder de opgegeven drempel ligt. Wordt bij elke uitlezing van de omvormer gelezen."
+          "en": "True when the backup power reserve (register 47102 on a LUNA2000 via the inverter, 30373 via EMMA) is below the given threshold. Read on every poll, so it follows a change made anywhere.",
+          "de": "Wahr, wenn die Backup-Reserve (Register 47102 beim LUNA2000 über den Wechselrichter, 30373 über EMMA) unter dem angegebenen Schwellwert liegt. Wird bei jeder Abfrage gelesen und folgt damit einer Änderung von überall her.",
+          "nl": "Waar wanneer de gereserveerde noodstroomcapaciteit (register 47102 bij een LUNA2000 via de omvormer, 30373 via EMMA) onder de opgegeven drempel ligt. Wordt bij elke uitlezing gelezen en volgt dus een wijziging van waar dan ook."
         },
         "args": [
           {
@@ -14147,7 +14172,7 @@
         "hint": {
           "en": "True when the battery max charge power setting (register 47075) is below the given threshold. Use threshold 1 to check whether the limit has already been set to 0 (blocked). Synced from the inverter on every poll, and at once after a change made from Homey.",
           "de": "Wahr, wenn die maximale Batterieladeleistung (Register 47075) unter dem angegebenen Schwellwert liegt. Schwellwert 1 prüft, ob das Limit bereits auf 0 (blockiert) gesetzt wurde. Wird bei jeder Abfrage synchronisiert, nach einer Änderung aus Homey sofort.",
-          "nl": "Waar wanneer de instelling voor het maximale laadvermogen van de batterij (register 47075) onder de opgegeven drempel ligt. Met drempel 1 controleert u of de grens al op 0 (geblokkeerd) staat. Wordt bij elke uitlezing met de omvormer gesynchroniseerd, en direct na een wijziging vanuit Homey."
+          "nl": "Waar wanneer de instelling voor het maximale laadvermogen van de batterij (register 47075) onder de opgegeven drempel ligt. Met drempel 1 controleer je of de grens al op 0 (geblokkeerd) staat. Wordt bij elke uitlezing met de omvormer gesynchroniseerd, en direct na een wijziging vanuit Homey."
         },
         "args": [
           {
@@ -14231,7 +14256,7 @@
         "hint": {
           "en": "True when the battery max discharge power setting (register 47077) is below the given threshold. Use threshold 1 to check whether the limit has already been set to 0 (blocked). Synced from the inverter on every poll, and at once after a change made from Homey.",
           "de": "Wahr, wenn die maximale Batterieentladeleistung (Register 47077) unter dem angegebenen Schwellwert liegt. Schwellwert 1 prüft, ob das Limit bereits auf 0 (blockiert) gesetzt wurde. Wird bei jeder Abfrage synchronisiert, nach einer Änderung aus Homey sofort.",
-          "nl": "Waar wanneer de instelling voor het maximale ontlaadvermogen van de batterij (register 47077) onder de opgegeven drempel ligt. Met drempel 1 controleert u of de grens al op 0 (geblokkeerd) staat. Wordt bij elke uitlezing met de omvormer gesynchroniseerd, en direct na een wijziging vanuit Homey."
+          "nl": "Waar wanneer de instelling voor het maximale ontlaadvermogen van de batterij (register 47077) onder de opgegeven drempel ligt. Met drempel 1 controleer je of de grens al op 0 (geblokkeerd) staat. Wordt bij elke uitlezing met de omvormer gesynchroniseerd, en direct na een wijziging vanuit Homey."
         },
         "args": [
           {
@@ -14287,7 +14312,7 @@
         },
         "hint": {
           "en": "Checks the current online status of the DTSU666 grid meter (Offline or Normal).",
-          "de": "Prüft den aktuellen Online-Status des DTSU666-Netzwerkzählers (Offline oder Normal).",
+          "de": "Prüft den aktuellen Online-Status des DTSU666-Netzzählers (Offline oder Normal).",
           "nl": "Controleert de actuele onlinestatus van de DTSU666-netmeter (Offline of Normaal)."
         },
         "titleFormatted": {
@@ -14923,8 +14948,8 @@
         },
         "hint": {
           "en": "Checks whether the SUN2000 inverter is currently generating power.",
-          "de": "Prüft, ob der Inverter SUN 2000 aktuell Strom erzeugt.",
-          "nl": "Controleert of de Inverter SUN 2000 op dit moment stroom opwekt."
+          "de": "Prüft, ob der SUN2000-Wechselrichter aktuell Strom erzeugt.",
+          "nl": "Controleert of de SUN2000-omvormer op dit moment stroom opwekt."
         },
         "args": [
           {
@@ -14940,6 +14965,11 @@
           "en": "EMS mode !{{is|is not}}",
           "de": "EMS-Modus !{{ist|ist nicht}}",
           "nl": "EMS-modus !{{is|is niet}}"
+        },
+        "hint": {
+          "en": "Compares the EMS's current mode (shown on the Energy Management device) with the one selected. To react the moment it changes, use the trigger for a changed EMS mode.",
+          "de": "Vergleicht den aktuellen EMS-Modus (am Gerät Energieverwaltung angezeigt) mit dem gewählten. Um sofort auf einen Wechsel zu reagieren, den Auslöser für einen geänderten EMS-Modus verwenden.",
+          "nl": "Vergelijkt de huidige EMS-modus (getoond op het apparaat Energiebeheer) met de gekozen modus. Gebruik de trigger voor een gewijzigde EMS-modus om meteen op een wissel te reageren."
         },
         "titleFormatted": {
           "en": "EMS mode !{{is|is not}} [[mode]]",
@@ -15091,6 +15121,11 @@
         "en": "EMS control for a device !{{is|is not}} active",
         "de": "EMS-Steuerung für ein Gerät !{{ist|ist nicht}} aktiv",
         "nl": "EMS-regeling voor een apparaat !{{is|is niet}} actief"
+      },
+      "hint": {
+        "en": "True while the EMS may start and stop the chosen charger or device — the per-device switch in the EMS settings and the EMS Device widget. Fails if the device is no longer set up in the EMS.",
+        "de": "Wahr, solange das EMS die gewählte Ladestation bzw. das gewählte Gerät ein- und ausschalten darf – der Schalter pro Gerät in den EMS-Einstellungen und im EMS-Geräte-Widget. Schlägt fehl, wenn das Gerät nicht mehr im EMS eingerichtet ist.",
+        "nl": "Waar zolang het EMS de gekozen laadpaal of het gekozen apparaat mag in- en uitschakelen – de schakelaar per apparaat in de EMS-instellingen en de EMS-apparaatwidget. Mislukt als het apparaat niet meer in het EMS is ingesteld."
       },
       "titleFormatted": {
         "en": "EMS control for [[target]] !{{is|is not}} active",
