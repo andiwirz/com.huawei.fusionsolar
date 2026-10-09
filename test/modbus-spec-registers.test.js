@@ -129,6 +129,34 @@ test('a row the spec contradicts itself about is listed but never typed', () => 
   assert.ok(conflicts.some((r) => r.address === 47321), '47321 is no longer flagged');
 });
 
+test('a row is left untyped only where the app has no decoder for what the documentation says', () => {
+  // Until 1.2.282 the EMMA's seven U64 energy totals were untyped like the I64 ones, although
+  // UINT64 has a decoder and the EMMA driver polls six of them. The Registers tab offered no
+  // read for them, "Read all" skipped them, and the comparison further down — which only
+  // compares types where the list has one — never looked at what the app reads them as.
+  const DECODER = {
+    U16: 'UINT16', UINT16: 'UINT16', ENUM16: 'UINT16', Bitfield16: 'UINT16',
+    I16: 'INT16',  INT16: 'INT16',
+    U32: 'UINT32', UINT32: 'UINT32', Bitfield32: 'UINT32', DBitfield32: 'UINT32', EPOCHTIME: 'UINT32',
+    I32: 'INT32',  INT32: 'INT32',
+    U64: 'UINT64',
+    STR: 'STRING', STRING: 'STRING', String: 'STRING',
+  };
+  // Byte blocks are not one number; I64 has no decoder (nobody polls those six).
+  const UNDECODABLE = new Set(['BYTES', 'Bytes', 'MLD', 'MLD/Bytes', 'MULTIDATA', 'I64']);
+
+  for (const r of ALL) {
+    if (r.conflict) continue;              // untyped on purpose, see the test above
+    const where = `${r.address} (${r.label}, documented ${r.specType})`;
+    if (UNDECODABLE.has(r.specType)) {
+      assert.strictEqual(r.type, null, `${where}: typed although nothing can decode it`);
+      continue;
+    }
+    assert.ok(r.specType in DECODER, `${where}: a documented type this test does not know — decide which decoder reads it`);
+    assert.strictEqual(r.type, DECODER[r.specType], `${where}: should be read as ${DECODER[r.specType]}`);
+  }
+});
+
 // ── the names survived the reconstruction ───────────────────────────────────
 
 test('no name carries the wreckage of the column it was wrapped in', () => {
