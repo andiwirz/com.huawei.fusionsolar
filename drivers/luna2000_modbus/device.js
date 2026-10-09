@@ -6,13 +6,15 @@ const {
   BATTERY_REGISTERS,
   BATTERY_MODULE_REGISTERS,
   CONTROL_REGISTERS,
+  LUNA2000_TOU_REGISTERS,
   isBatteryDataValid,
   isBatteryAbsent,
 } = require('../../lib/modbus-registers');
-const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { readModbusRegisters, writeModbusRegister, writeModbusU32, writeModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { pendingModeWrites, syncModeSettings, applyModeWrites } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const { keepLast } = require('../../lib/capability-order');
+const tou = require('../../lib/tou-periods');
 
 // Shown last on the tile, below everything added later (lib/capability-order.js).
 const VERSION_CAPABILITIES = ['luna2000_unit1_software_version', 'luna2000_unit2_software_version'];
@@ -194,6 +196,7 @@ class LUNA2000ModbusDevice extends Device {
     this._updatingSettingFromModbus = false;
     this._writeInProgress           = false;
     this._settingsInitialized       = false; // true once _applyControl has seen the working mode
+    this._touSeen                   = false; // true once the TOU windows (47255) were read
     this._controlPollCounter        = 4;     // start at 4 so first poll immediately reads control registers
     this._forceTimer                = null;  // pending auto-stop timer for timed force charge/discharge
     this._pendingForceMode          = null;  // set after a force charge/discharge write; cleared once poll confirms
@@ -214,6 +217,9 @@ class LUNA2000ModbusDevice extends Device {
     // Before anything else is written: a mode dropdown that cannot be written rejects the
     // whole save, so nothing is half-applied. See lib/mode-settings.js.
     const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
+    // The TOU windows, checked just as early: a typo rejects the save, naming its line.
+    const touWrite = changedKeys.includes('tou_periods') && !this._updatingSettingFromModbus
+      ? this._pendingTouWrite(newSettings.tou_periods) : null;
 
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
       await this._stopPolling();
@@ -305,6 +311,88 @@ class LUNA2000ModbusDevice extends Device {
         parseIntSafe(newSettings.modbus_id, 1), w.reg, parseInt(w.value, 10));
     }, (w, err) => this._revertSetting(w.key, oldSettings, err))
       .catch((err) => this.error('Mode write failed:', err.message));
+
+    if (touWrite) {
+      this._writeTou(touWrite, oldSettings.tou_periods, newSettings)
+        .catch((err) => this.error('TOU write failed:', err.message));
+    }
+  }
+
+  // ─── Time of Use windows (register 47255) ──────────────────────────────────
+  //
+  // The windows "Time of Use (LUNA2000)" follows, as text in the settings in the format of the
+  // Home Assistant integration — see lib/tou-periods.js. Until 1.2.307 they could only be set
+  // in the FusionSolar app, and a battery switched to Time of Use with none set, or with old
+  // ones, did what it pleased (issue #30).
+
+  /** What a save of the windows would write — or the reason it may not, in the user's language. */
+  _pendingTouWrite(text) {
+    // Like the mode dropdowns: never write over windows the app has not seen. Until the first
+    // read the field is empty, and saving it would erase the battery's real schedule.
+    if (!this._touSeen) throw new Error(this.homey.__('modbus.tou.notReadYet'));
+    let periods;
+    try {
+      periods = tou.parse(text);
+    } catch (err) {
+      throw new Error(tou.message(this.homey, err));
+    }
+    return { periods, words: tou.encode(periods), text: tou.format(periods) };
+  }
+
+  /** Write the windows as one block, then show them as the battery will report them. */
+  async _writeTou({ periods, words, text }, previous, settings) {
+    const host = settings.address;
+    const port = parseInt(settings.port, 10) || 502;
+    const unit = parseIntSafe(settings.modbus_id, 1);
+    this.log(`Write start  [tou_periods → reg 47255] ${periods.length} window(s): ${text ? text.split('\n').join(' · ') : 'none'}`);
+    this._writeInProgress = true;
+    try {
+      await writeModbusRegisters(host, port, unit, 47255, words);
+    } catch (err) {
+      this._writeInProgress = false;
+      await this._revertTou(previous, err);
+      return;
+    } finally {
+      this._writeInProgress = false;
+    }
+    this.log('Write OK     [tou_periods → reg 47255]');
+    // "0:00-6:00/54321/+" was accepted as 00:00-06:00/12345/+; the field says so at once
+    // rather than on the next read, where it would look like a change made elsewhere.
+    if (this.getSetting('tou_periods') !== text) {
+      this._updatingSettingFromModbus = true;
+      try { await this.setSettings({ tou_periods: text }); } catch (_) {} finally { this._updatingSettingFromModbus = false; }
+    }
+    // Read back with the next poll rather than up to five polls later.
+    this._controlPollCounter = 4;
+  }
+
+  async _revertTou(previous, err) {
+    this.error('tou_periods write failed:', err.message);
+    record(this, 'failed', 'tou_periods', `Write failed [tou_periods]: ${err.message} — setting taken back`);
+    if (typeof previous === 'string' && this.getSetting('tou_periods') !== previous) {
+      this._updatingSettingFromModbus = true;
+      try { await this.setSettings({ tou_periods: previous }); } catch (_) {} finally { this._updatingSettingFromModbus = false; }
+    }
+    if (this.getSetting('enable_timeline_notifications') === false) return;
+    this.homey.notifications.createNotification({
+      excerpt: `${this.getName()}: the Time of Use windows could not be written (${err.message}) — the battery keeps its previous ones.`,
+    }).catch((e) => this.log('Timeline notification failed:', e.message));
+  }
+
+  /** Fill the field from what the battery reports. A block that did not arrive changes nothing. */
+  async _applyTou(words) {
+    if (!Array.isArray(words)) return;
+    let text;
+    try {
+      text = tou.format(tou.decode(words));
+    } catch (err) {
+      this.log('TOU windows not understood, field left alone:', err.message);
+      return;
+    }
+    if (!this._touSeen) this.log(`TOU windows read: ${text ? text.split('\n').join(' · ') : 'none'}`);
+    this._touSeen = true;
+    if ((this.getSetting('tou_periods') || '') === text) return;
+    await applySettingSync(this, { tou_periods: text });
   }
 
   async onUninit() {
@@ -1258,6 +1346,15 @@ class LUNA2000ModbusDevice extends Device {
       await this._applyControl(ctrl);
     } catch (err) {
       this.log('Control register read skipped:', err.message);
+    }
+
+    // The TOU windows, 43 words at 47255, in a request of their own: a battery that does not
+    // answer them costs this one request and nothing else.
+    try {
+      const t = await readModbusRegisters(address, port, modbusId, LUNA2000_TOU_REGISTERS, () => this._writeInProgress);
+      await this._applyTou(t.storageTouPeriods);
+    } catch (err) {
+      this.log('TOU window read skipped:', err.message);
     }
 
     // Battery module count — read once at startup, then locked permanently.

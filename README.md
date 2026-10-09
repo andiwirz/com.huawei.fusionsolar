@@ -378,6 +378,25 @@ The log notes each mode once after every app start (`Mode dropdown filled`), and
 the battery reports a different one (`Mode dropdown follows the device`) — changed in the
 FusionSolar app, by a flow card, or by anything else talking to it.
 
+**Time of Use windows (since 1.2.307).** The charge and discharge windows *Time of Use (LUNA2000)*
+follows are in the same group, as text in the format of the Home Assistant integration
+([wiki](https://github.com/wlcrs/huawei_solar/wiki/Time-of-Use-control)) — one line per window,
+`start-end/days/+ or -`, days 1 = Monday to 7 = Sunday, `+` charge, `-` discharge:
+
+```
+00:00-06:00/12345/+
+17:00-23:59/1234567/-
+```
+
+Register 47255, 43 words, written as one block on Save; a save replaces all windows. At most 14,
+no two overlapping on a day they share, each within one day (a window over midnight is two lines,
+ending 23:59 — HA's users report an error for an end of 00:00). A line that does not fit refuses
+the save and names the line. The field shows what the inverter holds, read every fifth poll, so a
+change made in the FusionSolar app appears there too; like the dropdowns, it cannot be saved
+before it was read once. With no windows at all the battery charges from surplus solar only and
+does not discharge. The EMMA battery keeps its windows in the EMMA (40004) and has no such field
+yet.
+
 ---
 
 ### Battery LUNA2000 (EMMA Modbus)
@@ -768,7 +787,7 @@ sits in a group, the way the inverter's do:
 | Group | Settings |
 |-------|----------|
 | Connection | IP Address · Modbus Port · Modbus Unit ID · Update Interval |
-| Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above — and whether an Energy Management device is installed, the tool for charging by price or forecast |
+| Change battery mode | Storage working mode · Excess PV energy (Time of Use) · Charge/discharge windows (Time of Use) · Remote charge/discharge mode — see *Battery Modes* above — and whether an Energy Management device is installed, the tool for charging by price or forecast |
 | Charge and discharge power | Max charge power (W) · Max discharge power (W) |
 | Charging from the grid | Charge battery from grid · Grid charge power (W) · Grid charge power limit (W) · Grid charge cutoff SoC (%) |
 | State of charge limits | Charging cutoff capacity (%) · Discharge cutoff capacity (%) · Backup power SoC (%) |

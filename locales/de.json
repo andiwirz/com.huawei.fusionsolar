@@ -73,6 +73,15 @@
     "modes": {
       "notReadYet": "Dieser Modus lässt sich ändern, sobald die App seinen aktuellen Wert vom Gerät gelesen hat. Bitte in einer Minute nochmals versuchen.",
       "invalid": "Dieser Wert kann nicht auf das Gerät geschrieben werden."
+    },
+    "tou": {
+      "notReadYet": "Die Fenster lassen sich ändern, sobald die App sie von der Batterie gelesen hat. Bitte in ein paar Minuten nochmals versuchen.",
+      "format": "Zeile {{line}}: „{{text}}“ ist kein Fenster. Schreibweise Start-Ende/Wochentage/+ oder -, zum Beispiel 00:00-06:00/12345/+.",
+      "time": "Zeile {{line}}: „{{text}}“ hat eine Zeit ausserhalb von 00:00–24:00.",
+      "days": "Zeile {{line}}: „{{text}}“ – jeden Wochentag einmal angeben, von 1 (Montag) bis 7 (Sonntag).",
+      "order": "Zeile {{line}}: „{{text}}“ muss nach dem Start enden, am selben Tag. Ein Fenster über Mitternacht sind zwei Zeilen: …-23:59 und 00:00-….",
+      "overlap": "Zeile {{line}}: „{{other}}“ überschneidet sich mit „{{text}}“ an einem gemeinsamen Tag.",
+      "tooMany": "{{count}} Fenster – die Batterie fasst höchstens {{max}}."
     }
   },
   "settings": {

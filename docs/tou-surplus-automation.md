@@ -20,9 +20,11 @@ battery there. The `EMS: battery is full` / `EMS: battery is low` triggers only 
 for batteries in that list — a battery that merely exists in Homey is not enough.
 
 **2. The inverter must already be in TOU mode, with its time segments configured.**
-This app can *select* the working mode, but it cannot define the TOU time segments. Those
-still have to be set in the Huawei FusionSolar app. If no segments are defined, TOU mode
-does nothing regardless of what the surplus setting says.
+This app selects the working mode, and since 1.2.307 the `LUNA2000 Modbus` device also sets the
+TOU time segments: device settings → *Change battery mode* → *Charge/discharge windows (Time of
+Use)*, one line per window as in the Home Assistant integration (`00:00-06:00/12345/+`). Through
+an EMMA they still have to be set in the Huawei FusionSolar app. If no segments are defined, TOU
+mode does nothing regardless of what the surplus setting says.
 
 **3. No remote dispatch may be active.**
 If your installer or grid operator has remote dispatch enabled (register 47589), it
@@ -148,7 +150,7 @@ So if the behaviour is not what you expect, check the app log rather than the fl
 ## The short version
 
 1. Add the battery under EMS → Home Batteries.
-2. Confirm TOU mode and its time segments in the FusionSolar app.
+2. Confirm TOU mode and its time segments — in the battery's device settings (LUNA2000 Modbus) or the FusionSolar app (EMMA).
 3. Build two flows: `battery is full` → Feed to Grid, `battery is low` → Charge Battery.
 4. Put an `is not` condition in both so the register is written only on a real change.
 5. If something misbehaves, look in the app log for `Write failed`.

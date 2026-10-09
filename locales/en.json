@@ -73,6 +73,15 @@
     "modes": {
       "notReadYet": "This mode can be changed once the app has read its current value from the device. Please try again in a minute.",
       "invalid": "That value cannot be written to this device."
+    },
+    "tou": {
+      "notReadYet": "The windows can be changed once the app has read them from the battery. Please try again in a few minutes.",
+      "format": "Line {{line}}: \"{{text}}\" is not a window. Write start-end/days/+ or -, for example 00:00-06:00/12345/+.",
+      "time": "Line {{line}}: \"{{text}}\" has a time outside 00:00–24:00.",
+      "days": "Line {{line}}: \"{{text}}\" — give each day once, from 1 (Monday) to 7 (Sunday).",
+      "order": "Line {{line}}: \"{{text}}\" must end after it starts, on the same day. A window over midnight is two lines: …-23:59 and 00:00-….",
+      "overlap": "Line {{line}}: \"{{other}}\" overlaps \"{{text}}\" on a day they share.",
+      "tooMany": "{{count}} windows — the battery holds at most {{max}}."
     }
   },
   "settings": {

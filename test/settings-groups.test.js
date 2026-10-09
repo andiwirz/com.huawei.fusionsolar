@@ -33,7 +33,8 @@ test('a driver that groups its settings puts every one in a group', () => {
 test('the LUNA2000 settings come in these groups, in this order', () => {
   assert.deepStrictEqual(groups('luna2000_modbus').map((g) => [g.label.en, g.children.map((c) => c.id)]), [
     ['Connection', ['address', 'port', 'modbus_id', 'poll_interval']],
-    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'mode_remote_dispatch', 'info_ems_battery']],
+    // tou_periods since 1.2.307: the Time of Use windows, next to the other Time of Use setting
+    ['Change battery mode', ['mode_storage_working', 'mode_excess_pv_tou', 'tou_periods', 'mode_remote_dispatch', 'info_ems_battery']],
     ['Charge and discharge power', ['max_charge_power', 'max_discharge_power']],
     ['Charging from the grid', ['charge_from_grid', 'max_grid_charge_power', 'max_grid_charge_ceiling', 'grid_charge_cutoff_soc']],
     ['State of charge limits', ['charging_cutoff_capacity', 'discharge_cutoff_capacity', 'backup_power_soc']],
