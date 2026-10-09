@@ -78,3 +78,27 @@ test('every group is named in all three languages, and no setting sits in two', 
     assert.strictEqual(new Set(ids).size, ids.length, `${id}: a setting appears twice`);
   }
 });
+
+test('every driver puts every setting in a group, Connection first, named like the inverter\'s', () => {
+  // 1.2.277: the drivers that were still a plain list (DTSU666, SDongle, the EMMA devices, the
+  // cloud drivers, the kiosk, energy management) follow the inverter too.
+  const named = Object.fromEntries(groups('sun2000_modbus').map((g) => [g.label.en, g.label]));
+  const CONNECTS = ['address', 'base_url', 'kiosk_url', 'station_id', 'homey_api_key'];
+  let checked = 0;
+  for (const d of app.drivers) {
+    const top = d.settings || [];
+    if (!top.length) continue;
+    checked++;
+    assert.deepStrictEqual(top.filter((s) => s.type !== 'group').map((s) => s.id), [], `${d.id}: settings outside any group`);
+    if (flat(top).some((s) => CONNECTS.includes(s.id))) {
+      assert.strictEqual(top[0].label.en, 'Connection', `${d.id}: Connection is not the first group`);
+      assert.deepStrictEqual(top[0].label, named.Connection, `${d.id}: Connection is named differently from the inverter's`);
+    }
+    if (flat(top).some((s) => s.id === 'enable_timeline_notifications')) {
+      const n = top.find((g) => g.label.en === 'Notifications');
+      assert.ok(n && n.children.some((c) => c.id === 'enable_timeline_notifications'), `${d.id}: the notification switch is not under Notifications`);
+      assert.deepStrictEqual(n.label, named.Notifications, `${d.id}: Notifications is named differently`);
+    }
+  }
+  assert.ok(checked >= 18, `only ${checked} drivers with settings found`);
+});

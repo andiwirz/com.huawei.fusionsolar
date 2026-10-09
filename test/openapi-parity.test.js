@@ -231,7 +231,9 @@ test('the two cloud drivers that now announce a status also offer the switch', (
   const app = require(path.join('..', 'app.json'));
   for (const id of ['sun2000_openapi_fusionsolar', 'luna2000_openapi_fusionsolar']) {
     const drv = app.drivers.find((x) => x.id === id);
-    assert.ok((drv.settings || []).some((s) => s.id === 'enable_timeline_notifications'),
+    // Settings sit in groups since 1.2.277 — look inside them.
+    const flat = (l) => (l || []).flatMap((s) => (s.type === 'group' ? flat(s.children) : [s]));
+    assert.ok(flat(drv.settings).some((s) => s.id === 'enable_timeline_notifications'),
       `${id} announces status changes with no way to stop them`);
   }
 });

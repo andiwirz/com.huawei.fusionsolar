@@ -213,13 +213,19 @@ test('a plant polling faster than its allowance would be told so', async () => {
 
 test('no cloud driver offers an interval the allowance cannot serve', () => {
   const app = require(path.join(__dirname, '..', 'app.json'));
+  // Settings sit in groups since 1.2.277 — look inside them, and count what was checked: a
+  // lookup that misses everything would otherwise pass by checking nothing.
+  const flat = (l) => (l || []).flatMap((x) => (x.type === 'group' ? flat(x.children) : [x]));
+  let checked = 0;
   for (const d of app.drivers) {
-    const s = (d.settings || []).find((x) => x.id === 'poll_interval');
+    const s = flat(d.settings).find((x) => x.id === 'poll_interval');
     if (!s || !/openapi_fusionsolar$/.test(d.id)) continue;
+    checked++;
     assert.ok(s.min >= 5,
       `${d.id} allows a ${s.min}-minute interval; the allowance is one call per device type `
       + 'per five minutes, so anything under five is over it by construction');
   }
+  assert.strictEqual(checked, 7, 'the cloud drivers were not all found');
 });
 
 test('the system-level code Huawei documents beside 429 is known too', () => {

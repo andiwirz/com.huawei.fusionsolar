@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.276",
+  "version": "1.2.277",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -1909,42 +1909,52 @@
       ],
       "settings": [
         {
-          "id": "kiosk_url",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "Kiosk URL",
-            "de": "Kiosk URL",
-            "nl": "Kiosk-URL"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "The full FusionSolar Kiosk URL ending in ?kk=... — valid for 1 year. To renew: Monitoring → select plant → Kiosk View → copy URL.",
-            "de": "Die vollständige FusionSolar Kiosk URL mit ?kk=... — gültig für 1 Jahr. Erneuern: Überwachung → Anlage wählen → Kiosk-Ansicht → URL kopieren.",
-            "nl": "De volledige FusionSolar Kiosk-URL die eindigt op ?kk=... — één jaar geldig. Vernieuwen: Monitoring → installatie kiezen → Kiosk View → URL kopiëren."
-          },
-          "highlight": true
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 10,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data. Huawei caches data for ~30 minutes.",
-            "de": "Wie oft Daten abgerufen werden. Huawei cached Daten ~30 Minuten.",
-            "nl": "Hoe vaak gegevens worden opgehaald. Huawei bewaart gegevens ongeveer 30 minuten in de cache."
-          }
+          "children": [
+            {
+              "id": "kiosk_url",
+              "type": "text",
+              "label": {
+                "en": "Kiosk URL",
+                "de": "Kiosk URL",
+                "nl": "Kiosk-URL"
+              },
+              "value": "",
+              "hint": {
+                "en": "The full FusionSolar Kiosk URL ending in ?kk=... — valid for 1 year. To renew: Monitoring → select plant → Kiosk View → copy URL.",
+                "de": "Die vollständige FusionSolar Kiosk URL mit ?kk=... — gültig für 1 Jahr. Erneuern: Überwachung → Anlage wählen → Kiosk-Ansicht → URL kopieren.",
+                "nl": "De volledige FusionSolar Kiosk-URL die eindigt op ?kk=... — één jaar geldig. Vernieuwen: Monitoring → installatie kiezen → Kiosk View → URL kopiëren."
+              },
+              "highlight": true
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 10,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data. Huawei caches data for ~30 minutes.",
+                "de": "Wie oft Daten abgerufen werden. Huawei cached Daten ~30 Minuten.",
+                "nl": "Hoe vaak gegevens worden opgehaald. Huawei bewaart gegevens ongeveer 30 minuten in de cache."
+              }
+            }
+          ]
         }
       ]
     },
@@ -2048,76 +2058,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the EMMA energy management module — the charger is read through it, so this is not the charger's own address.",
-            "de": "IP-Adresse des EMMA Energy-Management-Moduls — der Charger wird darüber gelesen, hier gehört also nicht seine eigene Adresse hin.",
-            "nl": "IP-adres van de EMMA-energiemanagementmodule — de lader wordt daardoor uitgelezen, dus niet het eigen adres van de lader."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default Modbus port: 502.",
-            "de": "Standard Modbus Port: 502.",
-            "nl": "Standaard Modbus-poort: 502."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 0,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "The EMMA answers on unit ID 0. Some installations report the charger on an ID of its own — the Tester in the app settings finds it.",
-            "de": "Die EMMA antwortet auf Geräte-ID 0. Manche Anlagen melden den Charger unter einer eigenen ID — der Tester in den App-Einstellungen findet sie.",
-            "nl": "De EMMA antwoordt op apparaat-ID 0. Sommige installaties melden de lader op een eigen ID — de Tester in de app-instellingen vindt die."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 30,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the charger.",
-            "de": "Wie oft Daten vom Charger abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de Smart Charger worden gelezen."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the EMMA energy management module — the charger is read through it, so this is not the charger's own address.",
+                "de": "IP-Adresse des EMMA Energy-Management-Moduls — der Charger wird darüber gelesen, hier gehört also nicht seine eigene Adresse hin.",
+                "nl": "IP-adres van de EMMA-energiemanagementmodule — de lader wordt daardoor uitgelezen, dus niet het eigen adres van de lader."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default Modbus port: 502.",
+                "de": "Standard Modbus Port: 502.",
+                "nl": "Standaard Modbus-poort: 502."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "The EMMA answers on unit ID 0. Some installations report the charger on an ID of its own — the Tester in the app settings finds it.",
+                "de": "Die EMMA antwortet auf Geräte-ID 0. Manche Anlagen melden den Charger unter einer eigenen ID — der Tester in den App-Einstellungen findet sie.",
+                "nl": "De EMMA antwoordt op apparaat-ID 0. Sommige installaties melden de lader op een eigen ID — de Tester in de app-instellingen vindt die."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 30,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the charger.",
+                "de": "Wie oft Daten vom Charger abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de Smart Charger worden gelezen."
+              }
+            }
+          ]
         }
       ]
     },
@@ -3653,76 +3673,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the EMMA energy management module.",
-            "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
-            "nl": "IP-adres van de EMMA energiemanagementmodule."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502.",
-            "de": "Standard 502.",
-            "nl": "Standaard 502."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 0,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "EMMA typically uses unit ID 0.",
-            "de": "EMMA verwendet typischerweise Geräte-ID 0.",
-            "nl": "EMMA gebruikt meestal apparaat-ID 0."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the inverter.",
-            "de": "Wie oft Daten vom Wechselrichter abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de omvormer worden gelezen."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the EMMA energy management module.",
+                "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
+                "nl": "IP-adres van de EMMA energiemanagementmodule."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502.",
+                "de": "Standard 502.",
+                "nl": "Standaard 502."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "EMMA typically uses unit ID 0.",
+                "de": "EMMA verwendet typischerweise Geräte-ID 0.",
+                "nl": "EMMA gebruikt meestal apparaat-ID 0."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the inverter.",
+                "de": "Wie oft Daten vom Wechselrichter abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de omvormer worden gelezen."
+              }
+            }
+          ]
         }
       ]
     },
@@ -5038,91 +5068,111 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the SUN2000 inverter or SDongle the DTSU666 is connected to.",
-            "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem der DTSU666 angeschlossen ist.",
-            "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de DTSU666 is aangesloten."
-          },
-          "highlight": true
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the SUN2000 inverter or SDongle the DTSU666 is connected to.",
+                "de": "IP-Adresse des Inverter SUN 2000s oder SDongle, an dem der DTSU666 angeschlossen ist.",
+                "nl": "IP-adres van de Inverter SUN 2000 of SDongle waarop de DTSU666 is aangesloten."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502. SDongle typically uses 6607.",
+                "de": "Standard 502. SDongle verwendet typischerweise 6607.",
+                "nl": "Standaard 502. SDongle gebruikt meestal 6607."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 1,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
+                "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
+                "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the power meter.",
+                "de": "Wie oft Daten vom Energiezähler abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de energiemeter worden gelezen."
+              }
+            }
+          ]
         },
         {
-          "id": "port",
-          "type": "number",
+          "type": "group",
           "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
           },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502. SDongle typically uses 6607.",
-            "de": "Standard 502. SDongle verwendet typischerweise 6607.",
-            "nl": "Standaard 502. SDongle gebruikt meestal 6607."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 1,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "Same Modbus unit ID as the SUN2000 inverter (default: 1).",
-            "de": "Dieselbe Modbus Geräte-ID wie beim Inverter SUN 2000 (Standard: 1).",
-            "nl": "Dezelfde Modbus apparaat-ID als de Inverter SUN 2000 (standaard: 1)."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the power meter.",
-            "de": "Wie oft Daten vom Energiezähler abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de energiemeter worden gelezen."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the meter status changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Zählerstatus ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de meterstatus verandert."
-          }
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the meter status changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Zählerstatus ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de meterstatus verandert."
+              }
+            }
+          ]
         }
       ]
     },
@@ -5306,76 +5356,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the EMMA energy management module.",
-            "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
-            "nl": "IP-adres van de EMMA energiemanagementmodule."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502.",
-            "de": "Standard 502.",
-            "nl": "Standaard 502."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 0,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "EMMA typically uses unit ID 0.",
-            "de": "EMMA verwendet typischerweise Geräte-ID 0.",
-            "nl": "EMMA gebruikt meestal apparaat-ID 0."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the power meter.",
-            "de": "Wie oft Daten vom Energiezähler abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de energiemeter worden gelezen."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the EMMA energy management module.",
+                "de": "IP-Adresse des EMMA Energy-Management-Moduls.",
+                "nl": "IP-adres van de EMMA energiemanagementmodule."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502.",
+                "de": "Standard 502.",
+                "nl": "Standaard 502."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 0,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "EMMA typically uses unit ID 0.",
+                "de": "EMMA verwendet typischerweise Geräte-ID 0.",
+                "nl": "EMMA gebruikt meestal apparaat-ID 0."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the power meter.",
+                "de": "Wie oft Daten vom Energiezähler abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de energiemeter worden gelezen."
+              }
+            }
+          ]
         }
       ]
     },
@@ -5559,208 +5619,228 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://eu5.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "System Code",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
+          ]
         },
         {
-          "id": "base_url",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
           },
-          "value": "https://eu5.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "System Code",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the inverter status changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Inverterstatus ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de inverterstatus verandert."
-          }
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the inverter status changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Inverterstatus ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de inverterstatus verandert."
+              }
+            }
+          ]
         }
       ]
     },
@@ -5945,208 +6025,228 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://eu5.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "System Code",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
+          ]
         },
         {
-          "id": "base_url",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
           },
-          "value": "https://eu5.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "System Code",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the battery status changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
-          }
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the battery status changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Batteriestatus ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de batterijstatus verandert."
+              }
+            }
+          ]
         }
       ]
     },
@@ -6298,208 +6398,228 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://eu5.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "System Code",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
+          ]
         },
         {
-          "id": "base_url",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
           },
-          "value": "https://eu5.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "System Code",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Huawei updates data approximately every 5 minutes.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Huawei aktualisiert Daten ca. alle 5 Minuten.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Huawei ververst de gegevens ongeveer elke 5 minuten."
-          }
-        },
-        {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
-          "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijnmeldingen"
-          },
-          "value": true,
-          "hint": {
-            "en": "Show a timeline notification when the meter status changes.",
-            "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Zählerstatus ändert.",
-            "nl": "Toont een tijdlijnmelding wanneer de meterstatus verandert."
-          }
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijnmeldingen"
+              },
+              "value": true,
+              "hint": {
+                "en": "Show a timeline notification when the meter status changes.",
+                "de": "Zeigt eine Timeline-Benachrichtigung wenn sich der Zählerstatus ändert.",
+                "nl": "Toont een tijdlijnmelding wanneer de meterstatus verandert."
+              }
+            }
+          ]
         }
       ]
     },
@@ -6551,193 +6671,203 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://intl.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "Systemcode",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "base_url",
-          "type": "text",
-          "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
-          },
-          "value": "https://intl.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "Systemcode",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
-          }
+          ]
         }
       ]
     },
@@ -6870,193 +7000,203 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://intl.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "Systemcode",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "base_url",
-          "type": "text",
-          "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
-          },
-          "value": "https://intl.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "Systemcode",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
-          }
+          ]
         }
       ]
     },
@@ -7147,193 +7287,203 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://intl.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "Systemcode",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "base_url",
-          "type": "text",
-          "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
-          },
-          "value": "https://intl.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "Systemcode",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
-          }
+          ]
         }
       ]
     },
@@ -7397,193 +7547,203 @@
       ],
       "settings": [
         {
-          "id": "base_url_region",
-          "type": "dropdown",
+          "type": "group",
           "label": {
-            "en": "Server",
-            "de": "Server",
-            "nl": "Server"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "custom",
-          "values": [
+          "children": [
             {
-              "id": "https://eu5.fusionsolar.huawei.com",
+              "id": "base_url_region",
+              "type": "dropdown",
               "label": {
-                "en": "Europe · eu5",
-                "de": "Europa · eu5",
-                "nl": "Europa · eu5"
+                "en": "Server",
+                "de": "Server",
+                "nl": "Server"
+              },
+              "value": "custom",
+              "values": [
+                {
+                  "id": "https://eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe · eu5",
+                    "de": "Europa · eu5",
+                    "nl": "Europa · eu5"
+                  }
+                },
+                {
+                  "id": "https://intl.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "International · intl",
+                    "de": "International · intl",
+                    "nl": "Internationaal · intl"
+                  }
+                },
+                {
+                  "id": "https://region01eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 01",
+                    "de": "Europa Region 01",
+                    "nl": "Europa regio 01"
+                  }
+                },
+                {
+                  "id": "https://region02eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 02",
+                    "de": "Europa Region 02",
+                    "nl": "Europa regio 02"
+                  }
+                },
+                {
+                  "id": "https://region03eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 03",
+                    "de": "Europa Region 03",
+                    "nl": "Europa regio 03"
+                  }
+                },
+                {
+                  "id": "https://region04eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 04",
+                    "de": "Europa Region 04",
+                    "nl": "Europa regio 04"
+                  }
+                },
+                {
+                  "id": "https://region05eu5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Europe region 05",
+                    "de": "Europa Region 05",
+                    "nl": "Europa regio 05"
+                  }
+                },
+                {
+                  "id": "https://sg5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Southeast Asia · sg5",
+                    "de": "Südostasien · sg5",
+                    "nl": "Zuidoost-Azië · sg5"
+                  }
+                },
+                {
+                  "id": "https://au5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Australia · au5",
+                    "de": "Australien · au5",
+                    "nl": "Australië · au5"
+                  }
+                },
+                {
+                  "id": "https://jp5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Japan · jp5",
+                    "de": "Japan · jp5",
+                    "nl": "Japan · jp5"
+                  }
+                },
+                {
+                  "id": "https://la5.fusionsolar.huawei.com",
+                  "label": {
+                    "en": "Latin America · la5",
+                    "de": "Lateinamerika · la5",
+                    "nl": "Latijns-Amerika · la5"
+                  }
+                },
+                {
+                  "id": "https://openapi.monitor.energyorb.com",
+                  "label": {
+                    "en": "EnergyOrb (Europe)",
+                    "de": "EnergyOrb (Europa)",
+                    "nl": "EnergyOrb (Europa)"
+                  }
+                },
+                {
+                  "id": "custom",
+                  "label": {
+                    "en": "Other (use Server URL below)",
+                    "de": "Andere (Server URL unten verwenden)",
+                    "nl": "Anders (Server-URL hieronder gebruiken)"
+                  }
+                }
+              ],
+              "hint": {
+                "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
+                "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://intl.fusionsolar.huawei.com",
+              "id": "base_url",
+              "type": "text",
               "label": {
-                "en": "International · intl",
-                "de": "International · intl",
-                "nl": "Internationaal · intl"
+                "en": "Server URL",
+                "de": "Server URL",
+                "nl": "Server-URL"
+              },
+              "value": "https://intl.fusionsolar.huawei.com",
+              "hint": {
+                "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
+                "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
+                "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
               }
             },
             {
-              "id": "https://region01eu5.fusionsolar.huawei.com",
+              "id": "username",
+              "type": "text",
               "label": {
-                "en": "Europe region 01",
-                "de": "Europa Region 01",
-                "nl": "Europa regio 01"
-              }
+                "en": "Username",
+                "de": "Benutzername",
+                "nl": "Gebruikersnaam"
+              },
+              "value": "",
+              "highlight": true
             },
             {
-              "id": "https://region02eu5.fusionsolar.huawei.com",
+              "id": "system_code",
+              "type": "password",
               "label": {
-                "en": "Europe region 02",
-                "de": "Europa Region 02",
-                "nl": "Europa regio 02"
-              }
+                "en": "System Code",
+                "de": "Systemcode",
+                "nl": "Systeemcode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region03eu5.fusionsolar.huawei.com",
+              "id": "station_code",
+              "type": "text",
               "label": {
-                "en": "Europe region 03",
-                "de": "Europa Region 03",
-                "nl": "Europa regio 03"
-              }
+                "en": "Station Code",
+                "de": "Anlagencode",
+                "nl": "Installatiecode"
+              },
+              "value": ""
             },
             {
-              "id": "https://region04eu5.fusionsolar.huawei.com",
+              "id": "poll_interval",
+              "type": "number",
               "label": {
-                "en": "Europe region 04",
-                "de": "Europa Region 04",
-                "nl": "Europa regio 04"
-              }
-            },
-            {
-              "id": "https://region05eu5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Europe region 05",
-                "de": "Europa Region 05",
-                "nl": "Europa regio 05"
-              }
-            },
-            {
-              "id": "https://sg5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Southeast Asia · sg5",
-                "de": "Südostasien · sg5",
-                "nl": "Zuidoost-Azië · sg5"
-              }
-            },
-            {
-              "id": "https://au5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Australia · au5",
-                "de": "Australien · au5",
-                "nl": "Australië · au5"
-              }
-            },
-            {
-              "id": "https://jp5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Japan · jp5",
-                "de": "Japan · jp5",
-                "nl": "Japan · jp5"
-              }
-            },
-            {
-              "id": "https://la5.fusionsolar.huawei.com",
-              "label": {
-                "en": "Latin America · la5",
-                "de": "Lateinamerika · la5",
-                "nl": "Latijns-Amerika · la5"
-              }
-            },
-            {
-              "id": "https://openapi.monitor.energyorb.com",
-              "label": {
-                "en": "EnergyOrb (Europe)",
-                "de": "EnergyOrb (Europa)",
-                "nl": "EnergyOrb (Europa)"
-              }
-            },
-            {
-              "id": "custom",
-              "label": {
-                "en": "Other (use Server URL below)",
-                "de": "Andere (Server URL unten verwenden)",
-                "nl": "Anders (Server-URL hieronder gebruiken)"
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "minutes",
+                "de": "Minuten",
+                "nl": "minuten"
+              },
+              "value": 5,
+              "min": 5,
+              "max": 60,
+              "hint": {
+                "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
+                "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
+                "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
               }
             }
-          ],
-          "hint": {
-            "en": "Regional FusionSolar server. Choose \"Other\" for an address that is not listed. Applies to every OpenAPI device of the same plant.",
-            "de": "Regionaler FusionSolar-Server. Für eine nicht gelistete Adresse \"Andere\" wählen. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Regionale FusionSolar-server. Kies \"Anders\" voor een adres dat er niet bij staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "base_url",
-          "type": "text",
-          "label": {
-            "en": "Server URL",
-            "de": "Server URL",
-            "nl": "Server-URL"
-          },
-          "value": "https://intl.fusionsolar.huawei.com",
-          "hint": {
-            "en": "Only used when Server is set to \"Other\". Applies to every OpenAPI device of the same plant.",
-            "de": "Wird nur verwendet, wenn Server auf \"Andere\" steht. Gilt für alle OpenAPI-Geräte derselben Anlage.",
-            "nl": "Wordt alleen gebruikt als Server op \"Anders\" staat. Geldt voor alle OpenAPI-apparaten van dezelfde installatie."
-          }
-        },
-        {
-          "id": "username",
-          "type": "text",
-          "label": {
-            "en": "Username",
-            "de": "Benutzername",
-            "nl": "Gebruikersnaam"
-          },
-          "value": "",
-          "highlight": true
-        },
-        {
-          "id": "system_code",
-          "type": "password",
-          "label": {
-            "en": "System Code",
-            "de": "Systemcode",
-            "nl": "Systeemcode"
-          },
-          "value": ""
-        },
-        {
-          "id": "station_code",
-          "type": "text",
-          "label": {
-            "en": "Station Code",
-            "de": "Anlagencode",
-            "nl": "Installatiecode"
-          },
-          "value": ""
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "minutes",
-            "de": "Minuten",
-            "nl": "minuten"
-          },
-          "value": 5,
-          "min": 5,
-          "max": 60,
-          "hint": {
-            "en": "How often to fetch data (minutes). Default: 5. Values below 5 may trigger Huawei rate limiting (HTTP 407) and cause temporary data gaps.",
-            "de": "Wie oft Daten abgerufen werden (Minuten). Standard: 5. Werte unter 5 können Huawei-Rate-Limiting (HTTP 407) auslösen und kurze Datenlücken verursachen.",
-            "nl": "Hoe vaak gegevens worden opgehaald (minuten). Standaard: 5. Waarden onder 5 kunnen de snelheidsbegrenzing van Huawei activeren (HTTP 407) en tot korte gaten in de gegevens leiden."
-          }
+          ]
         }
       ]
     },
@@ -7664,76 +7824,86 @@
       ],
       "settings": [
         {
-          "id": "address",
-          "type": "text",
+          "type": "group",
           "label": {
-            "en": "IP Address",
-            "de": "IP-Adresse",
-            "nl": "IP-adres"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "value": "",
-          "hint": {
-            "en": "IP address of the Huawei SDongle A.",
-            "de": "IP-Adresse des Huawei SDongle A.",
-            "nl": "IP-adres van de Huawei SDongle A."
-          },
-          "highlight": true
-        },
-        {
-          "id": "port",
-          "type": "number",
-          "label": {
-            "en": "Modbus Port",
-            "de": "Modbus Port",
-            "nl": "Modbus-poort"
-          },
-          "value": 502,
-          "min": 1,
-          "max": 65535,
-          "hint": {
-            "en": "Default 502. SDongle A alternatively uses 6607.",
-            "de": "Standard 502. SDongle A alternativ 6607.",
-            "nl": "Standaard 502. SDongle A gebruikt daarnaast 6607."
-          }
-        },
-        {
-          "id": "modbus_id",
-          "type": "number",
-          "label": {
-            "en": "Modbus Unit ID",
-            "de": "Modbus Geräte-ID",
-            "nl": "Modbus apparaat-ID"
-          },
-          "value": 100,
-          "min": 0,
-          "max": 247,
-          "hint": {
-            "en": "Default: 100. Older firmware may use 0.",
-            "de": "Standard: 100. Ältere Firmware verwendet möglicherweise 0.",
-            "nl": "Standaard: 100. Oudere firmware gebruikt mogelijk 0."
-          }
-        },
-        {
-          "id": "poll_interval",
-          "type": "number",
-          "label": {
-            "en": "Update Interval",
-            "de": "Aktualisierungsintervall",
-            "nl": "Update-interval"
-          },
-          "units": {
-            "en": "seconds",
-            "de": "Sekunden",
-            "nl": "seconden"
-          },
-          "value": 60,
-          "min": 10,
-          "max": 300,
-          "hint": {
-            "en": "How often to read data from the SDongle A.",
-            "de": "Wie oft Daten vom SDongle A abgerufen werden.",
-            "nl": "Hoe vaak gegevens van de SDongle A worden gelezen."
-          }
+          "children": [
+            {
+              "id": "address",
+              "type": "text",
+              "label": {
+                "en": "IP Address",
+                "de": "IP-Adresse",
+                "nl": "IP-adres"
+              },
+              "value": "",
+              "hint": {
+                "en": "IP address of the Huawei SDongle A.",
+                "de": "IP-Adresse des Huawei SDongle A.",
+                "nl": "IP-adres van de Huawei SDongle A."
+              },
+              "highlight": true
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Modbus Port",
+                "de": "Modbus Port",
+                "nl": "Modbus-poort"
+              },
+              "value": 502,
+              "min": 1,
+              "max": 65535,
+              "hint": {
+                "en": "Default 502. SDongle A alternatively uses 6607.",
+                "de": "Standard 502. SDongle A alternativ 6607.",
+                "nl": "Standaard 502. SDongle A gebruikt daarnaast 6607."
+              }
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus Unit ID",
+                "de": "Modbus Geräte-ID",
+                "nl": "Modbus apparaat-ID"
+              },
+              "value": 100,
+              "min": 0,
+              "max": 247,
+              "hint": {
+                "en": "Default: 100. Older firmware may use 0.",
+                "de": "Standard: 100. Ältere Firmware verwendet möglicherweise 0.",
+                "nl": "Standaard: 100. Oudere firmware gebruikt mogelijk 0."
+              }
+            },
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Update Interval",
+                "de": "Aktualisierungsintervall",
+                "nl": "Update-interval"
+              },
+              "units": {
+                "en": "seconds",
+                "de": "Sekunden",
+                "nl": "seconden"
+              },
+              "value": 60,
+              "min": 10,
+              "max": 300,
+              "hint": {
+                "en": "How often to read data from the SDongle A.",
+                "de": "Wie oft Daten vom SDongle A abgerufen werden.",
+                "nl": "Hoe vaak gegevens van de SDongle A worden gelezen."
+              }
+            }
+          ]
         }
       ]
     },
@@ -7815,49 +7985,79 @@
       ],
       "settings": [
         {
-          "id": "homey_api_key",
-          "type": "password",
+          "type": "group",
           "label": {
-            "en": "Homey API Key",
-            "de": "Homey API-Schlüssel",
-            "nl": "Homey API-sleutel"
+            "en": "Connection",
+            "de": "Verbindung",
+            "nl": "Verbinding"
           },
-          "hint": {
-            "en": "Create in Homey → Settings → System → API Keys. The key requires read/write access to Devices and Flows. All EMS configuration is done in the app settings (EMS tab).",
-            "de": "Erstellen in Homey → Einstellungen → System → API-Schlüssel. Der Schlüssel benötigt Lese- und Schreibzugriff auf Geräte und Flows. Alle EMS-Einstellungen erfolgen in den App-Einstellungen (EMS-Tab).",
-            "nl": "Aanmaken in Homey → Instellingen → Systeem → API-sleutels. De sleutel heeft lees- en schrijfrechten op Apparaten en Flows nodig. Alle EMS-instellingen gebeuren in de app-instellingen (tabblad EMS)."
-          },
-          "value": ""
+          "children": [
+            {
+              "id": "homey_api_key",
+              "type": "password",
+              "label": {
+                "en": "Homey API Key",
+                "de": "Homey API-Schlüssel",
+                "nl": "Homey API-sleutel"
+              },
+              "hint": {
+                "en": "Create in Homey → Settings → System → API Keys. The key requires read/write access to Devices and Flows. All EMS configuration is done in the app settings (EMS tab).",
+                "de": "Erstellen in Homey → Einstellungen → System → API-Schlüssel. Der Schlüssel benötigt Lese- und Schreibzugriff auf Geräte und Flows. Alle EMS-Einstellungen erfolgen in den App-Einstellungen (EMS-Tab).",
+                "nl": "Aanmaken in Homey → Instellingen → Systeem → API-sleutels. De sleutel heeft lees- en schrijfrechten op Apparaten en Flows nodig. Alle EMS-instellingen gebeuren in de app-instellingen (tabblad EMS)."
+              },
+              "value": ""
+            }
+          ]
         },
         {
-          "id": "enable_timeline_notifications",
-          "type": "checkbox",
+          "type": "group",
           "label": {
-            "en": "Timeline notifications",
-            "de": "Timeline-Benachrichtigungen",
-            "nl": "Tijdlijn-meldingen"
+            "en": "Notifications",
+            "de": "Benachrichtigungen",
+            "nl": "Meldingen"
           },
-          "hint": {
-            "en": "Post to the Homey Timeline when EMS starts or stops a device, or when the battery SOC crosses a threshold.",
-            "de": "Im Homey-Timeline posten wenn EMS ein Gerät ein- oder ausschaltet oder der Batterie-SOC einen Schwellenwert erreicht.",
-            "nl": "Plaats een bericht op de Homey-tijdlijn wanneer EMS een apparaat in- of uitschakelt, of wanneer het laadniveau van de batterij een drempel passeert."
-          },
-          "value": true
+          "children": [
+            {
+              "id": "enable_timeline_notifications",
+              "type": "checkbox",
+              "label": {
+                "en": "Timeline notifications",
+                "de": "Timeline-Benachrichtigungen",
+                "nl": "Tijdlijn-meldingen"
+              },
+              "hint": {
+                "en": "Post to the Homey Timeline when EMS starts or stops a device, or when the battery SOC crosses a threshold.",
+                "de": "Im Homey-Timeline posten wenn EMS ein Gerät ein- oder ausschaltet oder der Batterie-SOC einen Schwellenwert erreicht.",
+                "nl": "Plaats een bericht op de Homey-tijdlijn wanneer EMS een apparaat in- of uitschakelt, of wanneer het laadniveau van de batterij een drempel passeert."
+              },
+              "value": true
+            }
+          ]
         },
         {
-          "id": "debug_logging",
-          "type": "checkbox",
+          "type": "group",
           "label": {
-            "en": "Debug logging",
-            "de": "Debug-Protokollierung",
-            "nl": "Debug-logging"
+            "en": "Diagnostics",
+            "de": "Diagnose",
+            "nl": "Diagnose"
           },
-          "hint": {
-            "en": "Log every tick's price/battery decision (and why), not just when it changes. Adds a lot of log volume — only enable while troubleshooting, e.g. via Homey → your Homey → Apps → this app → View logs.",
-            "de": "Protokolliert bei jedem Tick die Preis-/Batterie-Entscheidung (und den Grund), nicht nur bei Änderung. Erzeugt deutlich mehr Log-Volumen — nur zur Fehlersuche aktivieren, z.B. über Homey → dein Homey → Apps → diese App → Logs anzeigen.",
-            "nl": "Legt bij elke cyclus de prijs-/batterijbeslissing vast (en waarom), niet alleen bij een wijziging. Levert veel meer logregels op — alleen inschakelen tijdens het zoeken naar een probleem, bijvoorbeeld via Homey → uw Homey → Apps → deze app → Logboek bekijken."
-          },
-          "value": false
+          "children": [
+            {
+              "id": "debug_logging",
+              "type": "checkbox",
+              "label": {
+                "en": "Debug logging",
+                "de": "Debug-Protokollierung",
+                "nl": "Debug-logging"
+              },
+              "hint": {
+                "en": "Log every tick's price/battery decision (and why), not just when it changes. Adds a lot of log volume — only enable while troubleshooting, e.g. via Homey → your Homey → Apps → this app → View logs.",
+                "de": "Protokolliert bei jedem Tick die Preis-/Batterie-Entscheidung (und den Grund), nicht nur bei Änderung. Erzeugt deutlich mehr Log-Volumen — nur zur Fehlersuche aktivieren, z.B. über Homey → dein Homey → Apps → diese App → Logs anzeigen.",
+                "nl": "Legt bij elke cyclus de prijs-/batterijbeslissing vast (en waarom), niet alleen bij een wijziging. Levert veel meer logregels op — alleen inschakelen tijdens het zoeken naar een probleem, bijvoorbeeld via Homey → uw Homey → Apps → deze app → Logboek bekijken."
+              },
+              "value": false
+            }
+          ]
         }
       ]
     }
