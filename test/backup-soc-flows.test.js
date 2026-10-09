@@ -354,3 +354,23 @@ test('the EMMA driver answers the same cards the same way', () => {
   assert.strictEqual(made.cards[ABOVE].listener({ device: other, soc: 30 }), false,
     'the listener answered from the wrong device');
 });
+
+// ── how the reserve is drawn (1.2.278) ──────────────────────────────────────────
+
+test('the backup reserve is a reading, not a second battery', () => {
+  // A sub-capability of measure_battery inherits the battery component, so Homey drew the
+  // reserve as a big battery in the battery view, beside the real state of charge — at 0 %
+  // a red, empty battery. It is a setting (what is held back for a power cut), not a level.
+  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+    const d = manifest.drivers.find((x) => x.id === id);
+    assert.ok(d.capabilities.includes('measure_battery.backup'), `${id}: the capability is gone — flows and Insights hang on it`);
+    assert.strictEqual(d.capabilitiesOptions['measure_battery.backup'].uiComponent, 'sensor', `${id}: drawn as a battery again`);
+  }
+  // Any other battery sub-capability would have the same problem.
+  for (const d of manifest.drivers) {
+    for (const cap of (d.capabilities || []).filter((c) => /^measure_battery\./.test(c))) {
+      const o = (d.capabilitiesOptions || {})[cap] || {};
+      assert.ok(o.uiComponent === 'sensor' || o.uiComponent === null, `${d.id}/${cap} is drawn as a second battery`);
+    }
+  }
+});

@@ -1,4 +1,9 @@
 {
+  "1.2.278": {
+    "en": "The battery’s backup power SoC is shown as a value, no longer as a second battery.\n\nIt is the share the battery keeps in reserve for a power cut — a setting, not a charge level — but it was drawn like the state of charge, a red empty battery at 0 %. It now sits among the readings, and the battery view shows only the real state of charge. Flows and Insights are unchanged.",
+    "de": "Der Backup-Energie-SoC der Batterie wird als Messwert angezeigt, nicht mehr als zweite Batterie.\n\nEr ist der Anteil, den die Batterie für einen Stromausfall zurückhält — eine Einstellung, kein Ladestand —, wurde aber wie der Ladezustand gezeichnet, bei 0 % als rote, leere Batterie. Jetzt steht er bei den Messwerten, und die Batterie-Ansicht zeigt nur noch den echten Ladezustand. Flows und Insights bleiben unverändert.",
+    "nl": "De SoC voor noodstroom wordt als meetwaarde getoond en niet meer als tweede batterij; de batterijweergave toont alleen nog de echte laadtoestand."
+  },
   "1.2.277": {
     "en": "Every device’s settings are now sorted into groups, the way the inverter’s, the battery’s and the OCPP charger’s already were: Connection first, Notifications last, and on the energy management device Diagnostics for debug logging. Nothing about the settings themselves changed.",
     "de": "Die Einstellungen aller Geräte sind jetzt in Gruppen geordnet, wie es beim Wechselrichter, der Batterie und dem OCPP-Lader schon war: Verbindung zuerst, Benachrichtigungen zuletzt, und beim Energiemanagement Diagnose für die Debug-Protokollierung. An den Einstellungen selbst ändert sich nichts.",
