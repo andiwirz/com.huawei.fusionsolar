@@ -9,6 +9,10 @@ const {
 const { readModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const { applyEnergyWarning, rememberEnergyExclude } = require('../../lib/energy-warning');
+const { keepLast } = require('../../lib/capability-order');
+
+// Shown last on the tile, below everything added later (lib/capability-order.js).
+const VERSION_CAPABILITIES = ['sdongle_software_version'];
 const modbusPolling = require('../../lib/modbus-polling');
 
 const DEFAULT_INTERVAL_S = 60;
@@ -101,6 +105,7 @@ class SdonglaAModbusDevice extends Device {
         }
       }
     }
+    await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
   }
 
   // ─── Polling ───────────────────────────────────────────────────────────────
@@ -161,6 +166,8 @@ class SdonglaAModbusDevice extends Device {
 
 
       this._failureCount = 0;
+      // The version strings end the tile, after whatever this poll may have added (1.2.301).
+      await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
       if (!this.getAvailable()) await this.setAvailable();
       logPollOk(this, 'Poll OK: Solar=' + Math.round(data.totalInputPower ?? 0) + 'W Grid=' + Math.round(data.gridPower ?? 0) + 'W');
 

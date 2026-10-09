@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.300",
+  "version": "1.2.301",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -2772,8 +2772,8 @@
         "measure_current.pv2",
         "measure_frequency",
         "huawei_status",
-        "sun2000_software_version",
-        "activepower_controlmode"
+        "activepower_controlmode",
+        "sun2000_software_version"
       ],
       "capabilitiesOptions": {
         "measure_power": {

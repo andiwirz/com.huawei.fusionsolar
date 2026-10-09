@@ -14,6 +14,7 @@ const {
 const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { pendingModeWrites, syncModeSettings, applyModeWrites, revertModeSetting } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
+const { keepLast } = require('../../lib/capability-order');
 const modbusPolling = require('../../lib/modbus-polling');
 
 const DEFAULT_INTERVAL_S = 60;
@@ -32,9 +33,12 @@ const REQUIRED_CAPABILITIES = [
   'measure_current.pv2',
   'measure_frequency',
   'huawei_status',
-  'sun2000_software_version',
   'activepower_controlmode',
+  'sun2000_software_version',
 ];
+
+// Shown last on the tile, below everything added later (lib/capability-order.js).
+const VERSION_CAPABILITIES = ['sun2000_software_version'];
 
 // Dynamic capabilities – added when optimizers are registered (register 37200 > 0)
 const OPTIMIZER_CAPABILITIES = [
@@ -276,6 +280,7 @@ class SUN2000ModbusDevice extends Device {
         await this.addCapability(cap);
       }
     }
+    await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
   }
 
   /**
@@ -780,6 +785,8 @@ class SUN2000ModbusDevice extends Device {
       this._trackPower(newPower);
 
       this._failureCount = 0;
+      // The version strings end the tile, after whatever this poll may have added (1.2.301).
+      await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
       if (!this.getAvailable()) await this.setAvailable();
       logPollOk(this, 'Poll OK: PV=' + Math.round(newPower) + 'W');
 

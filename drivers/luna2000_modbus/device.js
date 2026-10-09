@@ -12,6 +12,10 @@ const {
 const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { pendingModeWrites, syncModeSettings, applyModeWrites } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
+const { keepLast } = require('../../lib/capability-order');
+
+// Shown last on the tile, below everything added later (lib/capability-order.js).
+const VERSION_CAPABILITIES = ['luna2000_unit1_software_version', 'luna2000_unit2_software_version'];
 const modbusPolling = require('../../lib/modbus-polling');
 const enumLabel     = require('../../lib/enum-label');
 
@@ -330,6 +334,7 @@ class LUNA2000ModbusDevice extends Device {
         }
       }
     }
+    await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
   }
 
   // ─── Why the battery modes cannot be changed from the device tile ────────────
@@ -1156,6 +1161,8 @@ class LUNA2000ModbusDevice extends Device {
       this._prevChargingState = chargingState;
 
       this._failureCount = 0;
+      // The version strings end the tile, after whatever this poll may have added (1.2.301).
+      await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
       if (!this.getAvailable()) await this.setAvailable();
       logPollOk(this, 'Poll OK: SoC=' + Math.round(soc) + '% P=' + Math.round(power) + 'W');
 
