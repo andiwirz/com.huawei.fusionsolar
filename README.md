@@ -889,7 +889,7 @@ power) and Notifications.
 | Set max charge power (W)          | Sets the maximum battery charge power (reg 47075)                                                  |
 | Set max discharge power (W)       | Sets the maximum battery discharge power (reg 47077)                                               |
 | Set grid charge power (W)         | Sets the active grid-to-battery charge power setpoint (reg 47242)                                  |
-| Set grid charge cutoff SoC (%)    | Sets the SoC at which grid charging stops (reg 47246)                                              |
+| Set grid charge cutoff SoC (%)    | Sets the SoC at which grid charging stops (reg 47088)                                              |
 
 #### Battery LUNA2000 (EMMA Modbus)
 
