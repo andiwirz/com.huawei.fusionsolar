@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const {
   SUN2000_EMMA_DATA_REGISTERS,
   isSun2000EmmaDataValid,
@@ -196,5 +197,8 @@ class SUN2000EmmaModbusDevice extends Device {
 }
 
 Object.assign(SUN2000EmmaModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(SUN2000EmmaModbusDevice);
 
 module.exports = SUN2000EmmaModbusDevice;

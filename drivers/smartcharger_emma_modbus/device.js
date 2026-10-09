@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const {
   SMARTCHARGER_REGISTERS,
   isSmartChargerDataValid,
@@ -288,5 +289,8 @@ class SmartChargerModbusDevice extends Device {
 }
 
 Object.assign(SmartChargerModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(SmartChargerModbusDevice);
 
 module.exports = SmartChargerModbusDevice;

@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const {
   SDONGLE_A_REGISTERS,
   isSdonglaADataValid,
@@ -156,5 +157,8 @@ class SdonglaAModbusDevice extends Device {
 }
 
 Object.assign(SdonglaAModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(SdonglaAModbusDevice);
 
 module.exports = SdonglaAModbusDevice;

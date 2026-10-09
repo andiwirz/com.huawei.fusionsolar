@@ -1862,6 +1862,17 @@
 
   <!-- ── Tab: Logs ── -->
   <div id="tab-logs" style="display:none">
+    <!-- What changed, kept across restarts (lib/change-log.js). Above the live log because it
+         answers the question people open this tab with: what changed my device, and when. -->
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+      <strong data-i18n="logs.changesTitle">Changes</strong>
+      <span id="changes-count" style="font-size:12px;color:var(--c-label-2)"></span>
+    </div>
+    <div class="tab-intro" data-i18n="logs.changesIntro">
+      What changed through a device's settings, a flow or on the device itself — the last 50 entries per device, kept across restarts and updates.
+    </div>
+    <div id="changes-output"
+         style="background:#1e1e22;color:#d6d6d9;border-radius:8px;padding:10px;max-height:240px;overflow-y:auto;margin-bottom:16px;font-family:SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word"></div>
     <div class="tab-intro" data-i18n="logs.intro">
       Live log of the whole app — every driver and device, the same output as <code>homey app run</code>. Keeps the last 1500 lines; refreshes every 3 seconds while this tab is open.
     </div>
@@ -2683,7 +2694,46 @@
 
     function logsStart() {
       logsRefresh();
-      if (!_logsTimer) _logsTimer = setInterval(logsRefresh, 3000);
+      changesRefresh();
+      if (!_logsTimer) _logsTimer = setInterval(function() {
+        logsRefresh();
+        // The change log moves rarely; every fifth tick is plenty.
+        _changesTick = (_changesTick + 1) % 5;
+        if (_changesTick === 0) changesRefresh();
+      }, 3000);
+    }
+
+    // ── Change log ────────────────────────────────────────────────────────────
+    var _changesTick = 0;
+    var _changesData = [];
+    var CHANGE_COLOURS = { settings: '#b98ae8', flow: '#5fd0a4', device: '#6fa8f5', failed: '#ff6b64' };
+
+    function changesRefresh() {
+      _H.api('GET', '/changes', null, function(err, result) {
+        if (err || !Array.isArray(result)) return;
+        _changesData = result;
+        changesRender();
+      });
+    }
+
+    function changesRender() {
+      var out = document.getElementById('changes-output');
+      var filter = (document.getElementById('logs-filter').value || '').toLowerCase();
+      var esc = function(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+      var rows = _changesData.filter(function(e) {
+        return !filter || (e.device + ' ' + e.text).toLowerCase().indexOf(filter) !== -1;
+      });
+      out.innerHTML = rows.length
+        ? rows.map(function(e) {
+            var colour = CHANGE_COLOURS[e.source] || '#d6d6d9';
+            // The live log's own colours: dimmed time, driver orange for the device name.
+            return '<span style="color:' + LOG_TS_COLOUR + '">' + esc(e.at) + '</span> '
+              + '<span style="color:#d9a55f">' + esc(e.device) + '</span> '
+              + '<span style="color:' + colour + '">[' + esc(_H.__('settings.logs.source.' + e.source)) + ']</span> '
+              + esc(e.text) + (e.n > 1 ? ' <span style="color:' + LOG_TS_COLOUR + '">(×' + e.n + ')</span>' : '');
+          }).join('\n')
+        : '<span style="color:' + LOG_TS_COLOUR + '">' + esc(_H.__('settings.logs.changesEmpty')) + '</span>';
+      document.getElementById('changes-count').textContent = rows.length ? String(rows.length) : '';
     }
 
     function logsStop() {
@@ -2771,6 +2821,7 @@
         lines.length + (lines.length !== _logsData.length ? ' / ' + _logsData.length : '') + ' ' + _H.__('settings.logs.lines');
 
       if (atBottom) out.scrollTop = out.scrollHeight;
+      if (typeof changesRender === 'function') changesRender();
     }
 
     function logsClear() {

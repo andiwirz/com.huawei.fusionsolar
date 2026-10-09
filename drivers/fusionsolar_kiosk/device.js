@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const { parseKioskUrl, buildApiUrl, fetchKioskData, extractKpiValues } = require('../../lib/kiosk-api');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 
@@ -168,5 +169,8 @@ class FusionSolarKioskDevice extends Device {
 Object.assign(FusionSolarKioskDevice.prototype, {
   _setCumulative: require('../../lib/capability-set')._setCumulative,
 });
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(FusionSolarKioskDevice);
 
 module.exports = FusionSolarKioskDevice;

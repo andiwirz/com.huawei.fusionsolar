@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const capabilitySet = require('../../lib/capability-set');
 
 const DEV_TYPE_METER        = 17; // Grid meter (DTSU666)
@@ -307,5 +308,8 @@ class FusionSolarMeterDevice extends Device {
 }
 
 Object.assign(FusionSolarMeterDevice.prototype, capabilitySet);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(FusionSolarMeterDevice);
 
 module.exports = FusionSolarMeterDevice;

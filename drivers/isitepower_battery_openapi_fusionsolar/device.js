@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const { DEV_TYPE_BATTERY_RACK, calculate } = require('../../lib/isitepower-utils');
 const { logPollOk } = require('../../lib/poll-log');
 const capabilitySet = require('../../lib/capability-set');
@@ -183,5 +184,8 @@ class ISitePowerBatteryDevice extends Device {
 }
 
 Object.assign(ISitePowerBatteryDevice.prototype, capabilitySet);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(ISitePowerBatteryDevice);
 
 module.exports = ISitePowerBatteryDevice;

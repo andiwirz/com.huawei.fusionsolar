@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog, applySettingSync, record } = require('../../lib/change-log');
 const {
   LUNA2000_EMMA_DATA_REGISTERS,
   LUNA2000_EMMA_CONTROL_REGISTERS,
@@ -115,7 +116,11 @@ class LUNA2000EmmaModbusDevice extends Device {
       const raw      = Math.round(kw * 1000);
       this.log(`Write max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);
       writeModbusU32(address, port, modbusId, 40002, raw)
-        .catch((err) => this.error('Max grid charge power write failed:', err.message));
+        .then(() => this.log('Write OK     [max_grid_charge_power → reg 40002]'))
+        .catch((err) => {
+          this.error('Max grid charge power write failed:', err.message);
+          record(this, 'failed', 'max_grid_charge_power', `Write failed [max_grid_charge_power → reg 40002]: ${err.message}`);
+        });
     }
 
     // Not awaited, like every other write here: Homey stores the settings when this returns.
@@ -480,10 +485,7 @@ class LUNA2000EmmaModbusDevice extends Device {
       if (ctrl.maxGridChargingPower !== null && ctrl.maxGridChargingPower !== undefined) {
         const currentKw = parseFloat(this.getSetting('max_grid_charge_power')) || 0;
         if (Math.abs(ctrl.maxGridChargingPower - currentKw) > 0.05) {
-          this._updatingSettingFromModbus = true;
-          await this.setSettings({ max_grid_charge_power: ctrl.maxGridChargingPower })
-            .catch((err) => this.log('setSettings max_grid_charge_power failed:', err.message));
-          this._updatingSettingFromModbus = false;
+          await applySettingSync(this, { max_grid_charge_power: ctrl.maxGridChargingPower });
         }
       }
 
@@ -520,5 +522,8 @@ class LUNA2000EmmaModbusDevice extends Device {
 }
 
 Object.assign(LUNA2000EmmaModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(LUNA2000EmmaModbusDevice);
 
 module.exports = LUNA2000EmmaModbusDevice;

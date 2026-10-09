@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device }    = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const HomeyLocalApi = require('../../lib/homey-local-api');
 
 const {
@@ -1479,5 +1480,8 @@ Object.assign(
   deviceDiagMixin,
   widgetMixin,
 );
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(EmsDevice);
 
 module.exports = EmsDevice;

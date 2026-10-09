@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const OcppServer = require('../../lib/ocpp-server');
 
 const MIN_AMPS            = 6;
@@ -2122,5 +2123,8 @@ class SmartChargerOcppDevice extends Device {
     };
   }
 }
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(SmartChargerOcppDevice);
 
 module.exports = SmartChargerOcppDevice;

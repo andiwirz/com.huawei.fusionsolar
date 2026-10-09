@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const capabilitySet = require('../../lib/capability-set');
 
 const DEV_TYPE_BATTERY     = 39; // Residential battery (LUNA2000)
@@ -327,5 +328,8 @@ class FusionSolarBatteryDevice extends Device {
 }
 
 Object.assign(FusionSolarBatteryDevice.prototype, capabilitySet);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(FusionSolarBatteryDevice);
 
 module.exports = FusionSolarBatteryDevice;

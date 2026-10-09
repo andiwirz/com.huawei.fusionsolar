@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const {
   POWERMETER_EMMA_DATA_REGISTERS,
   isPowerMeterEmmaDataValid,
@@ -183,5 +184,8 @@ class PowerMeterEmmaModbusDevice extends Device {
 }
 
 Object.assign(PowerMeterEmmaModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(PowerMeterEmmaModbusDevice);
 
 module.exports = PowerMeterEmmaModbusDevice;

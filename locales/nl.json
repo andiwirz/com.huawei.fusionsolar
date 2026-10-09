@@ -113,7 +113,16 @@
       "onlyErrors": "Alleen fouten",
       "pause": "Pauzeren",
       "clear": "Wissen",
-      "lines": "regels"
+      "lines": "regels",
+      "changesTitle": "Wijzigingen",
+      "changesIntro": "Wat via de apparaatinstellingen, een flow of op het apparaat zelf is gewijzigd — de laatste 50 regels per apparaat, ook na herstarts en updates.",
+      "changesEmpty": "Nog geen wijzigingen vastgelegd.",
+      "source": {
+        "settings": "Instellingen",
+        "flow": "Flow",
+        "device": "Apparaat",
+        "failed": "Mislukt"
+      }
     },
     "tester": {
       "intro": "Scant het lokale netwerk naar Huawei Modbus-apparaten en controleert de verbinding (IP, poort, eenheid-ID). Gebruik dit om de juiste instellingen voor een nieuw apparaat te vinden.",

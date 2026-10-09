@@ -2,12 +2,16 @@
 
 const { App }             = require('homey');
 const OpenAPICoordinator  = require('./lib/openapi-coordinator');
+const changeLog           = require('./lib/change-log');
 
 class FusionSolarApp extends App {
 
   async onInit() {
     this._appLogBuffer = [];
     this._wrapLogger(); // capture stdout/stderr into the ring buffer for the Settings → Logs tab
+    // Before any driver registers a card: every action card logs what it was asked to do,
+    // and why it refused — see lib/change-log.js.
+    changeLog.wrapFlowCards(this.homey, (...a) => this.log(...a));
     // The version, because a pasted log is how a problem arrives — and twice now the
     // answer to "which build is this?" had to be reconstructed from commit timestamps,
     // once leading straight to the wrong conclusion.
@@ -390,6 +394,28 @@ class FusionSolarApp extends App {
 
   getAppLog() {
     return this._appLogBuffer;
+  }
+
+  /**
+   * Every device's change log (lib/change-log.js), newest first, for Settings → Logs. Unlike
+   * the live log it survives restarts and updates; it holds the last entries of each device.
+   */
+  getChangeLog() {
+    const out = [];
+    let drivers = {};
+    try { drivers = this.homey.drivers.getDrivers(); } catch (_) { /* none yet */ }
+    for (const driver of Object.values(drivers)) {
+      let devices = [];
+      try { devices = driver.getDevices(); } catch (_) { /* driver not ready */ }
+      for (const device of devices) {
+        let name = '';
+        try { name = device.getName(); } catch (_) { /* unnamed */ }
+        for (const e of changeLog.entries(device)) {
+          out.push({ t: e.t, at: this._logStamp(new Date(e.t)), device: name, source: e.source, text: e.text, n: e.n || 1 });
+        }
+      }
+    }
+    return out.sort((a, b) => b.t - a.t).slice(0, 300);
   }
 
   clearAppLog() {

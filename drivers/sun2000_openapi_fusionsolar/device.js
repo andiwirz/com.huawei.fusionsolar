@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const capabilitySet = require('../../lib/capability-set');
 
 const DEV_TYPE_INVERTER             = 1;
@@ -525,5 +526,8 @@ class FusionSolarInverterDevice extends Device {
 }
 
 Object.assign(FusionSolarInverterDevice.prototype, capabilitySet);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(FusionSolarInverterDevice);
 
 module.exports = FusionSolarInverterDevice;

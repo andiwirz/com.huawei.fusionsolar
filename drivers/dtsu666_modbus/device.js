@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog } = require('../../lib/change-log');
 const {
   POWER_METER_REGISTERS,
   isPowerMeterDataValid,
@@ -208,5 +209,8 @@ class DTSU666ModbusDevice extends Device {
 }
 
 Object.assign(DTSU666ModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(DTSU666ModbusDevice);
 
 module.exports = DTSU666ModbusDevice;

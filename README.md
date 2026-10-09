@@ -1167,6 +1167,28 @@ from those ten.
 
 ---
 
+## Logs and the Change Log
+
+**App Settings → Logs** has two panels.
+
+**Changes** (since 1.2.275) lists what changed, per device, and survives restarts and updates —
+the last 50 entries per device, kept in the device's own store:
+
+| Source | What is recorded |
+|--------|------------------|
+| Settings | A saved device settings page: every changed setting from old to new (passwords, keys, codes and user names masked), or why the page was not saved |
+| Flow | Every action flow card that ran, with its arguments. Data feeds (electricity price, price forecast) appear in the live log only |
+| Device | A value changed on the device itself — in the FusionSolar app, say — once the app reads it (`Setting follows the device`, `Mode dropdown follows the device`) |
+| Failed | A write the device refused (the setting is put back where the app can), and a flow card the app refused, with the reason |
+
+A repeat of the same entry within 15 minutes — a flow that adjusts a charger every minute —
+counts up instead of pushing everything else out.
+
+**Live log** is everything the app writes, the last 1500 lines in memory: every write to a device
+with `Write start`, `Write OK` or the failure, each saved settings page (`Settings saved: …`)
+and each flow card (`[flow] …`). It is cleared by a restart or an update, and is what
+*More → Apps → FusionSolar → Submit App Logs* sends.
+
 ## Technical Background
 
 - **Kiosk:** HTTP polling of the public FusionSolar Kiosk API

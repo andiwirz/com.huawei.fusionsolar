@@ -113,7 +113,16 @@
       "onlyErrors": "Only errors",
       "pause": "Pause",
       "clear": "Clear",
-      "lines": "lines"
+      "lines": "lines",
+      "changesTitle": "Changes",
+      "changesIntro": "What changed through a device's settings, a flow or on the device itself — the last 50 entries per device, kept across restarts and updates.",
+      "changesEmpty": "No changes recorded yet.",
+      "source": {
+        "settings": "Settings",
+        "flow": "Flow",
+        "device": "Device",
+        "failed": "Failed"
+      }
     },
     "tester": {
       "intro": "Scans the local network for Huawei Modbus devices and verifies the connection (IP, port, unit ID). Use this to find the correct settings for a new device.",

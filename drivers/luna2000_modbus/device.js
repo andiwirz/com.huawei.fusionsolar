@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog, applySettingSync, record } = require('../../lib/change-log');
 const {
   BATTERY_REGISTERS,
   BATTERY_MODULE_REGISTERS,
@@ -227,6 +228,7 @@ class LUNA2000ModbusDevice extends Device {
         const raw = newSettings.charge_from_grid ? 1 : 0;
         this.log(`Write charge_from_grid: ${raw} → reg 47087`);
         writeModbusRegister(address, port, modbusId, 47087, raw)
+          .then(() => this.log('Write OK     [charge_from_grid → reg 47087]'))
           .catch((err) => this._revertSetting('charge_from_grid', oldSettings, err));
       }
 
@@ -244,6 +246,7 @@ class LUNA2000ModbusDevice extends Device {
           const raw = Math.round((Number.isFinite(val) ? val : 0) * scale);
           this.log(`Write ${key}: ${newSettings[key]} → reg ${reg} raw=${raw}`);
           (u32 ? writeModbusU32 : writeModbusRegister)(address, port, modbusId, reg, raw)
+            .then(() => this.log(`Write OK     [${key} → reg ${reg}]`))
             .catch((err) => this._revertSetting(key, oldSettings, err));
         }
       }
@@ -257,7 +260,7 @@ class LUNA2000ModbusDevice extends Device {
           const raw = Math.round(parseFloat(newSettings[key]) || 0);
           this.log(`Write ${key}: ${raw} W → reg ${reg}`);
           writeModbusU32(address, port, modbusId, reg, raw)
-            .then(() => this._reflectMaxPower(key, raw))
+            .then(() => { this.log(`Write OK     [${key} → reg ${reg}]`); return this._reflectMaxPower(key, raw); })
             .catch((err) => this._revertSetting(key, oldSettings, err));
         }
       }
@@ -267,6 +270,7 @@ class LUNA2000ModbusDevice extends Device {
         const raw = Math.round(Math.max(0, parseFloat(newSettings.max_grid_charge_ceiling) || 0));
         this.log(`Write max_grid_charge_ceiling: ${raw} W → reg 47244`);
         writeModbusU32(address, port, modbusId, 47244, raw)
+          .then(() => this.log('Write OK     [max_grid_charge_ceiling → reg 47244]'))
           .catch((err) => this._revertSetting('max_grid_charge_ceiling', oldSettings, err));
       }
 
@@ -286,6 +290,7 @@ class LUNA2000ModbusDevice extends Device {
           : Promise.resolve();
         ensureEnabled
           .then(() => writeModbusU32(address, port, modbusId, 47242, raw))
+          .then(() => this.log('Write OK     [max_grid_charge_power → reg 47242]'))
           .catch((err) => this._revertSetting('max_grid_charge_power', oldSettings, err));
       }
     }
@@ -362,6 +367,7 @@ class LUNA2000ModbusDevice extends Device {
    */
   async _revertSetting(settingId, oldSettings, err) {
     this.error(`${settingId} write failed:`, err.message);
+    record(this, 'failed', settingId, `Write failed [${settingId}]: ${err.message} — setting taken back`);
     const previous = oldSettings ? oldSettings[settingId] : undefined;
     if (previous === undefined || previous === null) return;
     if (this.getSetting(settingId) === previous) return;  // nothing drifted
@@ -1445,12 +1451,8 @@ class LUNA2000ModbusDevice extends Device {
         const current = parseFloat(this.getSetting('max_grid_charge_power'));
         if (!Number.isFinite(current) || Math.abs(v - current) > 0.5) settingUpdates.max_grid_charge_power = v;
       }
-      if (Object.keys(settingUpdates).length > 0) {
-        this._updatingSettingFromModbus = true;
-        await this.setSettings(settingUpdates)
-          .catch((err) => this.log('setSettings sync failed:', err.message));
-        this._updatingSettingFromModbus = false;
-      }
+      // Stored under the guard, and every value that moved on the device is logged.
+      await applySettingSync(this, settingUpdates);
 
 
       // The one setting of type "label" left, at the end of "Change battery mode": whether
@@ -1523,5 +1525,8 @@ class LUNA2000ModbusDevice extends Device {
 }
 
 Object.assign(LUNA2000ModbusDevice.prototype, modbusPolling, enumLabel);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(LUNA2000ModbusDevice);
 
 module.exports = LUNA2000ModbusDevice;

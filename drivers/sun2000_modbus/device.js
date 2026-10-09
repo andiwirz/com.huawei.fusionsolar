@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { withSettingsLog, applySettingSync, record } = require('../../lib/change-log');
 const {
   REGISTERS,
   POWER_METER_REGISTERS,
@@ -160,47 +161,52 @@ class SUN2000ModbusDevice extends Device {
       const port     = parseInt(this.getSetting('port'), 10) || 502;
       const modbusId = parseIntSafe(this.getSetting('modbus_id'), 1);
 
+      // One shape for every write from this page: start, OK, or failed — the failure in the
+      // change log too, since nothing here puts the setting back.
+      const write = (key, reg, raw, writeFn) => {
+        writeFn(address, port, modbusId, reg, raw)
+          .then(() => this.log(`Write OK     [${key} → reg ${reg}]`))
+          .catch((err) => {
+            this.error(`${key} write failed:`, err.message);
+            record(this, 'failed', key, `Write failed [${key} → reg ${reg}]: ${err.message}`);
+          });
+      };
+
       if (changedKeys.includes('max_feed_in_power')) {
         const raw = Math.round(parseFloat(newSettings.max_feed_in_power) || 0);
         this.log(`Write max_feed_in_power: ${raw} W → reg 47416`);
-        writeModbusU32(address, port, modbusId, 47416, raw)
-          .catch((err) => this.error('max_feed_in_power write failed:', err.message));
+        write('max_feed_in_power', 47416, raw, writeModbusU32);
       }
 
       if (changedKeys.includes('max_feed_in_power_pct')) {
         const raw = Math.round((parseFloat(newSettings.max_feed_in_power_pct) || 0) * 10);
         this.log(`Write max_feed_in_power_pct: ${newSettings.max_feed_in_power_pct} % → reg 47418 raw=${raw}`);
-        writeModbusRegister(address, port, modbusId, 47418, raw)
-          .catch((err) => this.error('max_feed_in_power_pct write failed:', err.message));
+        write('max_feed_in_power_pct', 47418, raw, writeModbusRegister);
       }
 
       if (changedKeys.includes('output_limit_w')) {
         const raw = Math.round(Math.max(0, parseFloat(newSettings.output_limit_w) || 0));
         this.log(`Write output_limit_w: ${raw} W → reg 40126`);
-        writeModbusU32(address, port, modbusId, 40126, raw)
-          .catch((err) => this.error('output_limit_w write failed:', err.message));
+        write('output_limit_w', 40126, raw, writeModbusU32);
       }
 
       if (changedKeys.includes('output_limit_pct')) {
         const pct = Math.min(100, Math.max(0, parseFloat(newSettings.output_limit_pct) || 0));
         const raw = Math.round(pct * 10);
         this.log(`Write output_limit_pct: ${pct} % → reg 40125 raw=${raw}`);
-        writeModbusRegister(address, port, modbusId, 40125, raw)
-          .catch((err) => this.error('output_limit_pct write failed:', err.message));
+        write('output_limit_pct', 40125, raw, writeModbusRegister);
       }
 
       if (changedKeys.includes('mppt_multimodal')) {
         const raw = newSettings.mppt_multimodal ? 1 : 0;
         this.log(`Write mppt_multimodal: ${newSettings.mppt_multimodal} → reg 42054 raw=${raw}`);
-        writeModbusRegister(address, port, modbusId, 42054, raw)
-          .catch((err) => this.error('mppt_multimodal write failed:', err.message));
+        write('mppt_multimodal', 42054, raw, writeModbusRegister);
       }
 
       if (changedKeys.includes('mppt_scan_interval')) {
         const raw = Math.round(Math.max(1, Math.min(60, parseFloat(newSettings.mppt_scan_interval) || 5)));
         this.log(`Write mppt_scan_interval: ${raw} min → reg 42055`);
-        writeModbusRegister(address, port, modbusId, 42055, raw)
-          .catch((err) => this.error('mppt_scan_interval write failed:', err.message));
+        write('mppt_scan_interval', 42055, raw, writeModbusRegister);
       }
     }
 
@@ -901,12 +907,8 @@ class SUN2000ModbusDevice extends Device {
         const mpptBool = ctrl.mpptMultimodal === 1;
         if (this.getSetting('mppt_multimodal') !== mpptBool) settingUpdates['mppt_multimodal'] = mpptBool;
       }
-      if (Object.keys(settingUpdates).length > 0) {
-        this._updatingSettingFromModbus = true;
-        await this.setSettings(settingUpdates)
-          .catch((err) => this.log('setSettings sync failed:', err.message));
-        this._updatingSettingFromModbus = false;
-      }
+      // Stored under the guard, and every value that moved on the device is logged.
+      await applySettingSync(this, settingUpdates);
 
       // The feed-in mode dropdown — see lib/mode-settings.js.
       await syncModeSettings(this, MODE_SETTINGS, { mode_active_power_control: ctrl.activePowerControlMode });
@@ -925,5 +927,8 @@ class SUN2000ModbusDevice extends Device {
 }
 
 Object.assign(SUN2000ModbusDevice.prototype, modbusPolling);
+
+// Every saved settings page in the log and the change log — see lib/change-log.js.
+withSettingsLog(SUN2000ModbusDevice);
 
 module.exports = SUN2000ModbusDevice;

@@ -2790,4 +2790,13 @@ module.exports = {
     return { ok: true };
   },
 
+  /**
+   * GET /changes
+   * What changed through the settings page, a flow or on the device itself — kept in each
+   * device's store, so it survives restarts and updates (lib/change-log.js).
+   */
+  async getChangeLog({ homey }) {
+    return homey.app.getChangeLog();
+  },
+
 };
