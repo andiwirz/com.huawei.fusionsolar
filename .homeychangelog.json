@@ -1,4 +1,9 @@
 {
+  "1.2.293": {
+    "en": "The most-used flow cards are now highlighted, so they appear at the top of the card list. LUNA2000 battery: \"Set storage working mode\", \"Set force charge/discharge\", \"Set charge from grid\", \"Set max charge power\", \"Set max discharge power\", \"Battery SoC is above/below threshold\". SUN2000 inverter: \"Set active power control mode\", \"Solar power is above value for duration\", \"Inverter status changed\". Chosen from how often each card is used in flows.",
+    "de": "Die meistgenutzten Flow-Karten sind jetzt hervorgehoben und stehen oben in der Kartenliste. LUNA2000-Batterie: „Speicher-Betriebsmodus setzen“, „Zwangsladen/Entladen steuern“, „Netzladen aktivieren/deaktivieren“, „Maximale Ladeleistung setzen“, „Maximale Entladeleistung setzen“, „Batterie-Ladezustand über/unter Schwellwert“. SUN2000-Wechselrichter: „Wirkleistungs-Steuermodus setzen“, „Solarleistung länger als X Minuten über Wert“, „Wechselrichter-Status hat sich geändert“. Ausgewählt danach, wie oft die Karten in Flows genutzt werden.",
+    "nl": "De meestgebruikte flowkaarten zijn nu uitgelicht en staan bovenaan de kaartenlijst."
+  },
   "1.2.292": {
     "en": "FusionSolar cloud meter and cloud battery: \"Meter status changed\" and \"Battery unit status changed\" now filter by the status chosen in the card, and \"Meter status is\" works, also on a plant without a DTSU666 or a Modbus battery. Until now these cards relied on the Modbus driver to answer them.",
     "de": "FusionSolar-Cloud-Zähler und -Cloud-Batterie: „Zählerstatus hat sich geändert“ und „Batterie-Betriebsstatus hat sich geändert“ filtern jetzt nach dem in der Karte gewählten Status, und „Zählerstatus ist“ funktioniert – auch in einer Anlage ohne DTSU666 oder Modbus-Batterie. Bisher hingen diese Karten am Modbus-Treiber.",
