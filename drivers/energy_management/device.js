@@ -993,24 +993,49 @@ class EmsDevice extends Device {
   // ENTIRE device object per call — with 2 caps per charger/simple device that
   // doubled the HTTP load. Here each device is fetched exactly once per tick
   // (single consistent snapshot); the cache is cleared at the top of _tickBody.
-  async _cap(deviceId, capId) {
+  // measured: the value is a measurement the energy balance is built from. A device Homey
+  // marks unavailable still carries the values it had when it went away, and the EMS used to
+  // keep regulating on them — with the export guards in chargerControl blocking exactly the
+  // correction a real reading would have asked for. Such a value now reads as missing, which
+  // the code below already treats with care: a missing grid value holds all control after
+  // GRID_SENSOR_HOLD_MS, a missing SoC holds the battery hard stop after BATTERY_SOC_HOLD_MS,
+  // a missing charger power falls back to the amps estimate. States are left alone on
+  // purpose: a charger that drops off the network for a minute must not read as unplugged
+  // and end the session, so "is the car plugged in?" still reads its last value.
+  async _cap(deviceId, capId, { measured = false } = {}) {
     if (!this._devCache.has(deviceId)) {
       this._devCache.set(deviceId, this._api.getDevice(deviceId).catch(() => null));
     }
     const device = await this._devCache.get(deviceId);
+    if (measured && device && this._noteAvailability(deviceId, device) === false) return null;
     const capObj = device?.capabilitiesObj || device?.capabilities || {};
     const entry  = !Array.isArray(capObj) ? capObj[capId] : null;
     if (entry === null || entry === undefined) return null;
     return typeof entry === 'object' ? (entry.value ?? null) : entry;
   }
 
+  // One line when a device the EMS measures goes away, one when it is back — not one per tick.
+  _noteAvailability(deviceId, device) {
+    if (!this._unavailableIds) this._unavailableIds = new Set();
+    const name = device.name || deviceId;
+    if (device.available === false) {
+      if (!this._unavailableIds.has(deviceId)) {
+        this._unavailableIds.add(deviceId);
+        this.log(`[EMS] "${name}" is unavailable — its measurements are ignored until it is back`);
+      }
+      return false;
+    }
+    if (this._unavailableIds.delete(deviceId)) this.log(`[EMS] "${name}" is available again`);
+    return true;
+  }
+
   async _getBattery(cfg) {
     const devices = cfg.battery_devices || [];
     if (!devices.length) return { soc: null, powerW: null, socPerDevice: {} };
     const [socs, powers, capacities] = await Promise.all([
-      Promise.all(devices.map((d) => this._cap(d.id, d.cap_soc || 'measure_battery'))),
-      Promise.all(devices.map((d) => d.cap_power ? this._cap(d.id, d.cap_power) : Promise.resolve(null))),
-      Promise.all(devices.map((d) => d.cap_capacity ? this._cap(d.id, d.cap_capacity) : Promise.resolve(null))),
+      Promise.all(devices.map((d) => this._cap(d.id, d.cap_soc || 'measure_battery', { measured: true }))),
+      Promise.all(devices.map((d) => d.cap_power ? this._cap(d.id, d.cap_power, { measured: true }) : Promise.resolve(null))),
+      Promise.all(devices.map((d) => d.cap_capacity ? this._cap(d.id, d.cap_capacity, { measured: true }) : Promise.resolve(null))),
     ]);
 
     // Remember the usable capacity a battery reported, so the four places that need it can
@@ -1230,7 +1255,7 @@ class EmsDevice extends Device {
     const devices = cfg.house_devices || [];
     if (devices.length) {
       const vals  = await Promise.all(devices.map((d) =>
-        this._cap(d.id, d.cap_power || 'measure_power'),
+        this._cap(d.id, d.cap_power || 'measure_power', { measured: true }),
       ));
       const valid = vals.filter((v) => v !== null && v >= 0);
       return valid.length ? valid.reduce((a, b) => a + b, 0) : null;
@@ -1258,7 +1283,7 @@ class EmsDevice extends Device {
     const devices = cfg.inverter_devices || [];
     if (!devices.length) return null;
     const vals  = await Promise.all(devices.map((d) =>
-      this._cap(d.id, d.cap_power || 'measure_power'),
+      this._cap(d.id, d.cap_power || 'measure_power', { measured: true }),
     ));
     const valid = vals.filter((v) => v !== null && v >= 0); // PV is never negative
     return valid.length ? valid.reduce((a, b) => a + b, 0) : null;
@@ -1275,7 +1300,7 @@ class EmsDevice extends Device {
     }
     const vals  = await Promise.all(devices.map((d) => {
       const cap = d.cap_power || 'measure_power';
-      return this._cap(d.id, cap);
+      return this._cap(d.id, cap, { measured: true });
     }));
     const valid = vals.filter((v) => v !== null);
     if (!valid.length) {
@@ -1307,7 +1332,7 @@ class EmsDevice extends Device {
       const [rawState, rawPowerW] = await Promise.all([
         this._cap(c.id, capState)
           .then((v) => v !== null ? v : this._cap(c.id, 'onoff')),
-        this._cap(c.id, capPower),
+        this._cap(c.id, capPower, { measured: true }),
       ]);
       const st = this._getChargerState(c.id);
       // When EMS has amps set, use estimated power as a floor — prevents false "no surplus"

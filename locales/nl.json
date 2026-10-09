@@ -63,7 +63,9 @@
       "ems": {
         "present": "Energiebeheersysteem aanwezig",
         "absent": "Energiebeheersysteem niet toegevoegd"
-      }
+      },
+      "chargeBlocked": "Het maximale laadvermogen staat op 0 W, de batterij mag dus niet laden. Verhoog het eerst onder „Laad- en ontlaadvermogen”.",
+      "dischargeBlocked": "Het maximale ontlaadvermogen staat op 0 W, de batterij mag dus niet ontladen. Verhoog het eerst onder „Laad- en ontlaadvermogen”."
     },
     "modes": {
       "notReadYet": "Deze modus kan worden gewijzigd zodra de app de huidige waarde van het apparaat heeft gelezen. Probeer het over een minuut opnieuw.",

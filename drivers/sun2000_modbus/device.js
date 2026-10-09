@@ -107,6 +107,17 @@ const FEED_IN_MODES = new Set(['0', '1', '5', '6', '7']);
 // remembering — a second "enable" would otherwise save zero export as the thing to return to.
 const isOwnZeroExport = (state) => !!state && state.mode === '6' && state.maxFeedInW === 0;
 
+// Setting id → the name a person would recognise, for the timeline note when the inverter
+// refuses a write from the settings page.
+const SETTING_LABEL = {
+  max_feed_in_power:     'Max feed-in power',
+  max_feed_in_power_pct: 'Max feed-in power (%)',
+  output_limit_w:        'Inverter output limit (W)',
+  output_limit_pct:      'Inverter output limit (%)',
+  mppt_multimodal:       'MPPT multimodal scanning',
+  mppt_scan_interval:    'MPPT scanning interval',
+};
+
 // The feed-in mode, changed from a dropdown in the device settings — see lib/mode-settings.js
 // and the comment where _registerControlListeners used to be.
 const MODE_SETTINGS = {
@@ -161,14 +172,15 @@ class SUN2000ModbusDevice extends Device {
       const port     = parseInt(this.getSetting('port'), 10) || 502;
       const modbusId = parseIntSafe(this.getSetting('modbus_id'), 1);
 
-      // One shape for every write from this page: start, OK, or failed — the failure in the
-      // change log too, since nothing here puts the setting back.
+      // One shape for every write from this page: start, OK, or failed — and a failure puts
+      // the setting back, so the page never shows a value the inverter does not have.
       const write = (key, reg, raw, writeFn) => {
         writeFn(address, port, modbusId, reg, raw)
           .then(() => this.log(`Write OK     [${key} → reg ${reg}]`))
           .catch((err) => {
             this.error(`${key} write failed:`, err.message);
-            record(this, 'failed', key, `Write failed [${key} → reg ${reg}]: ${err.message}`);
+            record(this, 'failed', key, `Write failed [${key} → reg ${reg}]: ${err.message} — setting taken back`);
+            return this._revertSetting(key, oldSettings, err);
           });
       };
 
@@ -216,6 +228,28 @@ class SUN2000ModbusDevice extends Device {
         parseIntSafe(newSettings.modbus_id, 1), w.reg, parseInt(w.value, 10));
     }, (w, err) => revertModeSetting(this, w.key, oldSettings[w.key], err))
       .catch((err) => this.error('Mode write failed:', err.message));
+  }
+
+  // Puts a setting back after the inverter refused it — the same as on the battery, where this
+  // came first. Homey has stored the page by the time a refusal arrives over the network.
+  async _revertSetting(settingId, oldSettings, err) {
+    const previous = oldSettings ? oldSettings[settingId] : undefined;
+    if (previous === undefined || previous === null) return;
+    if (this.getSetting(settingId) === previous) return;  // nothing drifted
+    this._updatingSettingFromModbus = true;
+    try {
+      await this.setSettings({ [settingId]: previous });
+    } catch (e) {
+      this.log(`setSettings(${settingId}) revert failed:`, e.message);
+      return;
+    } finally {
+      this._updatingSettingFromModbus = false;
+    }
+    if (this.getSetting('enable_timeline_notifications') === false) return;
+    const label = SETTING_LABEL[settingId] || settingId;
+    this.homey.notifications.createNotification({
+      excerpt: `${this.getName()}: ${label} could not be written (${err.message}) — put back to ${previous}.`,
+    }).catch((e) => this.log('Timeline notification failed:', e.message));
   }
 
   async onUninit() {

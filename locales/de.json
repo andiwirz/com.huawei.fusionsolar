@@ -63,7 +63,9 @@
       "ems": {
         "present": "Energiemanagementsystem vorhanden",
         "absent": "Energiemanagementsystem nicht hinzugefügt"
-      }
+      },
+      "chargeBlocked": "Die maximale Ladeleistung steht auf 0 W, die Batterie darf also nicht laden. Zuerst unter „Lade- und Entladeleistung“ erhöhen.",
+      "dischargeBlocked": "Die maximale Entladeleistung steht auf 0 W, die Batterie darf also nicht entladen. Zuerst unter „Lade- und Entladeleistung“ erhöhen."
     },
     "modes": {
       "notReadYet": "Dieser Modus lässt sich ändern, sobald die App seinen aktuellen Wert vom Gerät gelesen hat. Bitte in einer Minute nochmals versuchen.",

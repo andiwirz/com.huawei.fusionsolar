@@ -468,8 +468,7 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_start_force_charge')
       .registerRunListener(({ device, power, target_soc }) => {
         const h = host(), p = port(), u = unitId();
-        const maxChargeW = this.getSetting('max_charge_power') || 5000;
-        const powerW  = Math.round(Math.min(Math.max(0, power), maxChargeW));
+        const powerW = this._forcePowerW('charge', power);
         const socRaw  = Math.round(Math.max(0, Math.min(100, target_soc)) * 10);
         this.log(`Force charge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
         this._writeInProgress = true;
@@ -508,8 +507,7 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_start_force_discharge')
       .registerRunListener(({ device, power, target_soc }) => {
         const h = host(), p = port(), u = unitId();
-        const maxDischargeW = this.getSetting('max_discharge_power') || 5000;
-        const powerW  = Math.round(Math.min(Math.max(0, power), maxDischargeW));
+        const powerW = this._forcePowerW('discharge', power);
         const socRaw  = Math.round(Math.max(0, Math.min(99, target_soc)) * 10);
         this.log(`Force discharge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
         this._writeInProgress = true;
@@ -548,8 +546,7 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_start_force_discharge_soc')
       .registerRunListener(({ device, power, target_soc }) => {
         const h = host(), p = port(), u = unitId();
-        const maxDischargeW = this.getSetting('max_discharge_power') || 5000;
-        const powerW  = Math.round(Math.min(Math.max(0, power), maxDischargeW));
+        const powerW = this._forcePowerW('discharge', power);
         const socRaw  = Math.round(Math.max(0, Math.min(99, target_soc)) * 10);
         this.log(`Force discharge: power=${powerW} W, target SoC=${target_soc}% (raw ${socRaw})`);
         this._writeInProgress = true;
@@ -588,8 +585,7 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_start_force_charge_duration')
       .registerRunListener(({ device, power, duration }) => {
         const h = host(), p = port(), u = unitId();
-        const maxChargeW  = this.getSetting('max_charge_power') || 5000;
-        const powerW      = Math.round(Math.min(Math.max(0, power), maxChargeW));
+        const powerW = this._forcePowerW('charge', power);
         const durationMin = Math.round(Math.max(1, Math.min(1440, duration)));
         this.log(`Force charge for ${durationMin} min: power=${powerW} W`);
         this._writeInProgress = true;
@@ -618,8 +614,7 @@ class LUNA2000ModbusDevice extends Device {
       .getActionCard('luna2000_start_force_discharge_duration')
       .registerRunListener(({ device, power, duration }) => {
         const h = host(), p = port(), u = unitId();
-        const maxDischargeW = this.getSetting('max_discharge_power') || 5000;
-        const powerW        = Math.round(Math.min(Math.max(0, power), maxDischargeW));
+        const powerW = this._forcePowerW('discharge', power);
         const durationMin   = Math.round(Math.max(1, Math.min(1440, duration)));
         this.log(`Force discharge for ${durationMin} min: power=${powerW} W`);
         this._writeInProgress = true;
@@ -647,8 +642,7 @@ class LUNA2000ModbusDevice extends Device {
     this.homey.flow
       .getActionCard('luna2000_set_force_charge_power')
       .registerRunListener(({ device, power }) => {
-        const maxChargeW = this.getSetting('max_charge_power') || 5000;
-        const powerW = Math.round(Math.min(Math.max(0, power), maxChargeW));
+        const powerW = this._forcePowerW('charge', power);
         this.log(`Set force charge power: ${powerW} W`);
         this._writeInProgress = true;
         // Fire-and-forget — return immediately so Homey's 10 s flow timeout is never hit
@@ -858,8 +852,7 @@ class LUNA2000ModbusDevice extends Device {
     this.homey.flow
       .getActionCard('luna2000_set_force_discharge_power')
       .registerRunListener(({ device, power }) => {
-        const maxDischargeW = this.getSetting('max_discharge_power') || 5000;
-        const powerW = Math.round(Math.min(Math.max(0, power), maxDischargeW));
+        const powerW = this._forcePowerW('discharge', power);
         this.log(`Set force discharge power: ${powerW} W → reg 47249`);
         this._writeInProgress = true;
         (async () => {
@@ -1509,6 +1502,20 @@ class LUNA2000ModbusDevice extends Device {
       this._updatingFromModbus         = false;
       this._updatingSettingFromModbus  = false;
     }
+  }
+
+  // The power a force card may use, clamped to the configured limit — 47075 for charging,
+  // 47077 for discharging. Until 1.2.276 the limit was read as `setting || 5000`, and 0 is
+  // falsy: a battery whose discharging was blocked at 0 W (issue #31) still got a forced
+  // discharge of up to 5 kW. A limit of 0 now refuses the card with the reason; a limit not
+  // read yet, right after a start, leaves the ceiling to the battery, which enforces its own.
+  _forcePowerW(kind, power) {
+    const limit = parseFloat(this.getSetting(kind === 'charge' ? 'max_charge_power' : 'max_discharge_power'));
+    if (Number.isFinite(limit) && limit <= 0) {
+      throw new Error(this.homey.__(kind === 'charge' ? 'modbus.battery.chargeBlocked' : 'modbus.battery.dischargeBlocked'));
+    }
+    const asked = Math.max(0, Number(power) || 0);
+    return Math.round(Number.isFinite(limit) ? Math.min(asked, limit) : asked);
   }
 
   // Surfaces an aborted force charge/discharge on the timeline. The flow action is

@@ -117,3 +117,24 @@ test('the README does not call 0 W "no limit" — it shuts the inverter down', (
   assert.doesNotMatch(readme, /Set to 0 for no limit/);
   assert.match(setting('sun2000_modbus', 'output_limit_w').hint.en, /Set to 0 to fully shut down/);
 });
+
+// ── the EMS battery triggers (1.2.276) ──────────────────────────────────────────
+
+test('"battery full" and "battery low" name the thresholds they really follow', () => {
+  // Since 1.2.108 the two points of the battery share ramp, or 95 / 80 without one
+  // (lib/ems/battery.js _batteryAnnounceThresholds) — not the long-gone "Battery Full SOC".
+  const battery = fs.readFileSync(path.join(ROOT, 'lib', 'ems', 'battery.js'), 'utf8');
+  assert.match(battery, /if \(socHi > socLo\) return \{ lowSoc: socLo, fullSoc: socHi, source: 'ramp' \};/);
+  assert.match(battery, /cfg\.min_battery_soc\s*\?\? 80/);
+  assert.match(battery, /cfg\.battery_full_soc \?\? 95/);
+  const ramp = { en: 'surplus split', de: 'Aufteilung des Überschusses', nl: 'verdeling van het overschot' };
+  const trigger = (id) => app.flow.triggers.find((c) => c.id === id);
+  for (const lang of LANGS) {
+    for (const [id, fallback] of [['ems_battery_full', '95 %'], ['ems_battery_low', '80 %']]) {
+      const h = trigger(id).hint[lang];
+      assert.ok(h.includes(ramp[lang]), `${id} (${lang}) does not name the ramp`);
+      assert.ok(h.includes(fallback), `${id} (${lang}) does not give the threshold without a ramp`);
+      assert.doesNotMatch(h, /Battery Full SOC|Batterie voll'-Schwellenwert|configured minimum/, `${id} (${lang}) names a setting that is gone`);
+    }
+  }
+});

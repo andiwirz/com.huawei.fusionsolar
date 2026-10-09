@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.275",
+  "version": "1.2.276",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -3530,9 +3530,9 @@
               },
               "value": true,
               "hint": {
-                "en": "Show a timeline notification when the inverter status changes.",
-                "de": "Zeigt eine Timeline-Benachrichtigung, wenn sich der Status des Wechselrichters ändert.",
-                "nl": "Toont een tijdlijnmelding wanneer de status van de omvormer verandert."
+                "en": "Posts to the timeline when the inverter status changes, and when the inverter refuses a setting the app wrote (the setting is put back). Switching this off silences that warning too.",
+                "de": "Meldet in der Timeline, wenn sich der Status des Wechselrichters ändert und wenn der Wechselrichter eine Einstellung ablehnt, die die App geschrieben hat (die Einstellung wird zurückgesetzt). Ausgeschaltet entfällt auch diese Warnung.",
+                "nl": "Plaatst een tijdlijnmelding wanneer de status van de omvormer verandert en wanneer de omvormer een instelling weigert die de app schreef (de instelling wordt teruggezet). Uitgeschakeld vervalt ook die waarschuwing."
               }
             }
           ]
@@ -9978,9 +9978,9 @@
           "nl": "EMS: batterij [[battery_device_id]] is vol"
         },
         "hint": {
-          "en": "Fires when the battery SOC first rises above the configured 'Battery Full SOC' threshold. Use to start force-discharging the battery (e.g. into the EV charger).",
-          "de": "Wird ausgelöst, wenn der Batterie-SOC erstmals den konfigurierten 'Batterie voll'-Schwellenwert überschreitet. Nutzbar um die Batterie zu entladen (z.B. in den EV-Lader).",
-          "nl": "Wordt geactiveerd als de batterij-SOC voor het eerst boven de geconfigureerde 'Batterij vol'-drempelwaarde stijgt."
+          "en": "Fires when the battery SOC first reaches the upper point of \"Battery: surplus split\" (EMS settings → Home Batteries) — 95 % when no split is set up. It only notifies. Use it, for example, to start force-discharging the battery into the EV charger.",
+          "de": "Wird ausgelöst, wenn der Batterie-SOC erstmals den oberen Punkt von „Batterie: Aufteilung des Überschusses“ erreicht (EMS-Einstellungen → Hausbatterien) — 95 %, wenn keine Aufteilung eingerichtet ist. Meldet nur. Nutzbar etwa, um die Batterie in den EV-Lader zu entladen.",
+          "nl": "Wordt geactiveerd als de accu-SOC voor het eerst het bovenste punt van „Accu: verdeling van het overschot” bereikt (EMS-instellingen → Thuisbatterijen) — 95 % als er geen verdeling is ingesteld. Meldt alleen."
         },
         "args": [
           {
@@ -10027,9 +10027,9 @@
           "nl": "EMS: batterij [[battery_device_id]] is leeg"
         },
         "hint": {
-          "en": "Fires when the battery SOC drops below the configured minimum SOC. Use to stop force-discharging.",
-          "de": "Wird ausgelöst, wenn der Batterie-SOC unter das konfigurierte Minimum fällt. Nutzbar um die Zwangsentladung zu stoppen.",
-          "nl": "Wordt geactiveerd als de batterij-SOC onder de geconfigureerde minimum-SOC daalt."
+          "en": "Fires when the battery SOC drops below the lower point of \"Battery: surplus split\" (EMS settings → Home Batteries) — 80 % when no split is set up. It only notifies; switching the devices off is what the lower point itself does. Use it, for example, to stop force-discharging.",
+          "de": "Wird ausgelöst, wenn der Batterie-SOC unter den unteren Punkt von „Batterie: Aufteilung des Überschusses“ fällt (EMS-Einstellungen → Hausbatterien) — 80 %, wenn keine Aufteilung eingerichtet ist. Meldet nur; die Geräte abschalten tut der untere Punkt selbst. Nutzbar etwa, um die Zwangsentladung zu stoppen.",
+          "nl": "Wordt geactiveerd als de accu-SOC onder het onderste punt van „Accu: verdeling van het overschot” daalt (EMS-instellingen → Thuisbatterijen) — 80 % als er geen verdeling is ingesteld. Meldt alleen; de apparaten uitschakelen doet het onderste punt zelf."
         },
         "args": [
           {

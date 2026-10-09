@@ -386,7 +386,9 @@ test('inverter: a refused output limit lands in the change log, a good one is co
   d._settingsInitialized = true;
   await d.onSettings({ oldSettings: { ...d.settings }, newSettings: { ...d.settings, output_limit_w: 3000, output_limit_pct: 80 }, changedKeys: ['output_limit_w', 'output_limit_pct'] });
   await settle();
-  assert.ok(cl.entries(d).some((e) => e.source === 'failed' && e.text === 'Write failed [output_limit_w → reg 40126]: Timed out'), JSON.stringify(cl.entries(d)));
+  assert.ok(cl.entries(d).some((e) => e.source === 'failed' && e.text === 'Write failed [output_limit_w → reg 40126]: Timed out — setting taken back'), JSON.stringify(cl.entries(d)));
+  // Since 1.2.276 the inverter puts the refused setting back, as the battery does.
+  assert.strictEqual(d.settings.output_limit_w, 5000, 'the page still shows the value the inverter refused');
   assert.ok(d.logs.includes('Write OK     [output_limit_pct → reg 40125]'), d.logs.join('\n'));
 });
 
