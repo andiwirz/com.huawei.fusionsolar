@@ -19,14 +19,16 @@ const app    = require('../app.json');
 
 const CHOSEN = {
   // 'luna2000_set_force_charge_discharge' (72 flows) was retired in 1.2.304 for the HA-style
-  // start and stop cards; 'luna2000_start_force_charge' (21 flows) took its place.
-  actions: ['luna2000_set_working_mode', 'luna2000_start_force_charge', 'luna2000_set_charge_from_grid',
-    'luna2000_set_max_discharge_power', 'luna2000_set_max_charge_power', 'sun2000_set_active_power_mode'],
+  // start and stop cards; 'luna2000_start_force_charge' (21 flows) took its place. In 1.2.305
+  // Andi chose 'luna2000_start_force_discharge' over the two max-power cards (51 and 42 flows):
+  // the start pair is what a forced run is built from now.
+  actions: ['luna2000_set_working_mode', 'luna2000_start_force_charge', 'luna2000_start_force_discharge',
+    'luna2000_set_charge_from_grid', 'sun2000_set_active_power_mode'],
   conditions: ['luna2000_soc_above', 'luna2000_soc_below', 'sun2000_power_above_for'],
   triggers: ['sun2000_status_changed'],
 };
 
-test('exactly the ten chosen cards are highlighted', () => {
+test('exactly the chosen cards are highlighted', () => {
   for (const kind of ['triggers', 'conditions', 'actions']) {
     const highlighted = app.flow[kind].filter((c) => c.highlight).map((c) => c.id).sort();
     assert.deepStrictEqual(highlighted, [...CHOSEN[kind]].sort(), kind);

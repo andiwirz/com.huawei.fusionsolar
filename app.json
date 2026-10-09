@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.304",
+  "version": "1.2.305",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -12264,6 +12264,7 @@
       },
       {
         "id": "luna2000_start_force_discharge",
+        "highlight": true,
         "title": {
           "en": "Start discharging until SoC %",
           "de": "Entladen bis SoC % starten",
@@ -12544,7 +12545,6 @@
       },
       {
         "id": "luna2000_set_max_charge_power",
-        "highlight": true,
         "title": {
           "en": "Set max charge power",
           "de": "Maximale Ladeleistung setzen",
@@ -12587,7 +12587,6 @@
       },
       {
         "id": "luna2000_set_max_discharge_power",
-        "highlight": true,
         "title": {
           "en": "Set max discharge power",
           "de": "Maximale Entladeleistung setzen",

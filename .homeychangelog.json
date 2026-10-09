@@ -1,4 +1,9 @@
 {
+  "1.2.305": {
+    "en": "LUNA2000 (Modbus): \"Start discharging until SoC %\" is now highlighted next to \"Start charging until SoC %\"; \"Set max charge power\" and \"Set max discharge power\" are no longer highlighted.",
+    "de": "LUNA2000 (Modbus): „Entladen bis SoC % starten“ ist jetzt neben „Laden bis SoC % starten“ hervorgehoben; „Maximale Ladeleistung setzen“ und „Maximale Entladeleistung setzen“ sind es nicht mehr.",
+    "nl": "LUNA2000 (Modbus): „Ontladen tot SoC % starten” is nu uitgelicht naast „Laden tot SoC % starten”; de kaarten voor maximaal laad- en ontlaadvermogen niet meer."
+  },
   "1.2.304": {
     "en": "LUNA2000 (Modbus): \"Set force charge/discharge\" and the three cards that fed it (target percentage, charge power, discharge power) are retired. For new flows use the start cards — charging or discharging for minutes or until SoC % — and \"Stop force charge/discharge\", the same set the Home Assistant integration has. Existing flows with the retired cards keep working. \"Start charging until SoC %\" is now highlighted instead.",
     "de": "LUNA2000 (Modbus): „Zwangsladen/Entladen steuern“ und die drei Karten, die ihm Werte lieferten (Ziel-SoC, Ladeleistung, Entladeleistung), sind stillgelegt. Für neue Flows die Start-Karten – Laden oder Entladen für Minuten bzw. bis SoC % – und „Zwangsladen/-entladen stoppen“ verwenden, derselbe Satz wie in der Home-Assistant-Integration. Bestehende Flows mit den stillgelegten Karten laufen weiter. Hervorgehoben ist jetzt „Laden bis SoC % starten“.",
