@@ -60,11 +60,12 @@ test('a range with mixed meanings, or none, stays unknown', () => {
 });
 
 test('the cloud driver names the same state the same way', () => {
-  // FusionSolar's inverter_state is register 32089 in decimal: 780 = 0x030C.
+  // FusionSolar's inverter_state is register 32089 in decimal: 780 = 0x030C. Since 1.2.294 the
+  // cloud driver takes its words from statusLabel itself (test/openapi-small-fixes-1294.test.js
+  // runs it code by code); until then it kept a table of its own.
   const src = fs.readFileSync(path.join(__dirname, '..', 'drivers', 'sun2000_openapi_fusionsolar', 'device.js'), 'utf8');
-  const m = src.match(/^\s*780:\s*'([^']+)'/m);
-  assert.ok(m, 'inverter_state 780 is not named in the OpenAPI driver');
-  assert.strictEqual(m[1], statusLabel(0x030C));
+  assert.match(src, /const \{ statusLabel \} = require\('\.\.\/\.\.\/lib\/modbus-registers'\);/);
+  assert.match(src, /const inverterStateLabel = \(code\) => CLOUD_ONLY_STATES\[code\] \?\? statusLabel\(code\);/);
 });
 
 test('the tile and the status trigger both use this label', () => {

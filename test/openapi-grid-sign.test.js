@@ -230,8 +230,8 @@ test('the old names are stripped from devices that already have them', () => {
   const fs  = require('fs');
   const src = fs.readFileSync(
     path.join(__dirname, '..', 'drivers', 'sun2000_openapi_fusionsolar', 'device.js'), 'utf8');
-  const dep = src.slice(src.indexOf('const DEPRECATED_CAPABILITIES'),
-                        src.indexOf('const INVERTER_STATE_MAP'));
+  const from = src.indexOf('const DEPRECATED_CAPABILITIES');
+  const dep  = src.slice(from, src.indexOf('];', from));
   assert.match(dep, /^\s*'meter_power',$/m,
     'existing installations keep a plain meter_power holding their grid import total');
   assert.match(dep, /^\s*'meter_power\.exported',$/m);

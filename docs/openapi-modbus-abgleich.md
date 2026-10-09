@@ -1,7 +1,7 @@
 # OpenAPI gegen Modbus — Abgleich und Änderungsliste
 
 **Entwicklernotiz, kein Benutzerdokument.** Aufgenommen bei App-Version 1.2.211, **zuletzt
-Punkt für Punkt gegen den Code nachgeprüft bei 1.2.279** (2026-10-09), D2 bei 1.2.280, C1/C2 bei 1.2.281. Entstanden aus Issue #25
+Punkt für Punkt gegen den Code nachgeprüft bei 1.2.279** (2026-10-09), D2 bei 1.2.280, C1/C2 bei 1.2.281, A4/B7/B8 bei 1.2.294. Entstanden aus Issue #25
 (Jamesquare78, Homey Energy zeigt die Batterie nicht in der Summe) und einer Messreihe auf einer
 Anlage, die **beide Pfade gleichzeitig** betreibt — Modbus über 10.160.13.72 und OpenAPI über
 eu5, Station `NE=141986968`. Dadurch messen beide Treibersätze dieselbe Hardware im selben
@@ -19,18 +19,18 @@ werden.
 | A1 | erledigt (1.2.212): Leistung und Phasen von Leistungssensor (47) und Netzzähler (17) negiert | `test/openapi-grid-sign.test.js` |
 | A2 | **bewusst offen**: der EMMA-Zweig hat bei den Zählern eine eigene Konvention, es gibt keine EMMA-Messung, und ein Test hält den Zweig fest, damit die Negation nicht versehentlich hineinläuft | Kopfkommentar in `powermeter_openapi_fusionsolar/device.js` |
 | A3 | offen: die Phasen heissen weiter `meter_u`/`b_u`/`c_u` und `meter_i`/`b_i`/`c_i` | `powermeter_openapi_fusionsolar/device.js` ≈ Z. 49–54 |
-| A4 | teilweise (1.2.213): optionale Capabilities entstehen mit dem ersten Wert (`setOptional`). `powermeter_state_string` wird beim allerersten Abruf aber weiter geschrieben, bevor die EXTRA-Schleife sie anlegt | ebd. ≈ Z. 176 gegen 184 |
+| A4 | erledigt (1.2.294): `powermeter_state_string` geht in allen drei Zweigen über `setOptional` — beim ersten Abruf da, beim reinen Typ-17-Zähler überhaupt erst | `test/openapi-small-fixes-1294.test.js` |
 | B1 | erledigt (1.2.212) | |
 | B2, B3, B6 | **anders gelöst — die Migration aus 4 B ist hinfällig.** Homey Energy liest seit 1.2.216 `meter_power.pv_total`, seit 1.2.262 vom DC-Zähler `mppt_total_cap` getrieben (Issue #34). Die blanke `meter_power` ist seit 1.2.212 entfernt, `inv_total`/`inv_daily` bleiben als Anzeige | `sun2000_openapi_fusionsolar/device.js`, `_writePvMeter` |
 | B4, B5 | erledigt (1.2.212) | |
-| B7 | offen: „Grid-connected" statt „On-grid". Die Codes sind dieselben wie beim Modbus-Register 32089, nur dezimal (768 = 0x0300) — seit 1.2.269 so kommentiert | `INVERTER_STATE_MAP` |
-| B8 | offen: `openapi_inverter_efficiency`, Huawei liefert konstant 100 | |
+| B7 | erledigt (1.2.294): `huawei_status` kommt aus `statusLabel` wie beim Modbus-Wechselrichter — 16 von 27 Codes hatten eigene Wörter; nur 45056 und 49152 (reine Cloud-Zustände) behalten ihre Namen | ebd. |
+| B8 | erledigt (1.2.294): `openapi_inverter_efficiency` entfernt (steht in `DEPRECATED_CAPABILITIES`, Definition bleibt für das Entfernen) | ebd. |
 | C1 | erledigt (1.2.281): die Cloud-Batterie schreibt `luna2000_battery_status` mit den Wörtern des Modbus-Treibers („Fault", „Sleep mode" statt „Faulty", „Hibernating"); Auslöser und Bedingung „Batterie-Betriebsstatus …" gelten für beide Treiber, die Bedingung fragt das im Flow gewählte Gerät | `test/openapi-battery-status.test.js` |
 | C2 | erledigt (1.2.281): `modbus.battery.state.full`/`.empty`, wie bei Modbus | ebd. |
 | C3 | erledigt (1.2.212); seit 1.2.213 kommt der SoH aus `battery_unit_info[].soh` | `test/openapi-unread-fields.test.js` |
 | D1 | offen: alle vier Hausbatterie-Treiber tragen `batteries: ["INTERNAL"]`; LUNA2000 Modbus setzt es sogar nach der Modulzahl per `setEnergy`. Vor dem Streichen klären, ob Homey es für die Hausbatterie braucht | `luna2000_modbus/device.js`, Modulzählung |
 | D2 | erledigt (1.2.280). Im Betrieb überbrückt der Cache seit 1.2.197 bis zu drei leere Antworten; abgewiesene Aufrufe (407/403/429) setzen seit 1.2.220 nicht mehr offline (Issue #28); „ohne Daten" heisst seit 1.2.210, dass **jeder** vorhandene Typ fehlt. 1.2.280 schliesst den Rest: nach einem Start (kein Cache) bekommt die erste leere Antwort einen Zyklus Gnadenfrist; die Geräteliste wird täglich neu geholt und nach 15 Minuten nochmals, solange ein Gerät darin fehlt; fehlt es auch in der zweiten Liste, wird es mit „FusionSolar lists no device of type …" als nicht verfügbar markiert; eine leere Liste ersetzt nie eine volle | `lib/openapi-coordinator.js`, `test/openapi-device-list.test.js`, `test/openapi-starved-type.test.js` |
-| Abschnitt 5 | Wechselrichter und Leistungssensor sind konform. Offen: SDongle (kein energy-Block, `measure_power` ist der Hausverbrauch) und iSitePower Home (`cumulative`, der Export fest auf 0) | |
+| Abschnitt 5 | Wechselrichter und Leistungssensor sind konform. SDongle und iSitePower Home: von Andi verworfen (2026-10-09), nicht umsetzen | |
 | Ungenutzte Felder | seither genutzt: `rated_capacity` (1.2.257, `battery_rated_capacity`), `mppt_total_cap` (1.2.262). Weiter ungenutzt: `mppt_1_cap`/`mppt_2_cap`, `power_factor`, `reactive_power`, die Erträge in Geld. Die AC-Phasenwerte des Wechselrichters sind entfernt | |
 
 Tests aus dem ersten Stand: `test/openapi-grid-sign.test.js` und `test/openapi-parity.test.js`
@@ -320,13 +320,11 @@ Vergleichen in Ordnung, für den Dauerbetrieb nicht — eine Seite gehört auf
 
 ## 7 · Reihenfolge
 
-Stand 1.2.281 — erledigt sind die Vorzeichen (A1, B1), der Ertragszähler des Wechselrichters
-(anders gelöst, siehe Tabelle oben), die Batterie-Fassade (C1–C3) und die Verfügbarkeitsregel
-(D2). Was bleibt, nach Wirkung geordnet:
+Stand 1.2.294 — erledigt sind die Vorzeichen (A1, B1), der Ertragszähler des Wechselrichters
+(anders gelöst, siehe Tabelle oben), die Batterie-Fassade (C1–C3), die Verfügbarkeitsregel (D2)
+und A4, B7, B8. Was bleibt:
 
-1. **SDongle und iSitePower Home aus Energy nehmen** (Abschnitt 5) — beide melden den
-   Hausverbrauch ein zweites Mal.
-2. **A4-Rest, A3, B7, B8** — die Zustandszeile beim ersten Abruf, Namen und Wortlaute.
-3. **D1** — erst nach Klärung, ob Homey `batteries` für die Hausbatterie braucht.
+1. **A3** — die Phasennamen.
+2. **D1** — erst nach Klärung, ob Homey `batteries` für die Hausbatterie braucht.
 
 A2 bleibt bewusst offen, bis eine EMMA-Messung vorliegt.

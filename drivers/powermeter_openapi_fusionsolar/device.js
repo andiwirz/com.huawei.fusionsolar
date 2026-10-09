@@ -123,9 +123,10 @@ class FusionSolarMeterDevice extends Device {
     // Adds a capability the first time a usable value for it arrives, and writes it.
     // Two things fall out of doing it in this order. A plant whose API never sends the
     // field keeps a tile without an empty row — the same reasoning that leaves EMMA
-    // without a frequency. And the write cannot be dropped for want of the capability,
-    // which is what happens to powermeter_state_string on a device's very first poll:
-    // it is written above and only created by the EXTRA_CAPABILITIES loop below it.
+    // without a frequency. And the write cannot be dropped for want of the capability —
+    // which until 1.2.294 happened to powermeter_state_string: written before the
+    // EXTRA_CAPABILITIES loop created it, so lost on a device's first poll, and on a plant
+    // with only a type-17 meter, which never reaches that loop, never shown at all.
     const setOptional = async (cap, value) => {
       if (value === null || value === undefined) return;
       if (!this.hasCapability(cap)) await this.addCapability(cap).catch(() => {});
@@ -173,7 +174,7 @@ class FusionSolarMeterDevice extends Device {
       if (activePower !== null) {
         const gridWatts = Math.round(Math.abs(activePower));
         const label = activePower < 0 ? 'Export' : 'Import';
-        await this._set('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
+        await setOptional('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
       }
       this._fireExportImportTriggers(activePower);
       await this._set('meter_power',          sumKwh(emmaMaps, 'active_cap'));
@@ -222,7 +223,7 @@ class FusionSolarMeterDevice extends Device {
       if (activePower !== null) {
         const gridWatts = Math.round(Math.abs(activePower));
         const label = activePower < 0 ? 'Export' : 'Import';
-        await this._set('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
+        await setOptional('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
       }
       this._fireExportImportTriggers(activePower);
       await this._set('meter_power',            sumKwh(psMaps, 'reverse_active_cap'));
@@ -259,7 +260,7 @@ class FusionSolarMeterDevice extends Device {
       if (activePower !== null) {
         const gridWatts = Math.round(Math.abs(activePower));
         const label = activePower < 0 ? 'Export' : 'Import';
-        await this._set('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
+        await setOptional('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
       }
       this._fireExportImportTriggers(activePower);
     }

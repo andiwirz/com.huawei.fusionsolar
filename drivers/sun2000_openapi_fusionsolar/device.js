@@ -3,6 +3,7 @@
 const { Device } = require('homey');
 const { withSettingsLog } = require('../../lib/change-log');
 const capabilitySet = require('../../lib/capability-set');
+const { statusLabel } = require('../../lib/modbus-registers');
 
 const DEV_TYPE_INVERTER             = 1;
 const DEV_TYPE_RESIDENTIAL_INVERTER = 38;
@@ -42,7 +43,6 @@ const EXTRA_CAPABILITIES = [
   'measure_current.pv2',             // PV2 current (A)
   'huawei_status',                   // inverter state string
   'measure_frequency',               // grid frequency (Hz)
-  'openapi_inverter_efficiency',     // inverter efficiency (%)
 ];
 
 // Removed capabilities — stripped from already-paired devices on init
@@ -53,6 +53,9 @@ const DEPRECATED_CAPABILITIES = [
   'meter_power.daily',
   'meter_power_monthly',
   'meter_power.mppt_total',
+  // Removed in 1.2.294: Huawei reports the inverter efficiency as a constant 100 %, so the
+  // tile and its Insights showed nothing; the Modbus inverter has no such value either.
+  'openapi_inverter_efficiency',
   // huawei_status is not here any more: it came back as an EXTRA capability, and listed in
   // both it was removed on every start and added again on the first poll (1.2.279).
   'measure_voltage.a_u',
@@ -72,37 +75,16 @@ const DEPRECATED_CAPABILITIES = [
   'meter_power.exported',
 ];
 
-// OpenAPI inverter_state values: Modbus register 32089 in decimal (768 = 0x0300), with
-// different wording and a few cloud-only states (45056, 49152) on top.
-const INVERTER_STATE_MAP = {
-  0:     'Standby: initializing',
-  1:     'Standby: insulation resistance detecting',
-  2:     'Standby: irradiation detecting',
-  3:     'Standby: grid detecting',
-  256:   'Start',
-  512:   'Grid-connected',
-  513:   'Grid-connected: power limited',
-  514:   'Grid-connected: self-derating',
-  768:   'Shutdown: on fault',
-  769:   'Shutdown: on command',
-  770:   'Shutdown: OVGR',
-  771:   'Shutdown: communication interrupted',
-  772:   'Shutdown: power limited',
-  773:   'Shutdown: manual startup required',
-  774:   'Shutdown: DC switch disconnected',
-  780:   'Standby: battery empty', // 0x030C — see DEVICE_STATUS_MAP in lib/modbus-registers.js
-  1025:  'Grid scheduling: cosψ-P curve',
-  1026:  'Grid scheduling: Q-U curve',
-  1280:  'Ready for terminal test',
-  1281:  'Terminal testing',
-  1536:  'Inspection in progress',
-  1792:  'AFCI self-check',
-  2048:  'I-V scanning',
-  2304:  'DC input detection',
-  40960: 'Standby: no irradiation',
+// OpenAPI inverter_state is Modbus register 32089 in decimal (768 = 0x0300), so it is named
+// with the words the Modbus inverter uses — statusLabel in lib/modbus-registers.js, which the
+// status cards list too. Until 1.2.294 the cloud had wording of its own for 16 of the codes
+// ("Grid-connected" for "On-grid", "Start" for "Starting", "cosψ" for "cosφ"), so one inverter
+// read differently in the two drivers. Only the two states the cloud adds keep their names.
+const CLOUD_ONLY_STATES = {
   45056: 'Communication interrupted',
   49152: 'Loading',
 };
+const inverterStateLabel = (code) => CLOUD_ONLY_STATES[code] ?? statusLabel(code);
 
 class FusionSolarInverterDevice extends Device {
 
@@ -265,14 +247,13 @@ class FusionSolarInverterDevice extends Device {
     await this._set('meter_power.inv_daily',   sumKwh('day_cap'));
     await this._set('meter_power.inv_total',   sumKwh('total_cap'));
     await this._set('measure_power.mppt',      mpptPowerW);
-    await this._set('openapi_inverter_efficiency', avg('efficiency'));
     await this._set('measure_frequency',       avg('elec_freq'));
 
     const stateVal = maps[0]?.inverter_state;
     if (stateVal !== undefined && stateVal !== null) {
       const stateNum = parseInt(stateVal, 10);
-      const label = INVERTER_STATE_MAP[stateNum] ?? `State ${stateNum}`;
-      await this._set('huawei_status', label);
+      const label = Number.isFinite(stateNum) ? inverterStateLabel(stateNum) : null;
+      if (label !== null) await this._set('huawei_status', label);
       // Announced the way sun2000_modbus announces it. The first reading after a restart
       // is not a change, so _prevDeviceStatus starting at null keeps the timeline quiet
       // until the inverter actually does something different.

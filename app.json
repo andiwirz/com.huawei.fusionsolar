@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.293",
+  "version": "1.2.294",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -5605,14 +5605,6 @@
             "en": "Grid Frequency",
             "de": "Netzfrequenz",
             "nl": "Netfrequentie"
-          },
-          "insights": true
-        },
-        "openapi_inverter_efficiency": {
-          "title": {
-            "en": "Efficiency",
-            "de": "Wirkungsgrad",
-            "nl": "Rendement"
           },
           "insights": true
         }

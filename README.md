@@ -308,7 +308,6 @@ both sides.
 | `measure_temperature.invertor` | Inverter Temperature | yes | removed | yes |
 | `measure_frequency` | Grid Frequency | yes | — | on first poll |
 | `huawei_status` | Inverter Status | yes | — | on first poll |
-| `openapi_inverter_efficiency` | Inverter Efficiency | — | — | on first poll |
 | `sun2000_software_version` | Software Version | yes | — | — |
 | `activepower_controlmode` | Active Power Control Mode | yes | — | — |
 | `optimizer_total_count` / `optimizer_online_count` | Optimizers | with optimizers | — | — |
