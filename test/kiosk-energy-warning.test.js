@@ -6,8 +6,9 @@
 // an EMMA or from the cloud — reports the same production. Both in Energy count it twice.
 // Homey's "Exclude from Energy" is the user's setting, so the app warns: in the pairing view
 // before the device is added, and afterwards with a persistent device warning until the
-// conflict is gone — the SUN2000 removed, Homey's exclusion seen (energy_exclude, if Homey
-// hands it to the app), or the device setting "Excluded from Energy" ticked.
+// conflict is gone — the SUN2000 removed, or Homey's exclusion seen. Homey reports
+// energy_exclude to onSettings when it changes, not at start, so the device remembers it in its
+// store (1.2.298, lib/energy-warning.js; the restart case is tested with the SDongle).
 //
 // Run: node --test
 
@@ -28,7 +29,6 @@ const KioskDriver = require(path.join(ROOT, 'drivers', 'fusionsolar_kiosk', 'dri
 const { sun2000Names, SUN2000_DRIVERS } = require(path.join(ROOT, 'lib', 'sun2000-presence.js'));
 Module._load = origLoad;
 const en = require(path.join(ROOT, 'locales', 'en.json'));
-const app = require(path.join(ROOT, 'app.json'));
 
 function homeyWith(paired) {
   return {
@@ -46,6 +46,9 @@ function kiosk(paired, settings = {}) {
   const d = Object.create(KioskDevice.prototype);
   d.calls = [];
   d.logs = [];
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, v) => { d.store[k] = v; };
   d.settings = { kiosk_url: 'x', ...settings };
   d.homey = homeyWith(paired);
   d.getSettings = () => ({ ...d.settings });
@@ -80,19 +83,13 @@ test('without a SUN2000 the warning is cleared — also one left from before a r
   assert.deepStrictEqual(d.calls, [['unset']]);
 });
 
-test('Homey\'s own exclusion clears it, when Homey shows it to the app', async () => {
-  const d = kiosk({ sun2000_modbus: ['Wechselrichter'] }, { energy_exclude: true });
-  await d._updateEnergyWarning();
-  assert.deepStrictEqual(d.calls, [['unset']]);
-  assert.ok(d.logs.some((l) => /"Exclude from Energy" reads true/.test(l)));
-});
-
-test('when Homey does not show it, the device setting clears it', async () => {
+test('Homey\'s own exclusion clears it once Homey reports it, and it is remembered', async () => {
   const d = kiosk({ sun2000_modbus: ['Wechselrichter'] });
   await d._updateEnergyWarning();
-  assert.ok(d.logs.some((l) => /"Exclude from Energy" is not visible to the app/.test(l)), 'the measurement is not logged');
-  await d.onSettings({ newSettings: { excluded_from_energy: true }, changedKeys: ['excluded_from_energy'] });
+  assert.ok(d.logs.some((l) => /"Exclude from Energy" at start — settings none, last reported none/.test(l)), 'the start is not logged');
+  await d.onSettings({ newSettings: { energy_exclude: true }, changedKeys: ['energy_exclude'] });
   assert.deepStrictEqual(d.calls, [['set', en.kiosk.energyWarning], ['unset']]);
+  assert.deepStrictEqual(d.store, { energyExcludeReported: true });
 });
 
 test('a SUN2000 added later is noticed at the next poll, and its removal too', async () => {
@@ -128,14 +125,8 @@ test('pairing asks the driver for paired SUN2000s, before "Connect" adds the dev
 
 // ── the setting and the texts ──────────────────────────────────────────────────────────
 
-test('the fallback setting exists, and the warning names it in every language', () => {
-  const flat = (l) => (l || []).flatMap((x) => (x.type === 'group' ? flat(x.children) : [x]));
-  const s = flat(app.drivers.find((d) => d.id === 'fusionsolar_kiosk').settings).find((x) => x.id === 'excluded_from_energy');
-  assert.strictEqual(s.type, 'checkbox');
-  assert.strictEqual(s.value, false);
+test('the warning names Homey\'s setting in every language', () => {
   for (const l of ['en', 'de', 'nl']) {
-    const warning = require(path.join(ROOT, 'locales', `${l}.json`)).kiosk.energyWarning;
-    assert.ok(warning.includes(s.label[l]), `${l}: the warning does not name "${s.label[l]}"`);
-    assert.ok(warning.includes('Exclude from Energy'), l);
+    assert.ok(require(path.join(ROOT, 'locales', `${l}.json`)).kiosk.energyWarning.includes('Exclude from Energy'), l);
   }
 });

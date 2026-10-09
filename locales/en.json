@@ -1056,9 +1056,9 @@
     }
   },
   "kiosk": {
-    "energyWarning": "A SUN2000 inverter is paired as well and already reports the solar production to Homey Energy. Exclude this device from Energy (Settings → Energy → \"Exclude from Energy\"), or Homey counts the production twice. If this message stays once that is done, tick \"Excluded from Energy\" in this device's settings."
+    "energyWarning": "A SUN2000 inverter is paired as well and already reports the solar production to Homey Energy. Exclude this device from Energy (Settings → Energy → \"Exclude from Energy\"), or Homey counts the production twice. Excluded already? Then switch that setting off and on once: Homey tells the app only when it changes."
   },
   "sdongle": {
-    "energyWarning": "This device's power reading is the whole house's consumption, which Homey Energy counts as one more consumer unless the device is excluded. Exclude it from Energy (Settings → Energy → \"Exclude from Energy\"). If this message stays once that is done, tick \"Excluded from Energy\" in this device's settings."
+    "energyWarning": "This device's power reading is the whole house's consumption, which Homey Energy counts as one more consumer unless the device is excluded. Exclude it from Energy (Settings → Energy → \"Exclude from Energy\"). Excluded already? Then switch that setting off and on once: Homey tells the app only when it changes."
   }
 }

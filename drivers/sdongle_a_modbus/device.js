@@ -8,7 +8,7 @@ const {
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
-const { applyEnergyWarning } = require('../../lib/energy-warning');
+const { applyEnergyWarning, rememberEnergyExclude } = require('../../lib/energy-warning');
 const modbusPolling = require('../../lib/modbus-polling');
 
 const DEFAULT_INTERVAL_S = 60;
@@ -53,7 +53,7 @@ class SdonglaAModbusDevice extends Device {
 
   async onSettings({ newSettings, changedKeys }) {
     // newSettings, not getSettings(): Homey stores them only after this method resolves.
-    if (changedKeys.some((k) => k === 'excluded_from_energy' || k === 'energy_exclude')) {
+    if (await rememberEnergyExclude(this, { newSettings, changedKeys })) {
       await this._updateEnergyWarning({ ...this.getSettings(), ...newSettings });
     }
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
@@ -113,7 +113,6 @@ class SdonglaAModbusDevice extends Device {
   // ─── Data fetch ────────────────────────────────────────────────────────────
 
   async _fetchAndUpdate() {
-    // An exclusion Homey shows the app only through the settings is noticed here too.
     await this._updateEnergyWarning().catch((err) => this.error('Energy warning check failed:', err.message));
     if (this._fetchInProgress) return;
     this._fetchInProgress = true;

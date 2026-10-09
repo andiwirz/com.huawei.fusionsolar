@@ -41,7 +41,7 @@ Connection via the public Kiosk URL. No FusionSolar account required.
 
 A reading the kiosk endpoint does not deliver is **never reported as zero**. Its payload is JSON escaped inside more JSON, and a response that fails to unpack used to fall through to a complete set of zeros — nothing failed, the device stayed available, and the tile read `0 W`, indistinguishable from a roof in the dark. A missing figure now keeps its last known value, a response carrying no measurements at all marks the device unavailable with the real reason, and no flow fires on a value that never arrived. This mattered most for the lifetime counter, from which Homey derives the daily yield by difference: writing `0` and then the true reading again booked the whole lifetime output as a single day.
 
-**Beside a SUN2000, exclude the kiosk device from Homey Energy.** A SUN2000 paired by Modbus, through an EMMA or from the cloud already reports the plant's production to Energy; the kiosk device reports the same production again, and Homey counts it twice. Homey's own *Exclude from Energy* setting (device → Settings → Energy) fixes that, but only the owner can set it. So the pairing view warns before the kiosk device is added, and the device carries a warning for as long as a SUN2000 is paired and the exclusion is not seen. If Homey does not let the app see the exclusion, tick *Excluded from Energy* in the kiosk device's settings to clear the warning; the app log says once which of the two applies (`Homey Energy: "Exclude from Energy" …`).
+**Beside a SUN2000, exclude the kiosk device from Homey Energy.** A SUN2000 paired by Modbus, through an EMMA or from the cloud already reports the plant's production to Energy; the kiosk device reports the same production again, and Homey counts it twice. Homey's own *Exclude from Energy* setting (device → Settings → Energy) fixes that, but only the owner can set it. So the pairing view warns before the kiosk device is added, and the device carries a warning for as long as a SUN2000 is paired and the device is not excluded. Homey tells the app about the exclusion only when the setting changes, not when the app starts; the device remembers it from then on. A device excluded before the app knew to look needs the setting switched off and on once.
 
 ---
 
@@ -223,7 +223,7 @@ Dedicated driver for the Huawei iSitePower-M Home consumption measurement. Regis
 
 Direct Modbus TCP connection to the Huawei SDongle A (unit ID 100).
 
-**Exclude it from Homey Energy** (device → Settings → Energy → *Exclude from Energy*). Its power reading is the whole house's consumption, which Homey would otherwise count as one more consumer on top of everything else. The pairing view says so before the device is added, and the device carries a warning until the exclusion is seen — if Homey does not let the app see it, tick *Excluded from Energy* in the SDongle's settings to clear the warning.
+**Exclude it from Homey Energy** (device → Settings → Energy → *Exclude from Energy*). Its power reading is the whole house's consumption, which Homey would otherwise count as one more consumer on top of everything else. The pairing view says so before the device is added, and the device carries a warning until it is excluded. Homey tells the app only when that setting changes, so a SDongle excluded before needs the setting switched off and on once; the device remembers it from then on.
 
 | Capability              | Description                                                        |
 |-------------------------|--------------------------------------------------------------------|
@@ -709,7 +709,6 @@ The opposite direction is reported honestly too. What the EMS actually fires to 
 |-------------------|----------|-----------------------------------------------|
 | Kiosk URL         | –        | Public Kiosk URL of the plant                 |
 | Update interval   | 10 min   | How often data is fetched (min. 5 min)        |
-| Excluded from Energy | off   | Clears the Energy warning beside a SUN2000 once the device is excluded from Energy, if Homey does not let the app see that |
 
 ### OpenAPI (SUN2000 / LUNA2000 / iSitePower-M)
 

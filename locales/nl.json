@@ -1056,9 +1056,9 @@
     }
   },
   "kiosk": {
-    "energyWarning": "Er is ook een SUN2000-omvormer gekoppeld die de zonneproductie al aan Homey Energie meldt. Sluit dit apparaat uit van Energie (Instellingen → Energie → „Exclude from Energy”), anders telt Homey de productie dubbel. Blijft deze melding daarna staan, vink dan „Uitgesloten van Energie” aan in de instellingen van dit apparaat."
+    "energyWarning": "Er is ook een SUN2000-omvormer gekoppeld die de zonneproductie al aan Homey Energie meldt. Sluit dit apparaat uit van Energie (Instellingen → Energie → „Exclude from Energy”), anders telt Homey de productie dubbel. Al uitgesloten? Zet die instelling dan één keer uit en weer aan: Homey meldt ze de app alleen bij een wijziging."
   },
   "sdongle": {
-    "energyWarning": "Het vermogen van dit apparaat is het verbruik van het hele huis, dat Homey Energie als extra verbruiker telt zolang het apparaat niet is uitgesloten. Sluit het uit van Energie (Instellingen → Energie → „Exclude from Energy”). Blijft deze melding daarna staan, vink dan „Uitgesloten van Energie” aan in de instellingen van dit apparaat."
+    "energyWarning": "Het vermogen van dit apparaat is het verbruik van het hele huis, dat Homey Energie als extra verbruiker telt zolang het apparaat niet is uitgesloten. Sluit het uit van Energie (Instellingen → Energie → „Exclude from Energy”). Al uitgesloten? Zet die instelling dan één keer uit en weer aan: Homey meldt ze de app alleen bij een wijziging."
   }
 }

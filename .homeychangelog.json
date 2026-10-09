@@ -1,4 +1,9 @@
 {
+  "1.2.298": {
+    "en": "SDongle A and kiosk device: the Energy warning no longer comes back after every app restart once the device is excluded from Energy. Homey tells the app about the exclusion only when the setting changes; the device now remembers it. A device excluded before needs that setting switched off and on once. The setting \"Excluded from Energy\" in the app's device settings is gone, it is no longer needed.",
+    "de": "SDongle A und Kiosk-Gerät: Die Energy-Warnung kommt nicht mehr nach jedem Neustart der App zurück, wenn das Gerät aus Energy ausgenommen ist. Homey teilt der App das Ausnehmen nur bei einer Änderung mit; das Gerät merkt es sich jetzt. Ein schon ausgenommenes Gerät braucht die Einstellung einmal aus- und wieder eingeschaltet. Die Einstellung „Aus Energy ausgenommen“ in den Geräteeinstellungen der App ist weg, sie wird nicht mehr gebraucht.",
+    "nl": "SDongle A en kioskapparaat: de Energie-waarschuwing komt niet meer terug na elke herstart van de app als het apparaat van Energie is uitgesloten. Een apparaat dat al was uitgesloten, heeft die instelling één keer uit en weer aan nodig."
+  },
   "1.2.297": {
     "en": "SDongle A: the device now also shows a warning while it is not excluded from Homey Energy, like the kiosk device beside a SUN2000. If the warning stays after excluding it, tick \"Excluded from Energy\" in the SDongle's settings.",
     "de": "SDongle A: Das Gerät zeigt jetzt auch eine Warnung, solange es nicht aus Homey Energy ausgenommen ist – wie das Kiosk-Gerät neben einem SUN2000. Bleibt die Warnung nach dem Ausnehmen stehen, in den Einstellungen des SDongle „Aus Energy ausgenommen“ ankreuzen.",

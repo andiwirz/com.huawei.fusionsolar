@@ -5,7 +5,7 @@ const { withSettingsLog } = require('../../lib/change-log');
 const { parseKioskUrl, buildApiUrl, fetchKioskData, extractKpiValues } = require('../../lib/kiosk-api');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const { sun2000Names } = require('../../lib/sun2000-presence');
-const { applyEnergyWarning } = require('../../lib/energy-warning');
+const { applyEnergyWarning, rememberEnergyExclude } = require('../../lib/energy-warning');
 
 const DEFAULT_INTERVAL_MIN = 10;
 const MIN_INTERVAL_MIN = 5;
@@ -27,7 +27,7 @@ class FusionSolarKioskDevice extends Device {
 
   async onSettings({ newSettings, changedKeys }) {
     // newSettings, not getSettings(): Homey stores them only after this method resolves.
-    if (changedKeys.some((k) => k === 'excluded_from_energy' || k === 'energy_exclude')) {
+    if (await rememberEnergyExclude(this, { newSettings, changedKeys })) {
       await this._updateEnergyWarning({ ...this.getSettings(), ...newSettings });
     }
     if (changedKeys.includes('kiosk_url') || changedKeys.includes('poll_interval')) {

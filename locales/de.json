@@ -1056,9 +1056,9 @@
     }
   },
   "kiosk": {
-    "energyWarning": "Ein SUN2000-Wechselrichter ist ebenfalls gekoppelt und meldet die Solarproduktion bereits an Homey Energy. Dieses Gerät aus Energy ausnehmen (Einstellungen → Energie → „Exclude from Energy“), sonst zählt Homey die Produktion doppelt. Bleibt diese Meldung danach stehen, in den Einstellungen dieses Geräts „Aus Energy ausgenommen“ ankreuzen."
+    "energyWarning": "Ein SUN2000-Wechselrichter ist ebenfalls gekoppelt und meldet die Solarproduktion bereits an Homey Energy. Dieses Gerät aus Energy ausnehmen (Einstellungen → Energie → „Exclude from Energy“), sonst zählt Homey die Produktion doppelt. Schon ausgenommen? Dann die Einstellung einmal aus- und wieder einschalten: Homey teilt sie der App nur bei einer Änderung mit."
   },
   "sdongle": {
-    "energyWarning": "Die Leistung dieses Geräts ist der Verbrauch des ganzen Hauses, und Homey Energy zählt ihn als zusätzlichen Verbraucher, solange das Gerät nicht ausgenommen ist. Es aus Energy ausnehmen (Einstellungen → Energie → „Exclude from Energy“). Bleibt diese Meldung danach stehen, in den Einstellungen dieses Geräts „Aus Energy ausgenommen“ ankreuzen."
+    "energyWarning": "Die Leistung dieses Geräts ist der Verbrauch des ganzen Hauses, und Homey Energy zählt ihn als zusätzlichen Verbraucher, solange das Gerät nicht ausgenommen ist. Es aus Energy ausnehmen (Einstellungen → Energie → „Exclude from Energy“). Schon ausgenommen? Dann die Einstellung einmal aus- und wieder einschalten: Homey teilt sie der App nur bei einer Änderung mit."
   }
 }
