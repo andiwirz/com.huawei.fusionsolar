@@ -34,6 +34,15 @@ function lang(homey) {
   try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
 }
 
+// The two kinds of "PV today" a source can report; see pvToday below.
+const PV = 'pv';   // production at the panels
+const AC = 'ac';   // what the inverter delivered — the battery already netted out
+
+function reading(device, capId, kind) {
+  const kwh = cap(device, capId, null);
+  return kwh === null ? null : { kwh, kind };
+}
+
 module.exports = {
   async getData({ homey }) {
 
@@ -57,11 +66,16 @@ module.exports = {
     // inv_daily stays behind it for a plant whose station summary carries no daily figure.
     // The EMMA inverter names the same quantity meter_power.pv_daily, which is why the
     // OpenAPI one now uses that name too.
-    const pvTodayKwh = cap(sun2000, 'meter_power.daily', null)
-                    ?? cap(sun2000emma, 'meter_power.pv_daily', null)
-                    ?? cap(sun2000emma, 'meter_power.daily', null)
-                    ?? cap(sunOa, 'meter_power.pv_daily', null)
-                    ?? cap(sunOa, 'meter_power.inv_daily', null);
+    //
+    // Which of the two quantities was found matters for the house total below (1.2.299):
+    // PV production still contains what went into the battery, the AC output (Modbus
+    // 32114, the EMMA inverter yield, inv_daily) already has the battery netted out.
+    const pvToday = reading(sun2000, 'meter_power.daily', AC)
+                 ?? reading(sun2000emma, 'meter_power.pv_daily', PV)
+                 ?? reading(sun2000emma, 'meter_power.daily', AC)
+                 ?? reading(sunOa, 'meter_power.pv_daily', PV)
+                 ?? reading(sunOa, 'meter_power.inv_daily', AC);
+    const pvTodayKwh = pvToday ? pvToday.kwh : null;
 
     // Grid export today: prefer sun2000 cumulative delta, fall back to EMMA inverter or EMMA meter
     //
@@ -100,25 +114,44 @@ module.exports = {
       selfConsumptionPct = Math.max(0, Math.min(100, selfConsumptionPct));
     }
 
-    // Self-sufficiency: how much of total consumption was covered by PV
-    let selfSufficiencyPct = null;
-    if (selfConsumedKwh !== null && gridImportKwh !== null) {
-      const totalConsumption = selfConsumedKwh + gridImportKwh;
-      if (totalConsumption > 0) {
-        selfSufficiencyPct = Math.round(selfConsumedKwh / totalConsumption * 100);
-        selfSufficiencyPct = Math.max(0, Math.min(100, selfSufficiencyPct));
-      }
-    }
-
     // House consumption today: prefer a directly reported total, fall back to calculation.
     // The FusionSolar station KPI carries one (day_use_energy) and the OpenAPI meter now
     // publishes it, which matters most on a cloud-only plant: there the calculation below
     // rests on a grid delta against a midnight baseline, and Huawei has already done the
     // same sum against its own records.
+    //
+    // The calculation is the balance at the house connection: what the inverter delivered,
+    // minus what went to the grid, plus what came from it. From a PV production figure the
+    // battery's net charge comes off first — the panels' energy that went into the battery
+    // was not consumed today. Where a battery is paired but its day counters are missing
+    // that net is unknown, and so is the total; without a battery it is zero.
     let houseConsumptionKwh = cap(pmEmma, 'meter_power.consumption_today', null)
                            ?? cap(pmOa,   'meter_power.consumption_today', null);
-    if (houseConsumptionKwh === null && selfConsumedKwh !== null && gridImportKwh !== null) {
-      houseConsumptionKwh = selfConsumedKwh + gridImportKwh;
+    // Not selfConsumedKwh: that one waits for the first PV of the day, the house does not.
+    const keptKwh = (pvTodayKwh !== null && gridExportKwh !== null)
+      ? Math.max(0, pvTodayKwh - gridExportKwh) : null;
+    if (houseConsumptionKwh === null && keptKwh !== null && gridImportKwh !== null) {
+      const hasBattery = !!(luna || lunaEmma || lunaOa);
+      let batteryNetKwh = 0;
+      if (pvToday.kind === PV && hasBattery) {
+        batteryNetKwh = (battChargedKwh !== null && battDischargedKwh !== null)
+          ? battChargedKwh - battDischargedKwh
+          : null;
+      }
+      if (batteryNetKwh !== null) {
+        houseConsumptionKwh = Math.max(0, keptKwh - batteryNetKwh + gridImportKwh);
+      }
+    }
+
+    // Self-sufficiency: the share of the house's consumption that did not come from the
+    // grid. Taken against the house total shown beside it — the old sum of self-consumed
+    // PV and import counted the energy that went into the battery as consumed, which put
+    // the figure above what the two numbers next to it say (88 % beside 10 kWh used and
+    // 2 kWh bought).
+    let selfSufficiencyPct = null;
+    if (houseConsumptionKwh !== null && houseConsumptionKwh > 0 && gridImportKwh !== null) {
+      selfSufficiencyPct = Math.round((1 - gridImportKwh / houseConsumptionKwh) * 100);
+      selfSufficiencyPct = Math.max(0, Math.min(100, selfSufficiencyPct));
     }
 
     return {

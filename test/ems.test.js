@@ -270,6 +270,8 @@ test('getEmsPriceStatus — defaults to fixed mode with price 0 when price_confi
   assert.strictEqual(s.mode, 'fixed');
   assert.strictEqual(s.price, 0);
   assert.strictEqual(s.currency, 'CHF');
+  // …and says so, so the widget shows "not configured" instead of 0.000 (1.2.299).
+  assert.strictEqual(s.configured, false);
 });
 
 // ── chargerControl: _bestPhases ──────────────────────────────────────────────
@@ -3582,19 +3584,53 @@ test('getEmsControllableStatus — a disabled charger still reports enabled:fals
   assert.strictEqual(status.enabled, false);
 });
 
-test('setEmsDeviceEnabled — disables a charger, persists, and restarts the tick', async () => {
+// Since 1.2.299 a widget change runs one tick instead of restarting the loop: a restart
+// begins with a tick that only observes, so the change waited a whole interval and a mode
+// that tick decided went without its trigger.
+// powerW in the charger state is the control floor — amps × phases × 230 V while the EMS has
+// set a current. The widget showed that as the car's draw: 6.9 kW, the bolt and a remaining
+// time for a car taking nothing (1.2.299).
+test('getEmsControllableStatus — a charger reports what it measures, not the control floor', async () => {
   const cfg = { chargers: [{ id: 'c1' }] };
-  let saved = null, restarted = false;
+  const d = makeWidgetDevice({
+    _getConfig: () => cfg,
+    _getChargers: async ({ chargers }) => chargers.map((c) => ({ id: c.id, connected: true, powerW: 6900, rawPowerW: 0, chargeMode: 'solar' })),
+  });
+  assert.strictEqual((await d.getEmsControllableStatus('c1')).powerW, 0);
+});
+test('setEmsDeviceEnabled — disables a charger, persists, and runs a tick (no restart)', async () => {
+  const cfg = { chargers: [{ id: 'c1' }] };
+  let saved = null, restarted = false, ticked = false;
   const d = makeWidgetDevice({
     _getConfig: () => cfg,
     homey: { settings: { set: (k, v) => { saved = v; } } },
     _startTick() { restarted = true; },
+    _tick: async () => { ticked = true; },
   });
   const res = await d.setEmsDeviceEnabled('c1', false);
   assert.deepStrictEqual(res, { ok: true });
   assert.strictEqual(cfg.chargers[0].enabled, false);
   assert.strictEqual(saved, cfg);
-  assert.strictEqual(restarted, true);
+  assert.strictEqual(ticked, true);
+  assert.strictEqual(restarted, false, 'the loop restarted, and its first tick only observes');
+});
+test('setEmsDeviceEnabled — a missing or non-boolean flag is refused, nothing written', async () => {
+  const cfg = { chargers: [{ id: 'c1' }] };
+  let saved = null;
+  const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: (k, v) => { saved = v; } } } });
+  for (const v of [undefined, null, 'false', 'true', 0, 1]) {
+    assert.deepStrictEqual(await d.setEmsDeviceEnabled('c1', v), { error: 'invalid_value' }, String(v));
+  }
+  assert.strictEqual(cfg.chargers[0].enabled, undefined);
+  assert.strictEqual(saved, null);
+});
+test('a widget change during a running tick waits for it instead of counting as a skip', async () => {
+  const cfg = { chargers: [{ id: 'c1' }] };
+  let ticked = false;
+  const d = makeWidgetDevice({ _getConfig: () => cfg, _tick: async () => { ticked = true; } });
+  d._tickInProgress = true;
+  await d.setEmsDeviceEnabled('c1', true);
+  assert.strictEqual(ticked, false);
 });
 test('setEmsDeviceEnabled — re-enables a simple device', async () => {
   const cfg = { boiler_devices: [{ id: 'b1', enabled: false }] };
@@ -3630,19 +3666,21 @@ test('setEmsChargerMode — rejects an invalid mode without touching config', as
   assert.strictEqual(saved, null);
   assert.strictEqual(cfg.chargers[0].charge_mode, 'solar');
 });
-test('setEmsChargerMode — patches the mode, persists, and restarts the tick', async () => {
+test('setEmsChargerMode — patches the mode, persists, and runs a tick (no restart)', async () => {
   const cfg = { chargers: [{ id: 'c1', charge_mode: 'solar' }] };
-  let saved = null, restarted = false;
+  let saved = null, restarted = false, ticked = false;
   const d = makeWidgetDevice({
     _getConfig: () => cfg,
     homey: { settings: { set: (k, v) => { saved = v; } } },
     _startTick() { restarted = true; },
+    _tick: async () => { ticked = true; },
   });
   const res = await d.setEmsChargerMode('c1', 'always');
   assert.deepStrictEqual(res, { ok: true });
   assert.strictEqual(cfg.chargers[0].charge_mode, 'always');
   assert.strictEqual(saved, cfg);
-  assert.strictEqual(restarted, true);
+  assert.strictEqual(ticked, true);
+  assert.strictEqual(restarted, false);
 });
 test('setEmsChargerMode — unknown charger id → not_found', async () => {
   const d = makeWidgetDevice({ _getConfig: () => ({ chargers: [] }) });
@@ -3720,22 +3758,48 @@ test('getEmsBatteryStatus — no capacity configured → capacityKwh/energyKwh s
   assert.strictEqual(status.energyKwh, null);
 });
 
-test('setEmsBatteryZones — writes the one threshold, clamped to 0..100', () => {
-  const cfg = {};
+// The stop field writes the setting _batteryZones actually reads (1.2.299). It used to
+// write share_soc_low in every case: without a ramp that changed nothing, and with one a
+// value at or above the upper point switched the ramp off and the stop fell to 80 %.
+test('setEmsBatteryZones — with the ramp on, it moves the ramp\'s lower point', async () => {
+  const cfg = { share_soc_low: 20, share_soc_high: 60 };
   let saved = null;
   const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: (k, v) => { saved = v; } } } });
-  return d.setEmsBatteryZones({ stopSoc: 150 }).then(function (res) {
-    assert.deepStrictEqual(res, { ok: true });
-    assert.strictEqual(cfg.share_soc_low, 100);
-    assert.strictEqual(saved, cfg);
-  });
+  const res = await d.setEmsBatteryZones({ stopSoc: 30 });
+  assert.deepStrictEqual(res, { ok: true, stopSoc: 30 });
+  assert.strictEqual(cfg.share_soc_low, 30);
+  assert.strictEqual(saved, cfg);
 });
-test('setEmsBatteryZones — an older widget sending normalSoc lands on the same setting', () => {
-  const cfg = {};
+test('setEmsBatteryZones — a value at or above the ramp\'s upper point is refused with the limit', async () => {
+  const cfg = { share_soc_low: 20, share_soc_high: 60 };
+  let saved = null;
+  const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: (k, v) => { saved = v; } } } });
+  assert.deepStrictEqual(await d.setEmsBatteryZones({ stopSoc: 70 }), { error: 'above_ramp', max: 59 });
+  assert.deepStrictEqual(await d.setEmsBatteryZones({ stopSoc: 60 }), { error: 'above_ramp', max: 59 });
+  assert.strictEqual(cfg.share_soc_low, 20, 'the ramp was switched off');
+  assert.strictEqual(saved, null);
+});
+test('setEmsBatteryZones — without a ramp it sets the one floor, and the stop follows', async () => {
+  const cfg = { min_battery_soc: 80, min_battery_soc_low: 15 };
   const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: () => {} } } });
-  return d.setEmsBatteryZones({ normalSoc: 40 }).then(function () {
-    assert.strictEqual(cfg.share_soc_low, 40);
-  });
+  const res = await d.setEmsBatteryZones({ stopSoc: 30 });
+  assert.deepStrictEqual(res, { ok: true, stopSoc: 30 });
+  assert.strictEqual(cfg.min_battery_soc, 30);
+  assert.strictEqual(cfg.min_battery_soc_low, 0, 'a reserve floor left behind would take over as the stop');
+});
+test('setEmsBatteryZones — anything but a number from 0 to 100 is refused', async () => {
+  const cfg = { share_soc_low: 20, share_soc_high: 60 };
+  const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: () => {} } } });
+  for (const v of [150, -1, 'abc', '', null, undefined]) {
+    assert.deepStrictEqual(await d.setEmsBatteryZones({ stopSoc: v }), { error: 'invalid_value' }, String(v));
+  }
+  assert.strictEqual(cfg.share_soc_low, 20);
+});
+test('setEmsBatteryZones — an older widget sending normalSoc lands on the same setting', async () => {
+  const cfg = { share_soc_low: 20, share_soc_high: 60 };
+  const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: () => {} } } });
+  await d.setEmsBatteryZones({ normalSoc: 40 });
+  assert.strictEqual(cfg.share_soc_low, 40);
 });
 
 // ── _buildPriorityRuns (Geräte-Priorität) ────────────────────────────────────

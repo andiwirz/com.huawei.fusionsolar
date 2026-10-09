@@ -42,6 +42,7 @@ function makeApp({ devices = [], throwOnDriver = false, stored = {} } = {}) {
   const settings = { ...stored };
   const app = Object.create(App.prototype);
   app._capHistory = new Map();
+  app._capHistoryInited = true;
   app.log = () => {};
   app.error = () => {};
   app.homey = {

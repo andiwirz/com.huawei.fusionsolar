@@ -123,6 +123,7 @@ function onHomeyReady(Homey) {
       now: 'jetzt', slotsAhead: 'Slot(s) voraus', updated: 'aktualisiert', minAgo: 'Min. her',
       neverUpdated: 'nie aktualisiert', staleWarn: '⚠ veraltet',
       notConfiguredSolar: 'Solcast nicht konfiguriert', notConfiguredPrice: 'Preis nicht konfiguriert',
+      solarError: 'Solcast-Abruf fehlgeschlagen', priceModeZones: 'Tarifzonen',
       noDataYet: 'Noch keine Prognosedaten', refresh: 'Aktualisieren',
       priceModeFixed: 'Fixpreis', priceModeVariable: 'Live-Preis (Flow)', priceModeDual: 'Hoch-/Niedertarif',
     };
@@ -132,6 +133,7 @@ function onHomeyReady(Homey) {
       now: 'nu', slotsAhead: 'slot(en) vooruit', updated: 'bijgewerkt', minAgo: 'min geleden',
       neverUpdated: 'nooit bijgewerkt', staleWarn: '⚠ verouderd',
       notConfiguredSolar: 'Solcast niet geconfigureerd', notConfiguredPrice: 'Prijs niet geconfigureerd',
+      solarError: 'Solcast-ophalen mislukt', priceModeZones: 'Tariefzones',
       noDataYet: 'Nog geen prognosegegevens', refresh: 'Vernieuwen',
       priceModeFixed: 'Vaste prijs', priceModeVariable: 'Live prijs (flow)', priceModeDual: 'Hoog-/laagtarief',
     };
@@ -141,6 +143,7 @@ function onHomeyReady(Homey) {
       now: 'now', slotsAhead: 'slot(s) ahead', updated: 'updated', minAgo: 'min ago',
       neverUpdated: 'never updated', staleWarn: '⚠ stale',
       notConfiguredSolar: 'Solcast not configured', notConfiguredPrice: 'Price not configured',
+      solarError: 'Solcast fetch failed', priceModeZones: 'Tariff zones',
       noDataYet: 'No forecast data yet', refresh: 'Refresh',
       priceModeFixed: 'Fixed price', priceModeVariable: 'Live price (flow)', priceModeDual: 'Low/high tariff',
     };
@@ -260,22 +263,26 @@ function onHomeyReady(Homey) {
     });
   }
 
+  // "Not configured" only when it is not. Any fetch error used to be reported that way and
+  // hid a perfectly good forecast — during a rate-limit pause of up to six hours, or when
+  // one of two sites failed (1.2.299). An error now shows as a warning beside the chart,
+  // or in its place when there is nothing to draw.
   function renderSolar(pv, nowMs) {
-    if (!pv || pv.error || !pv.configured) {
+    var future = pv ? (pv.slots || []).filter(function (s) { return s.end > nowMs; }) : [];
+    if (!pv || !pv.configured || (pv.error && !future.length)) {
       solarBody.style.display = 'none';
       solarNoData.style.display = 'block';
-      solarNoData.textContent = T.notConfiguredSolar;
+      solarNoData.textContent = (pv && pv.configured) ? T.solarError : T.notConfiguredSolar;
       solarStatus.textContent = '';
       return;
     }
     solarBody.style.display = '';
     solarNoData.style.display = 'none';
-    solarStatus.className = 'sec-status' + (pv.stale ? ' warn' : '');
+    solarStatus.className = 'sec-status' + ((pv.stale || pv.error) ? ' warn' : '');
     solarStatus.textContent = statusLine(
       pv.nowKw != null ? pv.nowKw.toFixed(2) + ' kW' : null,
-      (pv.slots || []).filter(function (s) { return s.end > nowMs; }).length,
-      pv.ageMin, pv.stale
-    );
+      future.length, pv.ageMin, pv.stale
+    ) + (pv.error ? ' · ⚠ ' + T.solarError : '');
     var slots = (pv.slots || [])
       .filter(function (s) { return s.end > nowMs; })
       .slice(0, 48)
@@ -341,7 +348,7 @@ function onHomeyReady(Homey) {
     var currency = price.currency || '';
 
     if (mode === 'fixed' || mode === 'variable') {
-      if (price.price == null) { showPriceNoData(T.notConfiguredPrice); return; }
+      if (price.price == null || price.configured === false) { showPriceNoData(T.notConfiguredPrice); return; }
       showPriceFlat(price.price.toFixed(3), currency + '/kWh', mode === 'fixed' ? T.priceModeFixed : T.priceModeVariable);
       return;
     }
@@ -350,6 +357,16 @@ function onHomeyReady(Homey) {
       if (!price.configured) { showPriceNoData(T.notConfiguredPrice); return; }
       var dualSlots = (price.slots || []).map(function (s) { return { start: s.start, end: s.end, value: s.price }; });
       showPriceChart(dualSlots, currency, T.priceModeDual, false);
+      return;
+    }
+
+    // Tariff zones: the next 24 hours from the configured zones, and the zone in force now.
+    // There was no branch for them, so they fell into the forecast one and read
+    // "0 slot(s) ahead · never updated" (1.2.299).
+    if (mode === 'zones') {
+      if (!price.configured || !(price.slots || []).length) { showPriceNoData(T.notConfiguredPrice); return; }
+      var zoneSlots = price.slots.map(function (s) { return { start: s.start, end: s.end, value: s.price }; });
+      showPriceChart(zoneSlots, currency, T.priceModeZones + (price.zoneName ? ' · ' + price.zoneName : ''), false);
       return;
     }
 

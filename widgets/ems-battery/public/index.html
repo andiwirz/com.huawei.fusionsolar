@@ -52,6 +52,7 @@
   .zone-field { display: flex; align-items: center; gap: 4px; }
   .zone-field label { font-size: 10px; color: var(--homey-text-color-light); text-transform: uppercase; letter-spacing: 0.3px; }
   .zone-field input {
+    -webkit-user-select: text; user-select: text;
     width: 46px; font-size: 12px; font-weight: 600; text-align: right;
     padding: 3px 5px; border-radius: 6px; border: 1px solid var(--homey-line-color, rgba(128,128,128,0.3));
     background: rgba(128,128,128,0.08); color: var(--homey-text-color);
@@ -80,7 +81,6 @@
 
       <div class="bar-wrap">
         <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
-        <div class="bar-marker" id="markerReserve" style="display:none"></div>
         <div class="bar-marker" id="markerNormal"></div>
       </div>
 
@@ -111,18 +111,21 @@ function onHomeyReady(Homey) {
       stop: 'Stopp unter', kwhOf: 'von',
       zoneGreen: 'Solar frei', zoneRed: 'Geschützt — lädt Batterie',
       priceCharge: 'Preisgeladen', priceHold: 'Entladen gesperrt (Preis)', priceIdle: 'Preisladen aktiviert', writeFailed: 'Änderung fehlgeschlagen',
+      aboveRamp: 'Höchstens {max} % — darüber beginnt die Rampe nicht mehr', invalidValue: 'Bitte 0 bis 100 % eingeben',
     };
     var nl = {
       title: 'Batterijgebruik', noBattery: 'Geen batterij geconfigureerd', unreachable: 'EMS-apparaat niet bereikbaar',
       stop: 'Stop onder', kwhOf: 'van',
       zoneGreen: 'Zon vrij', zoneRed: 'Beschermd — batterij laadt',
       priceCharge: 'Prijsladen actief', priceHold: 'Ontladen geblokkeerd (prijs)', priceIdle: 'Prijsladen ingeschakeld', writeFailed: 'Wijziging mislukt',
+      aboveRamp: 'Hoogstens {max} % — daarboven begint de helling niet meer', invalidValue: 'Voer 0 tot 100 % in',
     };
     var en = {
       title: 'Battery Usage', noBattery: 'No battery configured', unreachable: 'EMS device unreachable',
       stop: 'Stop below', kwhOf: 'of',
       zoneGreen: 'Solar free', zoneRed: 'Protected — battery charging',
       priceCharge: 'Price-charging', priceHold: 'Discharge held (price)', priceIdle: 'Price-charging enabled', writeFailed: 'Change failed',
+      aboveRamp: 'At most {max} % — above that the ramp would no longer start', invalidValue: 'Enter 0 to 100 %',
     };
     return { de: de, nl: nl, en: en };
   })();
@@ -149,7 +152,6 @@ function onHomeyReady(Homey) {
   var socVal  = document.getElementById('socVal');
   var kwhLine = document.getElementById('kwhLine');
   var barFill = document.getElementById('barFill');
-  var markerReserve = document.getElementById('markerReserve');
   var markerNormal  = document.getElementById('markerNormal');
   var stopLabel   = document.getElementById('stopLabel');
   var stopInput   = document.getElementById('stopInput');
@@ -175,15 +177,23 @@ function onHomeyReady(Homey) {
     statusText.textContent = '⚠ ' + msg;
     statusText.style.color = 'var(--homey-text-color-red, #ef4444)';
   }
+  // The app's answer codes, in words. With the surplus ramp on, the stop is the ramp's
+  // lower point and has to stay below its upper one — a value at or above it is refused
+  // with the limit, where it used to switch the ramp off and stop every device (1.2.299).
+  function errorText(res) {
+    if (res && res.error === 'above_ramp') return T.aboveRamp.replace('{max}', res.max);
+    if (res && res.error === 'invalid_value') return T.invalidValue;
+    return T.writeFailed;
+  }
   function writeZones(body, rollback) {
     Homey.api('POST', '/zones', body)
       .then(function (res) {
-        if (res && res.error) throw new Error(res.error);
+        if (res && res.error) { rollback(); flashError(errorText(res)); return; }
         refresh();
       })
-      .catch(function (err) {
+      .catch(function () {
         rollback();
-        flashError((err && err.message) ? err.message : T.writeFailed);
+        flashError(T.writeFailed);
       });
   }
 
@@ -191,16 +201,18 @@ function onHomeyReady(Homey) {
   function bindInputs() {
     if (bound) return;
     bound = true;
+    // Enter commits and then blurs the field, and the blur fires 'change' for the same
+    // value — the write went out twice. One value, one write.
+    var lastCommitted = null;
     var commitStop = function () {
       var v = parseInt(stopInput.value, 10);
       if (!isFinite(v)) return;
       var prev = lastStatus ? lastStatus.stopSoc : null;
-      writeZones({ stopSoc: v }, function () { if (prev != null) stopInput.value = prev; });
+      if (v === prev || v === lastCommitted) return;
+      lastCommitted = v;
+      writeZones({ stopSoc: v }, function () { lastCommitted = null; if (prev != null) stopInput.value = prev; });
     };
-    var commitReserve = function () {
-      if (!isFinite(v)) return;
-      var prev = lastStatus ? lastStatus.reserveSoc : null;
-    };
+    stopInput.addEventListener('focus', function () { lastCommitted = null; });
     stopInput.addEventListener('change', commitStop);
     stopInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { commitStop(); stopInput.blur(); } });
   }
@@ -225,12 +237,6 @@ function onHomeyReady(Homey) {
       : '';
 
     markerNormal.style.left = s.stopSoc + '%';
-    if (s.reserveSoc != null) {
-      markerReserve.style.left = s.reserveSoc + '%';
-      markerReserve.style.display = '';
-    } else {
-      markerReserve.style.display = 'none';
-    }
 
     if (document.activeElement !== stopInput)  stopInput.value  = s.stopSoc;
     bindInputs();

@@ -994,7 +994,7 @@ A compact status widget with a pulsing colour circle indicating the current grid
 
 - 🟢 **Green pulse** — exporting to grid (Einspeisung)
 - 🔴 **Red pulse** — importing from grid (Netzbezug)
-- 🟡 **Yellow pulse** — self-sufficient (PV covers load exactly)
+- 🟡 **Yellow pulse** — self-sufficient: the grid is quiet. Shows the house load and what covers it — PV, the battery, or both (at night with the battery carrying the house it used to say "0 W, PV covers load")
 - ⚪ **Grey, no pulse** — no grid reading at all (no meter paired). Its own state on purpose: with nothing measured, both comparisons above are false, and the widget used to fall through to "self-sufficient" — announcing that the house covers its own load on the strength of no measurement whatsoever
 - Stats row shows current PV power, battery power + SoC, and house consumption
 - Battery stat is hidden when no LUNA2000 is paired
@@ -1015,7 +1015,7 @@ Daily energy totals shown as relative bars, plus self-consumption and self-suffi
 | PV today          | `sun2000_modbus` → `meter_power.daily` (register 32114, resets at midnight); on a cloud-only plant the FusionSolar plant summary |
 | Grid export today | `sun2000_modbus` → cumulative delta from midnight baseline                    |
 | Grid import today | `sun2000_modbus` → cumulative delta from midnight baseline                    |
-| House consumption | The plant summary's own daily total where there is one, otherwise calculated: self-consumed PV + grid import |
+| House consumption | The plant summary's own daily total where there is one, otherwise the balance at the house connection: what the inverter delivered − export + import. From a PV production figure (EMMA, cloud) the battery's net charge comes off first; with a battery paired but its day counters missing, the total is left unknown rather than guessed |
 
 Local sources come first everywhere: a Modbus or EMMA reading is seconds old and the cloud
 minutes at best, so the cloud is consulted only where nothing closer answers.
@@ -1023,7 +1023,7 @@ minutes at best, so the cloud is consulted only where nothing closer answers.
 > **Midnight baseline:** the app records the cumulative grid export/import counter at 00:00:05 each night. Daily values are derived as `current − baseline`. If the app was not running at midnight the baseline is written on the next start — retried after 1, 5 and 15 minutes, because ten seconds after start is a guess at how long an inverter needs for its first reading, and losing that race used to cost the whole day its baseline in silence. If the counters are still unread after that, the log says so instead. Installations with no SUN2000 Modbus or EMMA device have no cumulative counters to snapshot at all, and the log says that too rather than repeating that it is writing one. A hint is shown in the widget until the baseline is available.
 
 - **Eigenverbrauch %** — share of PV energy used on-site (not exported)
-- **Autarkie %** — share of total consumption covered by PV
+- **Autarkie %** — share of the house consumption that did not come from the grid: 1 − import ÷ consumption, against the very figures shown beside it
 - Battery charged / discharged row is shown only when a LUNA2000 is paired
 - Updates every **10 seconds**
 
@@ -1079,13 +1079,18 @@ A scrollable history of charging sessions — energy delivered, duration and end
 
 ### EMS History (EMS Verlauf)
 
-Recent Energy Management System events — mode changes, device start/stop and charger current steps — the same feed shown in App Settings, on your dashboard.
+Recent Energy Management System events — mode changes, device start/stop and charger current steps — the same feed shown in App Settings, on your dashboard. Pages through calendar days (also across a clock change); after the first load only new events are fetched. No settings — the former "Time window" was never read and is gone.
 
 ---
 
 ### Sensor Chart (Sensor-Verlauf)
 
-A configurable time-series chart of a chosen capability (e.g. solar power, grid power, SoC), for a quick trend view directly on the dashboard.
+A configurable time-series chart of up to four power readings, for a quick trend view directly on the dashboard. Any one series is enough to start it.
+
+- **6 h to 7 days.** The app keeps one point a minute for the last 25 hours and a quarter-hour average (with its low and high) for a week; the views beyond 24 hours draw from the latter. Until 1.2.299 only the 25 hours existed, and 48 H, 72 H and 7 D all showed them.
+- **Gaps stay gaps.** A device that is unreachable contributes nothing for that stretch, and the line breaks there; the legend shows "—" instead of a last value that is no longer true.
+- **Light on the network.** The app thins each series to at most 240 points before sending (largest-triangle sampling, which keeps peaks), a few kilobytes instead of every stored point.
+- Dates follow the dashboard's language (9.10. in German, 10/9 in English).
 
 ---
 
@@ -1097,7 +1102,7 @@ Live status card for a single EMS-controlled device — pick any configured **EV
 
 - **Heat pump / boiler / pool / dehumidifier:** on/off state, current power, today's energy and runtime (reset at local midnight, saved to the device store roughly every 60s so it survives an app restart), and the configured **minimum surplus (W)** threshold (read-only — change it in App Settings)
 - **All devices:** an **"EMS control" switch** — turns EMS's control of *this specific device* on or off, independent of any other device or the app-wide settings. Off means EMS leaves it alone entirely (no start/stop/current commands).
-- Updates every **15 seconds**, matching the EMS's own tick — polling faster only re-fetches that tick's cached snapshot. Responsiveness doesn't suffer, because every control you change (switch, charging-mode dropdown) applies optimistically and then confirms itself with an immediate refresh rather than waiting for the next poll. If the write fails, the control springs back to its previous state and shows the reason instead of silently reverting later. Changes take effect immediately (restarts the EMS tick loop, same as saving App Settings)
+- Updates every **15 seconds**, matching the EMS's own tick — polling faster only re-fetches that tick's cached snapshot. Responsiveness doesn't suffer, because every control you change (switch, charging-mode dropdown) applies optimistically and then confirms itself with an immediate refresh rather than waiting for the next poll. If the write fails, the control springs back to its previous state and shows the reason instead of silently reverting later. A change runs one EMS tick at once — it no longer restarts the loop, whose first tick only observes, so a change used to wait a full interval. The power shown for a charger is what it measures, not the floor the EMS uses for control (amps × phases × 230 V)
 
 ---
 
@@ -1105,8 +1110,8 @@ Live status card for a single EMS-controlled device — pick any configured **EV
 
 Aggregate view of the EMS's Home Battery SoC and its priority zones — mirrors the **Battery** section of App Settings.
 
-- Colour-coded SoC bar (green = full budget, orange = reserve zone, red = protected/hard-stop) with markers for the configured thresholds
-- **Normal SoC** and **Reserve SoC** are editable directly on the widget — an edited value confirms itself immediately, and on failure restores the previous value with the reason shown
+- Colour-coded SoC bar (green = solar free, red = protected/hard-stop) with a marker at the stop
+- **Stop below** is editable directly on the widget and writes the setting the EMS actually stops at: with the surplus ramp configured its lower point (a value at or above the ramp's upper point is refused, with the limit), otherwise the single battery floor. An edited value confirms itself immediately, and on failure restores the previous value with the reason shown
 - Status line shows whether price-optimised grid-charging is currently active or holding discharge, when configured
 - Updates every **15 seconds**, matching the EMS's own tick
 
@@ -1121,9 +1126,10 @@ Two stacked charts showing what the EMS is planning against: the Solcast **solar
 | Fixed price                  | The fixed value, as a single number (no chart — it doesn't change) |
 | Variable (via flow)          | The last value pushed by the `Set electricity price` flow action, as a single number (no future is known) |
 | Low / high tariff            | A 24h hourly step-chart built from the configured weekday high/low windows |
+| Tariff zones                 | The next 24 hours from the configured zones, with the name of the zone in force now |
 | Price forecast (day-ahead)   | The real ingested forecast — colour-graded cheap→green to expensive→red, same as the settings-page preview |
 
-The current slot/value is highlighted in both charts where a timeline is shown; a ↻ button forces an immediate re-read (the underlying forecasts themselves still only refresh server-side at Solcast's/your price source's own interval — this doesn't trigger a new fetch from either service). Each section shows its own "not configured" hint when that data source isn't set up. No settings — reads directly from the EMS device. Updates every **60 seconds**.
+The current slot/value is highlighted in both charts where a timeline is shown; a ↻ button forces an immediate re-read (the underlying forecasts themselves still only refresh server-side at Solcast's/your price source's own interval — this doesn't trigger a new fetch from either service). Each section shows its own "not configured" hint when that data source isn't set up — and only then: a Solcast fetch error (a rate-limit pause, one of two sites failing) shows as a warning beside the last good forecast, and a forecast too old to trust shows no figure for "now". No settings — reads directly from the EMS device. Updates every **60 seconds**.
 
 ---
 

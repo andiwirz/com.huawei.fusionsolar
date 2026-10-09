@@ -228,8 +228,8 @@ function applyLang(code) {
 var COLORS  = ['#22C55E', '#3B82F6', '#8B5CF6', '#EF4444'];
 var CHART_H = 200;
 var M       = { top: 6, right: 8, bottom: 20, left: 36 };
-var MAX_PTS = 250;
-/* Preset time-range steps in hours */
+/* Preset time-range steps in hours. Beyond 24 h the app answers from its quarter-hour
+   tier, kept for a week (1.2.299) — before, all three long steps drew the same 25 hours. */
 var STEPS   = [6, 12, 24, 48, 72, 168];
 
 /* ── Helpers ─────────────────────────────────────────── */
@@ -240,11 +240,23 @@ function fmt(v) {
   return Math.round(v) + ' W';
 }
 
+/* The date as the dashboard's language writes it — "9.10." in German, "10/9" in English.
+   It used to be month.day for every language, so "10.9" on the axis was the 9th of
+   October while the midnight marker beside it said "9.10." (1.2.299). */
+function fmtDay(ts) {
+  try {
+    return new Date(ts).toLocaleDateString(activeLang || undefined, { day: 'numeric', month: 'numeric' });
+  } catch (e) {
+    var d = new Date(ts);
+    return d.getDate() + '.' + (d.getMonth() + 1) + '.';
+  }
+}
+
 function fmtTime(ts, hours) {
   var d  = new Date(ts);
   var hh = d.getHours().toString().padStart(2, '0');
   var mm = d.getMinutes().toString().padStart(2, '0');
-  if (hours > 48) return (d.getMonth() + 1) + '.' + d.getDate() + ' ' + hh + ':' + mm;
+  if (hours > 48) return fmtDay(ts) + ' ' + hh + ':' + mm;
   return hh + ':' + mm;
 }
 
@@ -254,13 +266,19 @@ function labelFor(h) {
   return (h / 24) + 'D';
 }
 
-function downsample(pts, max) {
-  if (pts.length <= max) return pts;
-  var out  = [pts[0]];
-  var step = (pts.length - 2) / (max - 2);
-  for (var i = 0; i < max - 2; i++) out.push(pts[Math.round((i + 1) * step)]);
-  out.push(pts[pts.length - 1]);
-  return out;
+/* The app sends at most 240 points per series, already thinned, with { v: null } where the
+   device was away. Split there: each run is drawn on its own, so a hole stays a hole. */
+function runsOf(points) {
+  var runs = [[]];
+  points.forEach(function(p) {
+    if (p.v === null || p.v === undefined) { if (runs[runs.length - 1].length) runs.push([]); return; }
+    runs[runs.length - 1].push(p);
+  });
+  return runs.filter(function(r) { return r.length; });
+}
+
+function valuesOf(points) {
+  return points.filter(function(p) { return p.v !== null && p.v !== undefined; });
 }
 
 function niceStep(range, n) {
@@ -311,8 +329,7 @@ function updateLegend(series, names) {
   var el = document.getElementById('legend');
   el.innerHTML = '';
   series.forEach(function(s, i) {
-    if (!s || !s.points || !s.points.length) return;
-    var last = s.points[s.points.length - 1];
+    if (!s || !s.points || !valuesOf(s.points).length) return;
     var item = document.createElement('div');
     item.className = 'legend-item';
     var line = document.createElement('div');
@@ -322,7 +339,9 @@ function updateLegend(series, names) {
     var val = document.createElement('span');
     val.className = 'legend-val'; val.style.color = COLORS[i];
     val.setAttribute('data-series-idx', i);
-    val.textContent = last ? fmt(last.v) : '—';
+    // The app's current reading — none for a device that went away, instead of the last
+    // value it ever had, drawn as if it were live.
+    val.textContent = fmt(s.current);
     item.appendChild(line); item.appendChild(name); item.appendChild(val);
     el.appendChild(item);
   });
@@ -341,13 +360,15 @@ function renderChart(series, hours) {
   xhairEl.style.height = innerH + 'px';
 
   var allPts = [];
-  series.forEach(function(s) { if (s && s.points) allPts = allPts.concat(s.points); });
+  series.forEach(function(s) { if (s && s.points) allPts = allPts.concat(valuesOf(s.points)); });
 
   if (!allPts.length) {
     // "No data yet" invites waiting, and waiting is exactly wrong for a series saved
     // against the old key format: nothing will ever arrive under that key. The API says
     // which case it is, so the widget can ask for the one thing that fixes it.
-    var stale = series.length > 0 && series.every(function(s) { return s && s.known === false; });
+    // Empty slots (a series not set up) are not part of the verdict.
+    var present = series.filter(function(s) { return s; });
+    var stale = present.length > 0 && present.every(function(s) { return s.known === false; });
     var old = wrap.querySelector('svg'); if (old) old.remove();
     var nd  = wrap.querySelector('.no-data') || document.createElement('div');
     nd.className = 'no-data'; nd.textContent = stale ? T.reselect : T.noData;
@@ -427,7 +448,7 @@ function renderChart(series, hours) {
       svg += '<line x1="' + mx.toFixed(1) + '" y1="' + M.top
            + '" x2="' + mx.toFixed(1) + '" y2="' + (M.top + innerH).toFixed(1)
            + '" stroke="currentColor" stroke-opacity="0.2" stroke-width="1" stroke-dasharray="3,3"/>';
-      var mdLbl = md.getDate() + '.' + (md.getMonth() + 1) + '.';
+      var mdLbl = fmtDay(md.getTime());
       svg += '<text x="' + (mx + 3).toFixed(1) + '" y="' + (M.top + 9)
            + '" font-size="7" fill="currentColor" opacity="0.3">' + mdLbl + '</text>';
       md.setDate(md.getDate() + 1);
@@ -436,22 +457,33 @@ function renderChart(series, hours) {
 
   /* Series: area fill + line + end dot */
   series.forEach(function(s, i) {
-    if (!s || !s.points || s.points.length < 2) return;
-    var sorted = s.points.slice().sort(function(a,b) { return new Date(a.t).getTime()-new Date(b.t).getTime(); });
-    var ds     = downsample(sorted, MAX_PTS);
-    var coords = ds.map(function(p) { return [tx(new Date(p.t).getTime()), ty(p.v)]; });
-    var line   = smoothPath(coords);
-    var base   = (M.top + innerH).toFixed(1);
-    var area   = line + ' L' + coords[coords.length-1][0].toFixed(1) + ',' + base
+    if (!s || !s.points) return;
+    var base = (M.top + innerH).toFixed(1);
+    var runs = runsOf(s.points);
+    runs.forEach(function(run) {
+      var coords = run.map(function(p) { return [tx(new Date(p.t).getTime()), ty(p.v)]; });
+      if (coords.length < 2) {
+        svg += '<circle cx="' + coords[0][0].toFixed(1) + '" cy="' + coords[0][1].toFixed(1)
+             + '" r="1.5" fill="' + COLORS[i] + '"/>';
+        return;
+      }
+      var line = smoothPath(coords);
+      var area = line + ' L' + coords[coords.length-1][0].toFixed(1) + ',' + base
                + ' L' + coords[0][0].toFixed(1) + ',' + base + ' Z';
-    svg += '<path d="' + area + '" fill="url(#grd' + i + ')" clip-path="url(#cc)"/>';
-    svg += '<path d="' + line + '" fill="none" stroke="' + COLORS[i]
-         + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#cc)"/>';
-    var lp = coords[coords.length - 1];
-    svg += '<circle cx="' + lp[0].toFixed(1) + '" cy="' + lp[1].toFixed(1)
-         + '" r="5.5" fill="' + COLORS[i] + '" opacity="0.18"/>';
-    svg += '<circle cx="' + lp[0].toFixed(1) + '" cy="' + lp[1].toFixed(1)
-         + '" r="2.8" fill="' + COLORS[i] + '"/>';
+      svg += '<path d="' + area + '" fill="url(#grd' + i + ')" clip-path="url(#cc)"/>';
+      svg += '<path d="' + line + '" fill="none" stroke="' + COLORS[i]
+           + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#cc)"/>';
+    });
+    // The end dot marks "now" — only where there is a reading now.
+    var lastRun = runs[runs.length - 1];
+    if (lastRun && s.current !== null && s.current !== undefined) {
+      var lpt = lastRun[lastRun.length - 1];
+      var lp  = [tx(new Date(lpt.t).getTime()), ty(lpt.v)];
+      svg += '<circle cx="' + lp[0].toFixed(1) + '" cy="' + lp[1].toFixed(1)
+           + '" r="5.5" fill="' + COLORS[i] + '" opacity="0.18"/>';
+      svg += '<circle cx="' + lp[0].toFixed(1) + '" cy="' + lp[1].toFixed(1)
+           + '" r="2.8" fill="' + COLORS[i] + '"/>';
+    }
   });
 
   svg += '</svg>';
@@ -470,7 +502,7 @@ var tipEl   = document.getElementById('tip');
 
 function findNearest(pts, tMs) {
   var best = null, bestD = Infinity;
-  pts.forEach(function(p) {
+  valuesOf(pts).forEach(function(p) {
     var d = Math.abs(new Date(p.t).getTime() - tMs);
     if (d < bestD) { bestD = d; best = p; }
   });
@@ -530,9 +562,8 @@ function hideHover() {
   if (G.ready && G.series) {
     G.series.forEach(function(s, i) {
       if (!s || !s.points || !s.points.length) return;
-      var last = s.points[s.points.length - 1];
       var el   = document.querySelector('.legend-val[data-series-idx="' + i + '"]');
-      if (el) el.textContent = last ? fmt(last.v) : '—';
+      if (el) el.textContent = fmt(s.current);
     });
   }
 }
@@ -554,16 +585,27 @@ function onHomeyReady(Homey) {
   var s = [resolve(settings.series1), resolve(settings.series2),
            resolve(settings.series3), resolve(settings.series4)];
 
-  var defaultLabels = [T.label1, T.label2, T.label3, T.label4];
-  var names = ['label1','label2','label3','label4'].map(function(k, i) {
-    var c = settings[k];
-    return (c && c.trim()) ? c.trim() : (s[i].name || defaultLabels[i]);
-  });
+  // Built when drawn, not here: before the first answer T is the phone's language, and
+  // names made from it stayed in that language for good (1.2.299).
+  function namesNow() {
+    var defaultLabels = [T.label1, T.label2, T.label3, T.label4];
+    return ['label1','label2','label3','label4'].map(function(k, i) {
+      var c = settings[k];
+      return (typeof c === 'string' && c.trim()) ? c.trim() : (s[i].name || defaultLabels[i]);
+    });
+  }
 
-  if (!s[0].id) {
+  // Any one series is enough. Series 1 used to be required, so a chart set up with only
+  // series 2 asked for a device forever.
+  if (!s.some(function(x) { return x.id; })) {
     document.body.classList.remove('loading');
     document.getElementById('chart-wrap').innerHTML =
-      '<div class="no-data">' + T.noSetting + '</div>';
+      '<div class="no-data" id="no-setting"></div>';
+    document.getElementById('no-setting').textContent = T.noSetting;
+    // The language arrives with the first answer; ask once so the hint is in it.
+    Homey.api('GET', '/?hours=1', {}).then(function(data) {
+      if (applyLang(data && data.lang)) document.getElementById('no-setting').textContent = T.noSetting;
+    }).catch(function() {});
     return;
   }
 
@@ -588,26 +630,48 @@ function onHomeyReady(Homey) {
   /* ── Load ── */
   var pollTimer = null;
 
-  function buildUrl() {
-    var h   = STEPS[stepIdx];
-    var url = '/?hours=' + h + '&s1=' + encodeURIComponent(s[0].id);
-    if (s[1].id) url += '&s2=' + encodeURIComponent(s[1].id);
-    if (s[2].id) url += '&s3=' + encodeURIComponent(s[2].id);
-    if (s[3].id) url += '&s4=' + encodeURIComponent(s[3].id);
+  function buildUrl(h) {
+    var url = '/?hours=' + h;
+    for (var i = 0; i < 4; i++) {
+      if (s[i].id) url += '&s' + (i + 1) + '=' + encodeURIComponent(s[i].id);
+    }
     return url;
   }
 
+  // The answer is drawn with the hours it was asked for, and only if no newer request has
+  // gone out since. Pressing + a few times fired a request per step, and whichever answer
+  // came back last was drawn under whatever label the stepper showed by then — a day of
+  // points labelled "7D" (1.2.299).
+  var reqSeq = 0;
+  var retryTimer = null;
   function load() {
-    Homey.api('GET', buildUrl(), {})
+    var seq = ++reqSeq;
+    var h   = STEPS[stepIdx];
+    Homey.api('GET', buildUrl(h), {})
       .then(function(data) {
+        if (seq !== reqSeq) return;
         applyLang(data && data.lang);
         document.body.classList.remove('loading');
         if (!data || !data.series) return;
-        updateLegend(data.series, names);
-        renderChart(data.series, STEPS[stepIdx]);
+        // Right after an app start the history is still being loaded: wait for it instead
+        // of reporting every series as unknown.
+        if (data.ready === false) {
+          renderChart([], h);
+          clearTimeout(retryTimer);
+          retryTimer = setTimeout(load, 10000);
+          return;
+        }
+        // Keep each answer in its slot: s[i] is series i+1 and owns COLORS[i].
+        var bySlot = [null, null, null, null];
+        var k = 0;
+        for (var i = 0; i < 4; i++) if (s[i].id) bySlot[i] = data.series[k++] || null;
+        var names = namesNow();
+        updateLegend(bySlot, names);
+        renderChart(bySlot.filter(function(x) { return x; }).length ? bySlot : [], h);
         G.names = names; // used by showHover / hideHover (change 3)
       })
       .catch(function(e) {
+        if (seq !== reqSeq) return;
         document.body.classList.remove('loading');
         console.error('sensor-chart:', e);
       });
@@ -618,15 +682,16 @@ function onHomeyReady(Homey) {
     pollTimer = setInterval(load, 60000);
   }
 
-  /* stepper click */
+  /* stepper click — the label moves at once, the request waits until the steps settle */
+  var stepTimer = null;
   function applyStep(dir) {
     var next = stepIdx + dir;
     if (next < 0 || next >= STEPS.length) return;
     stepIdx = next;
     updateStepper();
     hideHover();
-    load();
-    resetPoll();
+    clearTimeout(stepTimer);
+    stepTimer = setTimeout(function() { load(); resetPoll(); }, 250);
   }
 
   btnDown.addEventListener('click', function() { applyStep(-1); });

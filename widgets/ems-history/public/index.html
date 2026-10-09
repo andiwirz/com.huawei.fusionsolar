@@ -293,11 +293,14 @@ var DICTS = (function () {
     emsStarted: 'EMS gestartet', emsStopped: 'EMS gestoppt',
     batFull: 'Batterie voll', batLow: 'Batterie tief', batCharge: 'Zwangsladung', batDischarge: 'Zwangsentladung', batHold: 'Hält', batNormal: 'Normalbetrieb',
     started: 'gestartet', chargerStarted: 'Lader gestartet', chargerAdjusted: 'Lader angepasst', chargerStopped: 'Lader gestoppt', stopIneffective: '⚠ Stopp wirkungslos',
+    targetReached: 'Ladeziel erreicht', targetReleased: 'Ladeziel aufgehoben',
+    manualOn: 'ausserhalb des EMS eingeschaltet', manualOff: 'ausserhalb des EMS ausgeschaltet', startNoEffect: 'gestartet, aber ohne Wirkung',
+    forecastGateOn: 'Prognose-Sperre aktiv', forecastGateOff: 'Prognose-Sperre aufgehoben', noEms: 'Kein EMS-Gerät gefunden',
     modes: {
       solar_ev: 'Solar-EV-Laden', solar_hp: 'Solar-Wärmepumpe', solar_boiler: 'Solar-Boiler', solar_pool: 'Solar-Poolpumpe',
       solar_dehumidifier: 'Solar-Entfeuchter', solar_aircon: 'Solar-Klimaanlage', solar_multi: 'Solar (mehrere Geräte)',
       offpeak_ev: 'Off-Peak-EV-Laden', lowtariff_ev: 'Niedertarif-EV-Laden', price_ev: 'Preisoptimiertes EV-Laden',
-      instant_ev: 'Sofortladen (max.)', battery_priority: 'Batterie-Priorität', holding: 'Wartet — kein Überschuss',
+      instant_ev: 'Sofortladen (max.)', battery_priority: 'Batterie-Priorität', holding: 'Wartet',
       idle: 'Kein EV verbunden', disabled: 'EMS deaktiviert', not_configured: 'Nicht konfiguriert', error: 'Fehler',
       export_limit_on: 'Einspeiselimit aktiviert', export_limit_off: 'Einspeiselimit deaktiviert',
     },
@@ -309,12 +312,15 @@ var DICTS = (function () {
     appUpdated: 'App bijgewerkt', appStarted: 'App gestart',
     emsStarted: 'EMS gestart', emsStopped: 'EMS gestopt',
     batFull: 'Accu vol', batLow: 'Accu laag', batCharge: 'Geforceerd laden', batDischarge: 'Geforceerd ontladen', batHold: 'Houdt vast', batNormal: 'Normale modus',
-    started: 'gestart', chargerStarted: 'Lader gestart', chargerAdjusted: 'Lader aangepast', chargerStopped: 'Lader gestopt', stopIneffective: '⚠ Stop had no effect',
+    started: 'gestart', chargerStarted: 'Lader gestart', chargerAdjusted: 'Lader aangepast', chargerStopped: 'Lader gestopt', stopIneffective: '⚠ Stop had geen effect',
+    targetReached: 'Laaddoel bereikt', targetReleased: 'Laaddoel opgeheven',
+    manualOn: 'buiten de EMS om ingeschakeld', manualOff: 'buiten de EMS om uitgeschakeld', startNoEffect: 'gestart, maar zonder effect',
+    forecastGateOn: 'Prognoseblokkering actief', forecastGateOff: 'Prognoseblokkering opgeheven', noEms: 'Geen EMS-apparaat gevonden',
     modes: {
       solar_ev: 'Zon EV-laden', solar_hp: 'Zon warmtepomp', solar_boiler: 'Zon boiler', solar_pool: 'Zon zwembadpomp',
       solar_dehumidifier: 'Zon ontvochtiger', solar_aircon: 'Zonne-airco', solar_multi: 'Zon (meerdere apparaten)',
       offpeak_ev: 'Daltarief EV-laden', lowtariff_ev: 'Laag-tarief EV-laden', price_ev: 'Prijsgeoptimaliseerd EV-laden',
-      instant_ev: 'Direct laden (max)', battery_priority: 'Batterijprioriteit', holding: 'Wachten — geen overschot',
+      instant_ev: 'Direct laden (max)', battery_priority: 'Batterijprioriteit', holding: 'Wacht',
       idle: 'Geen EV aangesloten', disabled: 'EMS uitgeschakeld', not_configured: 'Niet geconfigureerd', error: 'Fout',
       export_limit_on: 'Exportlimiet geactiveerd', export_limit_off: 'Exportlimiet gedeactiveerd',
     },
@@ -326,12 +332,15 @@ var DICTS = (function () {
     appUpdated: 'App updated', appStarted: 'App started',
     emsStarted: 'EMS started', emsStopped: 'EMS stopped',
     batFull: 'Battery full', batLow: 'Battery low', batCharge: 'Forced charge', batDischarge: 'Forced discharge', batHold: 'Holding', batNormal: 'Normal mode',
-    started: 'started', chargerStarted: 'Charger started', chargerAdjusted: 'Charger adjusted', chargerStopped: 'Charger stopped', stopIneffective: '⚠ Stop had geen effect',
+    started: 'started', chargerStarted: 'Charger started', chargerAdjusted: 'Charger adjusted', chargerStopped: 'Charger stopped', stopIneffective: '⚠ Stop had no effect',
+    targetReached: 'Charge target reached', targetReleased: 'Charge target released',
+    manualOn: 'switched on outside the EMS', manualOff: 'switched off outside the EMS', startNoEffect: 'started, but without effect',
+    forecastGateOn: 'Forecast gate closed', forecastGateOff: 'Forecast gate open', noEms: 'No EMS device found',
     modes: {
       solar_ev: 'Solar EV charging', solar_hp: 'Solar heat pump', solar_boiler: 'Solar boiler', solar_pool: 'Solar pool pump',
       solar_dehumidifier: 'Solar dehumidifier', solar_aircon: 'Solar air conditioning', solar_multi: 'Solar (multiple devices)',
       offpeak_ev: 'Off-peak EV charging', lowtariff_ev: 'Low-tariff EV charging', price_ev: 'Price-optimised EV charging',
-      instant_ev: 'Instant charge (max)', battery_priority: 'Battery priority', holding: 'Waiting — no surplus',
+      instant_ev: 'Instant charge (max)', battery_priority: 'Battery priority', holding: 'Waiting',
       idle: 'No EV connected', disabled: 'EMS disabled', not_configured: 'Not configured', error: 'Error',
       export_limit_on: 'Export limit activated', export_limit_off: 'Export limit deactivated',
     },
@@ -344,18 +353,25 @@ function dictFor(code) {
 }
 var activeLang = null;
 var T = dictFor(navigator.language); // placeholder until the first payload arrives
+// The title, the button tooltips and the day label were set once from the placeholder —
+// the phone's language — and stayed in it on a German Homey; the day label stayed "—"
+// until a day arrow was tapped (1.2.299). All of them follow the language now.
+function applyStaticTexts() {
+  document.getElementById('title').textContent      = T.title;
+  document.getElementById('refresh-btn').title       = T.refresh;
+  document.getElementById('nav-prev').title           = T.prevDay;
+  document.getElementById('nav-next').title           = T.nextDay;
+  var initial = document.getElementById('initialLoading');
+  if (initial) initial.textContent = T.loading;
+  document.getElementById('nav-day-label').textContent = navLabel(dayOffset);
+}
 function applyLang(code) {
   if (!code || code === activeLang) return false;
   activeLang = code;
   T = dictFor(code);
+  applyStaticTexts();
   return true;
 }
-
-document.getElementById('title').textContent           = T.title;
-document.getElementById('refresh-btn').title            = T.refresh;
-document.getElementById('nav-prev').title                = T.prevDay;
-document.getElementById('nav-next').title                = T.nextDay;
-document.getElementById('initialLoading').textContent    = T.loading;
 
 // ── Mode metadata ──────────────────────────────────────────────────────────
 var MODE_DOTS = {
@@ -376,15 +392,19 @@ function fmtTime(ts) {
   return h + ':' + m;
 }
 
+// Calendar days, counted with setDate: "n × 24 h before midnight" put the start of every
+// day before a clock change an hour off — yesterday began at 01:00, and an event at 00:30
+// on a Sunday showed on Saturday's page (1.2.299).
 function dayStart(offset) {
   var d = new Date();
   d.setHours(0, 0, 0, 0);
-  return d.getTime() - offset * 86400000;
+  d.setDate(d.getDate() - offset);
+  return d.getTime();
 }
 
 function dayEnd(offset) {
   if (offset === 0) return Date.now();
-  return dayStart(offset) + 86400000 - 1;
+  return dayStart(offset - 1) - 1;
 }
 
 function navLabel(offset) {
@@ -398,7 +418,7 @@ function fmtDayLabel(ts) {
   var d   = new Date(ts);
   var now = new Date();
   var today     = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  var yesterday = today - 86400000;
+  var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).getTime();
   var ds        = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   if (ds === today)     return T.today;
   if (ds === yesterday) return T.yesterday;
@@ -418,11 +438,18 @@ function fmtStatusDetail(raw) {
 // ── Build event display info ───────────────────────────────────────────────
 function eventInfo(ev) {
   if (ev.type === 'system') {
+    // The forecast gate is a system event too, and was labelled "App started" (1.2.299).
+    if (ev.event === 'forecast_gate_on' || ev.event === 'forecast_gate_off') {
+      return { cls: 'ev-system', dot: ev.event === 'forecast_gate_on' ? 'dot-holding' : 'dot-app-start',
+               label: ev.event === 'forecast_gate_on' ? T.forecastGateOn : T.forecastGateOff,
+               detail: ev.label || '' };
+    }
     var isUpdate = ev.event === 'app_update';
+    var isStart  = ev.event === 'app_start';
     return {
       cls:    'ev-system',
       dot:    isUpdate ? 'dot-app-update' : 'dot-app-start',
-      label:  isUpdate ? T.appUpdated     : T.appStarted,
+      label:  isUpdate ? T.appUpdated : isStart ? T.appStarted : ev.event,
       detail: ev.label || '',
     };
   }
@@ -449,13 +476,17 @@ function eventInfo(ev) {
       return { cls: '', dot: ev.event === 'battery_low' ? 'dot-dev-stop' : 'dot-dev-start',
                label: BAT[ev.event], detail: ev.label || '' };
     }
-    var isStart = ev.event === 'start';
     var devName = ev.label || (ev.deviceId ? ev.deviceId.slice(0, 8) : '');
+    // Switched by hand, or started without effect: everything that was not 'start' used to
+    // read "EMS stopped" (1.2.299).
+    var DEV = { start: T.emsStarted, stop: T.emsStopped, manual_on: T.manualOn,
+                manual_off: T.manualOff, start_no_effect: T.startNoEffect };
+    var on = ev.event === 'start' || ev.event === 'manual_on';
     return {
       cls:    '',
-      dot:    isStart ? 'dot-dev-start' : 'dot-dev-stop',
+      dot:    on ? 'dot-dev-start' : 'dot-dev-stop',
       label:  devName,
-      detail: isStart ? T.emsStarted : T.emsStopped,
+      detail: DEV[ev.event] || ev.event,
     };
   }
   if (ev.type === 'charger') {
@@ -463,6 +494,8 @@ function eventInfo(ev) {
     if (ev.event === 'set_amps') return { cls:'', dot: 'dot-charger-amps',  label: '→ ' + ev.label,       detail: T.chargerAdjusted };
     if (ev.event === 'stop')     return { cls:'', dot: 'dot-charger-stop',  label: T.chargerStopped,      detail: ''                };
     if (ev.event === 'stop_ineffective') return { cls:'', dot: 'dot-charger-stop', label: T.stopIneffective, detail: ev.label || '' };
+    if (ev.event === 'target_reached')   return { cls:'', dot: 'dot-charger-stop', label: T.targetReached,   detail: ev.label || '' };
+    if (ev.event === 'target_released')  return { cls:'', dot: 'dot-charger-amps', label: T.targetReleased,  detail: ev.label || '' };
   }
   return { cls: '', dot: 'dot-idle', label: ev.event, detail: ev.label || '' };
 }
@@ -521,6 +554,7 @@ function esc(s) {
 function updateNav() {
   document.getElementById('nav-day-label').textContent = navLabel(dayOffset);
   document.getElementById('nav-next').disabled = (dayOffset === 0);
+  renderedFor = '';
   render();
 }
 
@@ -533,24 +567,40 @@ document.getElementById('nav-next').addEventListener('click', function() {
 });
 
 // ── Load ───────────────────────────────────────────────────────────────────
-async function load() {
+// After the first full load only what is new is fetched (?since=), and the list is redrawn
+// only when something arrived or the day changed.
+var newestTs = 0;
+var renderedFor = '';
+async function load(full) {
   try {
-    var result = await Homey.api('GET', '/history');
+    var since = full ? 0 : newestTs;
+    var result = await Homey.api('GET', since ? '/history?since=' + since : '/history');
     applyLang(result && result.lang); // authoritative language, before anything is drawn
     if (!result || result.error) {
-      document.getElementById('timeline').innerHTML =
-        '<div class="empty">' + esc((result && result.error) || T.failedToLoad) + '</div>';
+      var msg = result && result.error === 'no_ems_device' ? T.noEms : ((result && result.error) || T.failedToLoad);
+      document.getElementById('timeline').innerHTML = '<div class="empty">' + esc(msg) + '</div>';
+      renderedFor = '';
       return;
     }
-    allEvents = result.events || [];
-    render();
+    var events = result.events || [];
+    if (result.full) {
+      allEvents = events;
+    } else if (typeof result.newestTs === 'number' && result.newestTs < newestTs) {
+      return load(true); // the history shrank behind our back — start over
+    } else if (events.length) {
+      allEvents = allEvents.concat(events).slice(-400);
+    }
+    if (allEvents.length) newestTs = allEvents[allEvents.length - 1].ts;
+    var key = allEvents.length + ':' + newestTs + ':' + dayOffset + ':' + new Date().toDateString() + ':' + activeLang;
+    if (key !== renderedFor) { renderedFor = key; render(); }
   } catch (err) {
     document.getElementById('timeline').innerHTML =
       '<div class="empty">' + esc(T.errorPrefix + (err.message || String(err))) + '</div>';
+    renderedFor = '';
   }
 }
 
-document.getElementById('refresh-btn').addEventListener('click', load);
+document.getElementById('refresh-btn').addEventListener('click', function () { load(true); });
 
 // Auto-refresh every 30 s (only re-fetches, keeps current day view). Stops entirely
 // while the dashboard is hidden — an open widget used to keep polling around the clock —
@@ -565,7 +615,8 @@ document.addEventListener('visibilitychange', function () {
   startPolling();
 });
 
-load();
+applyStaticTexts();
+load(true);
 if (!document.hidden) startPolling();
 
 Homey.ready();

@@ -167,6 +167,7 @@ test('the picker filters on the name it shows', async () => {
 function appWithHistory(entries) {
   const app = Object.create(FusionSolarApp.prototype);
   app._capHistory = new Map(entries);
+  app._capHistoryInited = true;
   return app;
 }
 
@@ -239,7 +240,8 @@ test('the widget asks for a fresh selection instead of telling people to wait', 
   // every, not some: a chart with one stale series and one that is genuinely still filling
   // is still collecting, and telling that user to re-pick would send them after the wrong
   // thing. Only when nothing can ever arrive is re-picking the answer.
-  assert.match(WIDGET, /series\.every\(function\(s\) \{ return s && s\.known === false; \}\)/);
+  // Empty slots (a series not set up at all) are left out of the verdict first (1.2.299).
+  assert.match(WIDGET, /present\.every\(function\(s\) \{ return s\.known === false; \}\)/);
 });
 
 test('the new message exists in all three widget languages', () => {

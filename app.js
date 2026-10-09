@@ -3,6 +3,9 @@
 const { App }             = require('homey');
 const OpenAPICoordinator  = require('./lib/openapi-coordinator');
 const changeLog           = require('./lib/change-log');
+const { downsample }      = require('./lib/chart-downsample');
+const { isReachable }     = require('./lib/widget-data');
+const localTime           = require('./lib/local-time');
 
 class FusionSolarApp extends App {
 
@@ -57,6 +60,7 @@ class FusionSolarApp extends App {
 
     // Sensor-chart: initialise in-memory rolling history after drivers are ready
     this._capHistory       = new Map();
+    this._capHistoryCoarse = new Map();
     this._capHistoryInited = false;
     this._registerSensorChartAutocomplete();
     this.homey.setTimeout(() => this._initCapHistory(), 5000);
@@ -173,24 +177,16 @@ class FusionSolarApp extends App {
 
   /**
    * Milliseconds until 00:00:05 of the next calendar day in the Homey timezone.
+   *
+   * From the real next local midnight (lib/local-time.js), not 86 400 s minus the time
+   * gone: on the 25-hour day in October that fired at 23:00:05 and wrote tomorrow's
+   * baseline an hour early, on the 23-hour day in March an hour late (1.2.299).
    * Node.js runs UTC — we use Intl.DateTimeFormat to read the current wall-clock
    * time in the local timezone and compute the offset to the next midnight.
    */
-  _msUntilLocalMidnight() {
-    const tz  = this._getHomeyTz();
-    const now = new Date();
-
-    // Extract current time-of-day parts in the Homey timezone
-    const parts = new Intl.DateTimeFormat('en', {
-      timeZone: tz,
-      hour: 'numeric', minute: 'numeric', second: 'numeric',
-      hour12: false,
-    }).formatToParts(now);
-
-    const get = type => parseInt(parts.find(p => p.type === type)?.value ?? '0', 10);
-    const secsElapsed = get('hour') * 3600 + get('minute') * 60 + get('second');
-    // 5-second buffer past midnight
-    return (86400 - secsElapsed + 5) * 1000;
+  _msUntilLocalMidnight(nowMs = Date.now()) {
+    const tz = localTime.safeTz(this._getHomeyTz());
+    return localTime.nextLocalMidnight(tz, nowMs) - nowMs + 5000;
   }
 
   /**
@@ -425,12 +421,6 @@ class FusionSolarApp extends App {
   // ── Sensor-chart: capability history ──────────────────────────────────────
 
   /**
-   * Returns true for capabilities that are meaningful to chart.
-   * Limits the list to measure_*, meter_* and target_* — excludes alarm booleans,
-   * status enums, module counts, etc.
-   */
-  /** Capabilities tracked and offered in the Sensor Chart autocomplete. */
-  /**
    * The history key for one capability of one device.
    *
    * device.getId() and NOT device.getData().id. The data id is the app's own identifier,
@@ -454,16 +444,17 @@ class FusionSolarApp extends App {
    * a list of rows all reading "Power Sensor (OpenAPI)" is unpickable — and once picked,
    * the legend said as little. The capability's own title is what tells them apart.
    */
-  static _seriesLabel(device, capId) {
+  static _seriesLabel(device, capId, lang = 'en') {
     const name = device.getName();
     let title = null;
     try {
       const t = device.getCapabilityOptions(capId)?.title;
-      title = typeof t === 'string' ? t : (t?.en ?? null);
+      title = typeof t === 'string' ? t : (t?.[lang] ?? t?.en ?? null);
     } catch (e) { /* no options set for this capability */ }
     return title ? `${name} · ${title}` : `${name} · ${capId}`;
   }
 
+  /** Capabilities tracked and offered in the Sensor Chart autocomplete. */
   static _isMeaningfulCap(capId) {
     return capId === 'measure_power'
         || capId === 'measure_power.load';
@@ -479,6 +470,8 @@ class FusionSolarApp extends App {
 
       const handler = async (query) => {
         const results = [];
+        let lang = 'en';
+        try { lang = this.homey.i18n.getLanguage() || 'en'; } catch (e) { /* keep en */ }
         try {
           const drivers = this.homey.drivers.getDrivers();
           for (const driver of Object.values(drivers)) {
@@ -490,11 +483,11 @@ class FusionSolarApp extends App {
                   if (typeof val !== 'number') continue;
 
                   const id   = FusionSolarApp._seriesKey(device, capId);
-                  const name = FusionSolarApp._seriesLabel(device, capId);
+                  const name = FusionSolarApp._seriesLabel(device, capId, lang);
 
                   if (!query || query.length === 0
                       || name.toLowerCase().includes(query.toLowerCase())) {
-                    results.push({ id, name, description: `${fmtVal(val)} W` });
+                    results.push({ id, name, description: fmtVal(val) });
                   }
                 }
               }
@@ -514,12 +507,13 @@ class FusionSolarApp extends App {
       this.error('sensor-chart: autocomplete registration failed:', e.message);
     }
 
-    /** Small inline helper — format a numeric value compactly */
+    /** Small inline helper — a power reading with its unit. It used to append " W" to
+     *  a figure already in kW, which read "2.3 kW W". */
     function fmtVal(v) {
       if (v === null || v === undefined) return '—';
       const a = Math.abs(v);
       if (a >= 1000) return (v / 1000).toFixed(1) + ' kW';
-      return v.toFixed(1);
+      return Math.round(v) + ' W';
     }
   }
 
@@ -574,6 +568,30 @@ class FusionSolarApp extends App {
   // 1 500 pts × 60 s = 25 h; compact JSON ≈ 40 KB — well within the settings limit.
   static get CAP_HISTORY_MAX() { return 1500; }
 
+  // The long tier (1.2.299): one point per quarter hour — average, low and high — for a
+  // week. The chart's stepper offered 48 h, 72 h and 7 days while only the 25 h above were
+  // kept, so all three drew the same day under a longer label. 7 × 96 = 672 buckets, with a
+  // little headroom; stored beside the minute points as sch_hist7_<logId>.
+  static get CAP_HISTORY_COARSE_MS()  { return 15 * 60 * 1000; }
+  static get CAP_HISTORY_COARSE_MAX() { return 700; }
+
+  /** Fold one minute point into the quarter-hour tier. */
+  static _addCoarse(buckets, t, v) {
+    const q = FusionSolarApp.CAP_HISTORY_COARSE_MS;
+    const bt = Math.floor(t / q) * q;
+    const last = buckets[buckets.length - 1];
+    if (last && last.t === bt) {
+      last.v  = (last.v * last.n + v) / (last.n + 1);
+      last.lo = Math.min(last.lo, v);
+      last.hi = Math.max(last.hi, v);
+      last.n += 1;
+    } else if (!last || bt > last.t) {
+      buckets.push({ t: bt, v, lo: v, hi: v, n: 1 });
+    }
+    const max = FusionSolarApp.CAP_HISTORY_COARSE_MAX;
+    if (buckets.length > max) buckets.splice(0, buckets.length - max);
+  }
+
   /**
    * Initialise rolling capability history and start the 60 s polling timer.
    * Called 5 s after app start so drivers have completed their first poll.
@@ -593,9 +611,11 @@ class FusionSolarApp extends App {
     this._capHistoryPollCount  = 0;
     this._capHistoryPollTimer  = this.homey.setInterval(() => {
       this._snapshotAllCaps();
-      // Persist every 5 minutes (5 × 60 s ticks)
+      // Persist every 15 minutes (15 × 60 s ticks). Every save rewrites every series —
+      // ~30 KB each — and onUninit saves too, so an app update or restart loses nothing;
+      // only a crash costs up to a quarter of an hour of points (1.2.299, was 5 minutes).
       this._capHistoryPollCount++;
-      if (this._capHistoryPollCount % 5 === 0) this._saveCapHistory();
+      if (this._capHistoryPollCount % 15 === 0) this._saveCapHistory();
     }, 60 * 1000);
   }
 
@@ -606,6 +626,7 @@ class FusionSolarApp extends App {
    */
   _loadCapHistory() {
     let loaded = 0;
+    if (!this._capHistoryCoarse) this._capHistoryCoarse = new Map();
     // Collected while walking the currently paired devices, then handed to the orphan
     // cleanup below — the same walk answers both "what do I restore" and "what is stale".
     const validLogIds = new Set();
@@ -630,6 +651,19 @@ class FusionSolarApp extends App {
               const points = raw.map(([t, v]) => ({ t: Number(t), v }));
               this._capHistory.set(logId, points);
               loaded++;
+
+              // The quarter-hour tier, or — the first start after 1.2.299 — built from
+              // the minute points, so the longer views have a day to show at once.
+              const rawCoarse = this.homey.settings.get(`sch_hist7_${logId}`);
+              const coarse = [];
+              if (Array.isArray(rawCoarse) && rawCoarse.length) {
+                for (const [t, v, lo, hi, n] of rawCoarse) {
+                  coarse.push({ t: Number(t), v, lo: lo ?? v, hi: hi ?? v, n: n || 1 });
+                }
+              } else {
+                for (const p of points) FusionSolarApp._addCoarse(coarse, p.t, p.v);
+              }
+              this._capHistoryCoarse.set(logId, coarse);
             }
           }
         } catch (e) { enumerationComplete = false; /* skip unavailable driver */ }
@@ -662,12 +696,13 @@ class FusionSolarApp extends App {
     }
     if (validLogIds.size === 0) return;
     try {
-      const PREFIX = 'sch_hist_';
+      const PREFIXES = ['sch_hist_', 'sch_hist7_'];
       const keys = this.homey.settings.getKeys() || [];
       let removed = 0;
       for (const key of keys) {
-        if (!key.startsWith(PREFIX)) continue;
-        if (validLogIds.has(key.slice(PREFIX.length))) continue;
+        const prefix = PREFIXES.find((p) => key.startsWith(p));
+        if (!prefix) continue;
+        if (validLogIds.has(key.slice(prefix.length))) continue;
         this.homey.settings.unset(key);
         removed++;
       }
@@ -688,6 +723,11 @@ class FusionSolarApp extends App {
         // p.t is already epoch ms — no Date round-trip needed.
         const compact = points.map((p) => [p.t, Math.round(p.v * 100) / 100]);
         this.homey.settings.set(`sch_hist_${logId}`, compact);
+      }
+      const r2 = (x) => Math.round(x * 100) / 100;
+      for (const [logId, buckets] of (this._capHistoryCoarse || new Map()).entries()) {
+        this.homey.settings.set(`sch_hist7_${logId}`,
+          buckets.map((b) => [b.t, r2(b.v), r2(b.lo), r2(b.hi), b.n]));
       }
       // Every five minutes, forever, this said the same thing — ~290 lines a day confirming
       // that a periodic save ran, in a log that holds 1500. What is worth knowing is when
@@ -716,6 +756,11 @@ class FusionSolarApp extends App {
       for (const driver of Object.values(drivers)) {
         try {
           for (const device of driver.getDevices()) {
+            // An unreachable device still hands back its last reading, and recording it
+            // once a minute drew a flat line at that value for as long as the device was
+            // away. Nothing is recorded instead, and the chart shows the hole (1.2.299) —
+            // the same rule lib/widget-data.js applies to every other widget.
+            if (!isReachable(device)) continue;
             for (const capId of device.getCapabilities()) {
               if (!FusionSolarApp._isMeaningfulCap(capId)) continue;
               const val = device.getCapabilityValue(capId);
@@ -727,6 +772,11 @@ class FusionSolarApp extends App {
 
               pts.push({ t: now, v: val });
               if (pts.length > max) pts.splice(0, pts.length - max);
+
+              if (!this._capHistoryCoarse) this._capHistoryCoarse = new Map();
+              let coarse = this._capHistoryCoarse.get(logId);
+              if (!coarse) { coarse = []; this._capHistoryCoarse.set(logId, coarse); }
+              FusionSolarApp._addCoarse(coarse, now, val);
             }
           }
         } catch (e) { /* skip unavailable driver */ }
@@ -744,9 +794,21 @@ class FusionSolarApp extends App {
    * @returns {{ series: Array<{id, points}> }}
    */
   getSensorChartData(query) {
-    const hours  = Math.max(1, parseFloat(query.hours) || 24);
-    const cutoff = Date.now() - hours * 3600 * 1000;
+    const hours  = Math.min(168, Math.max(1, parseFloat(query.hours) || 24));
+    const now    = Date.now();
+    const cutoff = now - hours * 3600 * 1000;
     const series = [];
+
+    // For the first seconds after a start the history is not loaded yet, and every series
+    // looked unknown — the widget then asked the user to pick them all again. Saying "not
+    // ready" lets it wait instead (1.2.299).
+    if (!this._capHistoryInited) return { series, ready: false };
+
+    // A day or less from the minute points, more from the quarter hours. A gap is wider
+    // than three of the tier's own steps: a missed poll is not a hole, an hour away is.
+    const long   = hours > 24;
+    const gapMs  = long ? 3 * FusionSolarApp.CAP_HISTORY_COARSE_MS : 3 * 60 * 1000;
+    const coarseMap = this._capHistoryCoarse || new Map();
 
     for (const key of ['s1', 's2', 's3', 's4']) {
       const id = query[key];
@@ -757,12 +819,17 @@ class FusionSolarApp extends App {
       // it appear. Saying which of the two it is turns a permanently empty chart into an
       // instruction; the widget shows "pick this series again".
       const known    = !!(this._capHistory && this._capHistory.has(id));
-      const points   = known ? this._capHistory.get(id) : [];
-      const filtered = points.filter((p) => p.t >= cutoff);
-      series.push({ id, points: filtered, known });
+      const fine     = known ? this._capHistory.get(id) : [];
+      const source   = long ? (coarseMap.get(id) || []) : fine;
+      const filtered = source.filter((p) => p.t >= cutoff).map((p) => ({ t: p.t, v: Math.round(p.v * 10) / 10 }));
+      // The reading now, for the legend — or none when the last point is older than the
+      // gap rule allows: a device that went away has no current value.
+      const last     = fine[fine.length - 1];
+      const current  = last && now - last.t <= 3 * 60 * 1000 ? Math.round(last.v * 10) / 10 : null;
+      series.push({ id, known, current, points: downsample(filtered, 240, gapMs) });
     }
 
-    return { series };
+    return { series, ready: true };
   }
 
 }

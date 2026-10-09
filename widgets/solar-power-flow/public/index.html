@@ -155,7 +155,7 @@
       <line x1="17.66" y1="6.34"  x2="19.78" y2="4.22"/>
     </svg>
     <div class="node-value" id="pv-val">—</div>
-    <div class="node-label">Solar PV</div>
+    <div class="node-label" id="label-pv"></div>
   </div>
 
   <!-- Grid (middle left) -->
@@ -200,9 +200,9 @@
 // Language comes from the API payload (Homey i18n.getLanguage()), not
 // navigator.language — see widgets/ems-device/api.js.
 var DICTS = (function() {
-  var de = { grid: 'Netz', batt: 'Batterie', house: 'Haus',  export: 'Einspeisung', import: 'Bezug'  };
-  var nl = { grid: 'Net',  batt: 'Batterij', house: 'Huis',  export: 'Teruglevering', import: 'Afname' };
-  var en = { grid: 'Grid', batt: 'Battery',  house: 'House', export: 'Export',       import: 'Import' };
+  var de = { pv: 'Solar', grid: 'Netz', batt: 'Batterie', house: 'Haus',  export: 'Einspeisung', import: 'Bezug'  };
+  var nl = { pv: 'Zon',   grid: 'Net',  batt: 'Batterij', house: 'Huis',  export: 'Teruglevering', import: 'Afname' };
+  var en = { pv: 'Solar', grid: 'Grid', batt: 'Battery',  house: 'House', export: 'Export',       import: 'Import' };
   return { de: de, nl: nl, en: en };
 })();
 function dictFor(code) {
@@ -211,6 +211,15 @@ function dictFor(code) {
 }
 var activeLang = null;
 var T = dictFor(navigator.language); // placeholder until the first payload arrives
+// Top level, like applyLang which calls it. It used to sit inside onHomeyReady, out of
+// applyLang's reach: the first payload threw a ReferenceError, the widget kept its loading
+// state until the next poll, and the labels stayed in the phone's language (1.2.299).
+function applyStaticLabels() {
+  document.getElementById('label-pv').textContent    = T.pv;
+  document.getElementById('label-grid').textContent  = T.grid;
+  document.getElementById('label-batt').textContent  = T.batt;
+  document.getElementById('label-house').textContent = T.house;
+}
 function applyLang(code) {
   if (!code || code === activeLang) return false;
   activeLang = code;
@@ -320,9 +329,11 @@ function onHomeyReady(Homey) {
     document.getElementById('batt-soc').textContent =
       (soc !== null && soc !== undefined) ? Math.round(soc) + '%' : '';
 
+    // The same threshold as the line beside it — a fixed 50 W here said "Import" next
+    // to an idle line whenever the setting was higher.
     document.getElementById('grid-sub').textContent =
-      (grid !== null && grid < -50) ? T.export :
-      (grid !== null && grid >  50) ? T.import : '';
+      (grid !== null && grid < -thr) ? T.export :
+      (grid !== null && grid >  thr) ? T.import : '';
 
     // ── Recalculate line positions (text may have changed width) ──
     positionLines();
@@ -411,14 +422,8 @@ function onHomeyReady(Homey) {
       .catch(function(err) { console.error('widget error:', err); });
   }
 
-  // Apply translated node labels
-  // Re-applied on a language change so static labels never stay in the
-  // language the widget first rendered in (mixed-language UI).
-  function applyStaticLabels() {
-    document.getElementById('label-grid').textContent  = T.grid;
-    document.getElementById('label-batt').textContent  = T.batt;
-    document.getElementById('label-house').textContent = T.house;
-  }
+  // Translated node labels; re-applied by applyLang on a language change so they never
+  // stay in the language the widget first rendered in.
   applyStaticLabels();
 
   // Initial line positioning once DOM is painted

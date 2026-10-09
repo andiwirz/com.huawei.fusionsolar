@@ -176,18 +176,24 @@ var DICTS = (function() {
     export: 'Einspeisung', exportSub: 'ins Netz',
     import: 'Netzbezug',   importSub: 'vom Netz',
     self:   'Eigenversorgung', selfSub: 'PV deckt Verbrauch',
+    selfSubBatt: 'Batterie deckt Verbrauch', selfSubBoth: 'PV + Batterie decken Verbrauch',
+    selfSubIdle: 'kein Netzbezug',
     unknown: 'Keine Netzdaten', unknownSub: 'kein Zähler gekoppelt',
   };
   var nl = {
     export: 'Teruglevering', exportSub: 'aan net',
     import: 'Netafname',     importSub: 'van net',
     self:   'Zelfvoorzienend', selfSub: 'PV dekt verbruik',
+    selfSubBatt: 'Batterij dekt verbruik', selfSubBoth: 'PV + batterij dekken verbruik',
+    selfSubIdle: 'geen netafname',
     unknown: 'Geen netgegevens', unknownSub: 'geen meter gekoppeld',
   };
   var en = {
     export: 'Feed-in',      exportSub: 'to grid',
     import: 'Grid import',  importSub: 'from grid',
     self:   'Self-sufficient', selfSub: 'PV covers load',
+    selfSubBatt: 'Battery covers load', selfSubBoth: 'PV + battery cover load',
+    selfSubIdle: 'no grid import',
     unknown: 'No grid data', unknownSub: 'no meter paired',
   };
   return { de: de, nl: nl, en: en };
@@ -210,6 +216,15 @@ function fmt(w) {
   const abs = Math.abs(w);
   if (abs >= 1000) return (abs / 1000).toFixed(1) + ' kW';
   return Math.round(abs) + ' W';
+}
+
+// Who covers the house while the grid is quiet. The self-sufficient state used to name
+// PV and show the PV figure whatever was going on — at night, with the battery carrying
+// the load, that read "self-sufficient 0 W, PV covers load" (1.2.299).
+function selfSubKey(pv, batt, thr) {
+  var pvOn   = pv   !== null && pv   !== undefined && pv   > thr;
+  var battOn = batt !== null && batt !== undefined && batt < -thr;
+  return pvOn && battOn ? 'selfSubBoth' : pvOn ? 'selfSub' : battOn ? 'selfSubBatt' : 'selfSubIdle';
 }
 
 function onHomeyReady(Homey) {
@@ -260,12 +275,12 @@ function onHomeyReady(Homey) {
       value.style.color = '#EF4444';
       sub.textContent   = T.importSub;
     } else {
-      // Self-sufficient
+      // Self-sufficient: the load being covered, and by what.
       circle.setAttribute('class', 'circle pulse-yellow');
       label.textContent = T.self;
-      value.textContent = fmt(pv);
+      value.textContent = fmt(house);
       value.style.color = '#F59E0B';
-      sub.textContent   = T.selfSub;
+      sub.textContent   = T[selfSubKey(pv, batt, thr)];
     }
 
     // Stats

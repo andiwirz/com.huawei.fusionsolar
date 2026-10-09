@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.298",
+  "version": "1.2.299",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -15298,60 +15298,7 @@
       },
       "height": 420,
       "transparent": false,
-      "settings": [
-        {
-          "id": "hours",
-          "type": "dropdown",
-          "title": {
-            "en": "Time window",
-            "de": "Zeitfenster",
-            "nl": "Tijdvenster"
-          },
-          "value": "6",
-          "values": [
-            {
-              "id": "1",
-              "title": {
-                "en": "Last 1 hour",
-                "de": "Letzte 1 Std",
-                "nl": "Laatste 1 uur"
-              }
-            },
-            {
-              "id": "3",
-              "title": {
-                "en": "Last 3 hours",
-                "de": "Letzte 3 Std",
-                "nl": "Laatste 3 uur"
-              }
-            },
-            {
-              "id": "6",
-              "title": {
-                "en": "Last 6 hours",
-                "de": "Letzte 6 Std",
-                "nl": "Laatste 6 uur"
-              }
-            },
-            {
-              "id": "12",
-              "title": {
-                "en": "Last 12 hours",
-                "de": "Letzte 12 Std",
-                "nl": "Laatste 12 uur"
-              }
-            },
-            {
-              "id": "24",
-              "title": {
-                "en": "Last 24 hours",
-                "de": "Letzte 24 Std",
-                "nl": "Laatste 24 uur"
-              }
-            }
-          ]
-        }
-      ],
+      "settings": [],
       "images": {
         "light": "/widgets/ems-history/preview-light.png",
         "dark": "/widgets/ems-history/preview-dark.png"

@@ -244,7 +244,9 @@ var DICTS = (function() {
     remaining:   'noch ',
     chargedToday:    'Heute geladen',
     dischargedToday: 'Heute entladen',
-    statusMap: { charging: 'Laden', discharging: 'Entladen', standby: 'Standby' },
+    statusMap: { charging: 'Laden', discharging: 'Entladen', standby: 'Standby', running: 'In Betrieb',
+                 offline: 'Offline', fault: 'Störung', sleep: 'Ruhemodus', starting: 'Startet',
+                 off: 'Aus', testing: 'Test' },
   };
   var nl = {
     noBattery:   'Geen batterij',
@@ -254,7 +256,9 @@ var DICTS = (function() {
     remaining:   'nog ',
     chargedToday:    'Vandaag geladen',
     dischargedToday: 'Vandaag ontladen',
-    statusMap: { charging: 'Laden', discharging: 'Ontladen', standby: 'Standby' },
+    statusMap: { charging: 'Laden', discharging: 'Ontladen', standby: 'Standby', running: 'In bedrijf',
+                 offline: 'Offline', fault: 'Storing', sleep: 'Slaapstand', starting: 'Opstarten',
+                 off: 'Uit', testing: 'Test' },
   };
   var en = {
     noBattery:   'No battery',
@@ -264,7 +268,9 @@ var DICTS = (function() {
     remaining:   '',
     chargedToday:    'Charged today',
     dischargedToday: 'Discharged today',
-    statusMap: { charging: 'Charging', discharging: 'Discharging', standby: 'Standby' },
+    statusMap: { charging: 'Charging', discharging: 'Discharging', standby: 'Standby', running: 'Running',
+                 offline: 'Offline', fault: 'Fault', sleep: 'Sleep mode', starting: 'Starting',
+                 off: 'Off', testing: 'Testing' },
   };
   return { de: de, nl: nl, en: en };
 })();

@@ -9,7 +9,43 @@ function lang(homey) {
   try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
 }
 
+// The batteries report their state in Huawei's English words — "Running", "Sleep mode",
+// "Fault" — which the widget showed untranslated beside its own German "Laden". They go
+// out as keys the widget translates (1.2.299). "Running" says nothing about which way the
+// energy flows, so for that one the power decides, as it already did without a state.
+const STATE_KEYS = {
+  'offline': 'offline',
+  'standby': 'standby',
+  'fault': 'fault',
+  'sleep mode': 'sleep',
+  'hibernation': 'sleep',
+  'initial power-on': 'starting',
+  'power-off': 'off',
+  'float charging': 'charging',
+  'boost charging': 'charging',
+  'charging': 'charging',
+  'discharging': 'discharging',
+  'testing': 'testing',
+};
+
+function direction(powerW) {
+  if (powerW === null) return 'running';
+  if (powerW > 50)  return 'charging';
+  if (powerW < -50) return 'discharging';
+  return 'standby';
+}
+
+function statusKey(raw, powerW) {
+  if (raw === null || raw === undefined) return powerW === null ? null : direction(powerW);
+  const k = String(raw).trim().toLowerCase();
+  if (k === 'running') return direction(powerW);
+  // A word not in the list ("Status 7" for an unknown code) goes out as it came.
+  return STATE_KEYS[k] || String(raw);
+}
+
 module.exports = {
+  statusKey,
+
   async getData({ homey }) {
 
     // Try luna2000_modbus → luna2000_emma_modbus → isitepower_battery
@@ -32,15 +68,11 @@ module.exports = {
                             ?? cap(lunaOa, 'meter_power.today_batt_output', null);
 
     // Status: prefer luna2000_battery_status, derive from power if not available
-    let status = cap(luna, 'luna2000_battery_status', null)
-              ?? cap(lunaOa, 'luna2000_battery_status', null)    // since 1.2.281
-              ?? cap(lunaOa, 'openapi_battery_status', null)     // until the device has moved over
-              ?? cap(ispBatt, 'openapi_battery_status', null);
-    if (status === null && powerW !== null) {
-      if (powerW > 50)       status = 'charging';
-      else if (powerW < -50) status = 'discharging';
-      else                   status = 'standby';
-    }
+    const rawStatus = cap(luna, 'luna2000_battery_status', null)
+                   ?? cap(lunaOa, 'luna2000_battery_status', null)    // since 1.2.281
+                   ?? cap(lunaOa, 'openapi_battery_status', null)     // until the device has moved over
+                   ?? cap(ispBatt, 'openapi_battery_status', null);
+    const status = statusKey(rawStatus, powerW);
 
     // The nameplate capacity, straight from the battery (register 37758 on a LUNA2000),
     // so the remaining-time estimate no longer depends on somebody having typed the right

@@ -163,7 +163,7 @@ function before(chain, first, second, msg) {
 }
 
 test('the energy-balance widget asks for the production figure before the AC one', () => {
-  const c = chain(read('widgets', 'energy-balance', 'api.js'), 'const pvTodayKwh');
+  const c = chain(read('widgets', 'energy-balance', 'api.js'), 'const pvToday =');
   before(c, "sunOa, 'meter_power.pv_daily'", "sunOa, 'meter_power.inv_daily'",
     'the AC counter is consulted first, so the production figure never gets a turn');
   // Local before cloud, everywhere. A Modbus reading is seconds old and the cloud minutes,

@@ -180,8 +180,14 @@ class EmsDevice extends Device {
     // user's generated "Set charge <soc>%" flow do the rest.
     // Exposed on the device (not a local helper) so api.js can reach it.
     this.setCarTargetSoc = async (carId, rawSoc) => {
-      const soc = Math.round(Number(rawSoc));
+      // An empty value is not 0 %: Number(null) and Number('') both are, and a widget
+      // request without a figure set the car's target to nothing at all (1.2.299).
+      const blank = rawSoc === null || rawSoc === undefined || String(rawSoc).trim() === '';
+      const soc = blank ? NaN : Math.round(Number(rawSoc));
       if (!Number.isFinite(soc) || soc < 0 || soc > 100) throw new Error('Target SOC must be 0–100');
+      // Only a configured car. Any id used to be taken: it got a capability, a stored
+      // target and a trigger of its own.
+      if (!(this._getConfig().car_devices || []).some((c) => c.id === carId)) throw new Error('Unknown car');
       this._carTargets[carId] = soc;
       (this._carTargetSetAt = this._carTargetSetAt || {})[carId] = Date.now();
       // _carStates is what the widget's /status reads, and it is only rebuilt on the 15 s
