@@ -2,7 +2,8 @@
 
 // Five small things from the open list, checked against the code (1.2.279):
 //
-//   - the backup power SoC, a reading since 1.2.278, had no icon and showed Homey's dashed box;
+//   - the backup power SoC, a reading since 1.2.278, had no icon and showed Homey's dashed box
+//     (the icon added for it never showed; see the first test);
 //   - the battery wrote its discharge cutoff and backup SoC to the settings on every poll;
 //   - the cloud inverter listed huawei_status as removed and as extra at once, so every start
 //     took the status tile away and the first poll put it back, at the end of the view;
@@ -23,17 +24,16 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 // ── the backup SoC icon ─────────────────────────────────────────────────────────
 
-test('the backup power SoC has an icon of its own, in both battery drivers', () => {
-  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
-    const o = app.drivers.find((d) => d.id === id).capabilitiesOptions['measure_battery.backup'];
-    assert.strictEqual(o.icon, '/assets/capabilities/battery_backup_soc.svg', id);
+test('no driver sets an icon in capabilitiesOptions — Homey ignores it there', () => {
+  // The icon 1.2.279 gave the backup power SoC this way never showed: on the installed app
+  // the tile kept Homey's dashed box, while uiComponent from the same options took effect.
+  // Homey documents no icon option, and the validator accepts any key. An icon needs a
+  // custom capability; the LUNA2000 Modbus tile is hidden instead since 1.2.283.
+  const set = [];
+  for (const d of app.drivers) {
+    for (const [cap, o] of Object.entries(d.capabilitiesOptions || {})) if (o && 'icon' in o) set.push(`${d.id}/${cap}`);
   }
-  const svg = read('assets/capabilities/battery_backup_soc.svg');
-  assert.match(svg, /viewBox="0 0 24 24"/);
-  assert.match(svg, /fill="currentColor"/);
-  assert.doesNotMatch(svg, /stroke=/, 'Homey fills icons; a line drawing comes out as a block');
-  const nums = svg.match(/ d="([^"]+)"/)[1].match(/-?\d+(\.\d+)?/g).map(Number);
-  assert.ok(nums.every((n) => n >= 0 && n <= 24), 'a point lies outside the box');
+  assert.deepStrictEqual(set, []);
 });
 
 // ── settings written only when they change ──────────────────────────────────────

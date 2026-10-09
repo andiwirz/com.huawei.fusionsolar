@@ -1,4 +1,9 @@
 {
+  "1.2.283": {
+    "en": "LUNA2000 Modbus battery: the \"Backup Power SoC\" tile is hidden. The value is in the device settings (\"Backup power SoC (%)\", under \"State of charge limits\") and follows the battery; its flow cards and Insights keep working. The icon added in 1.2.279 never showed — Homey does not take an icon for a built-in capability. The EMMA battery keeps the tile, as it has no such setting.",
+    "de": "LUNA2000-Modbus-Batterie: Die Kachel „Backup-Energie-SoC“ ist ausgeblendet. Der Wert steht in den Geräteeinstellungen („Backup-Energie-SoC (%)“ unter „Grenzen des Ladezustands“) und folgt der Batterie; die Flow-Karten und Insights dazu funktionieren weiter. Das in 1.2.279 ergänzte Icon wurde nie angezeigt — Homey übernimmt bei einer eingebauten Capability kein eigenes Icon. Die EMMA-Batterie behält die Kachel, weil sie keine solche Einstellung hat.",
+    "nl": "LUNA2000 Modbus-batterij: de tegel \"SoC voor noodstroom\" is verborgen. De waarde staat in de apparaatinstellingen, en de flowkaarten en Insights blijven werken."
+  },
   "1.2.282": {
     "en": "Registers tab (app settings): the EMMA's seven energy totals — charged, discharged, consumption, feed-in, supply from grid, PV yield and absorbed energy — can now be read in the list of all registers, one by one or with \"Read all\". They were marked as not readable and skipped, although the EMMA device reads six of them on every poll.",
     "de": "Register-Tab (App-Einstellungen): Die sieben Energiezähler der EMMA — geladen, entladen, Verbrauch, Einspeisung, Netzbezug, PV-Ertrag und aufgenommene Energie — lassen sich in der Liste aller Register lesen, einzeln oder mit „Alle lesen“. Bisher waren sie als nicht lesbar markiert und wurden übersprungen, obwohl das EMMA-Gerät sechs davon bei jedem Abruf liest.",

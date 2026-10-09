@@ -44,6 +44,8 @@ Module._load = function (request, parent, isMain) {
 
 const test     = require('node:test');
 const assert   = require('node:assert');
+const fs       = require('fs');
+const path     = require('path');
 const manifest = require('../app.json');
 const REG      = require('../lib/modbus-registers');
 
@@ -361,11 +363,22 @@ test('the backup reserve is a reading, not a second battery', () => {
   // A sub-capability of measure_battery inherits the battery component, so Homey drew the
   // reserve as a big battery in the battery view, beside the real state of charge — at 0 %
   // a red, empty battery. It is a setting (what is held back for a power cut), not a level.
-  for (const id of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+  //
+  // Since 1.2.283 the LUNA2000 Modbus battery hides the tile altogether: the reserve is a
+  // device setting there, which follows the device, and the tile had no icon to offer (Homey
+  // ignores an icon set in capabilitiesOptions). The EMMA battery has no such setting, so
+  // its tile is the only place the reserve can be seen and stays.
+  const SHOWN = { luna2000_modbus: null, luna2000_emma_modbus: 'sensor' };
+  for (const [id, ui] of Object.entries(SHOWN)) {
     const d = manifest.drivers.find((x) => x.id === id);
     assert.ok(d.capabilities.includes('measure_battery.backup'), `${id}: the capability is gone — flows and Insights hang on it`);
-    assert.strictEqual(d.capabilitiesOptions['measure_battery.backup'].uiComponent, 'sensor', `${id}: drawn as a battery again`);
+    assert.strictEqual(d.capabilitiesOptions['measure_battery.backup'].uiComponent, ui, `${id}: drawn as ${ui === null ? 'a tile again' : 'a battery again'}`);
+    const setting = (d.settings || []).flatMap((g) => g.children || [g]).find((s) => s.id === 'backup_power_soc');
+    assert.strictEqual(Boolean(setting), ui === null, `${id}: ${ui === null ? 'hidden, but no setting shows the reserve' : 'a setting appeared — the tile could be hidden here too'}`);
   }
+  // The hidden tile is only fine while the setting follows what the device reports.
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'drivers', 'luna2000_modbus', 'device.js'), 'utf8'),
+    /\['storageBackupPowerSoc',\s*'backup_power_soc'\]/, 'the backup SoC setting no longer follows the device');
   // Any other battery sub-capability would have the same problem.
   for (const d of manifest.drivers) {
     for (const cap of (d.capabilities || []).filter((c) => /^measure_battery\./.test(c))) {

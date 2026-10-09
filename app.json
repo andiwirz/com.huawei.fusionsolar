@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.282",
+  "version": "1.2.283",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -3827,8 +3827,7 @@
             "nl": "SoC voor noodstroom"
           },
           "insights": true,
-          "uiComponent": "sensor",
-          "icon": "/assets/capabilities/battery_backup_soc.svg"
+          "uiComponent": null
         },
         "meter_power.charged": {
           "title": {
@@ -4652,8 +4651,7 @@
             "nl": "SoC voor noodstroom"
           },
           "insights": true,
-          "uiComponent": "sensor",
-          "icon": "/assets/capabilities/battery_backup_soc.svg"
+          "uiComponent": "sensor"
         },
         "meter_power.chargeable_capacity": {
           "title": {
