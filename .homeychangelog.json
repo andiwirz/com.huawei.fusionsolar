@@ -1,4 +1,9 @@
 {
+  "1.2.306": {
+    "en": "LUNA2000 and EMMA battery: the tooltip of the working mode — in the device settings and on the flow card — is about half as long, one short line per option. The excess PV cards now say \"in TOU mode\" in their title, since the setting only takes effect there; the EMMA battery's tile says so too.",
+    "de": "LUNA2000- und EMMA-Batterie: Der Tooltip zum Betriebsmodus – in den Geräteeinstellungen und auf der Flow-Karte – ist etwa halb so lang, eine kurze Zeile pro Option. Die PV-Überschuss-Karten sagen jetzt „im TOU-Modus“ im Titel, weil die Einstellung nur dort wirkt; auch die Kachel der EMMA-Batterie sagt es.",
+    "nl": "LUNA2000- en EMMA-batterij: de tooltip van de bedrijfsmodus – in de apparaatinstellingen en op de flowkaart – is ongeveer half zo lang, één korte regel per optie. De kaarten voor PV-overschot zeggen nu „in TOU-modus” in hun titel, omdat de instelling alleen daar werkt; ook de tegel van de EMMA-batterij zegt het."
+  },
   "1.2.305": {
     "en": "LUNA2000 (Modbus): \"Start discharging until SoC %\" is now highlighted next to \"Start charging until SoC %\"; \"Set max charge power\" and \"Set max discharge power\" are no longer highlighted.",
     "de": "LUNA2000 (Modbus): „Entladen bis SoC % starten“ ist jetzt neben „Laden bis SoC % starten“ hervorgehoben; „Maximale Ladeleistung setzen“ und „Maximale Entladeleistung setzen“ sind es nicht mehr.",

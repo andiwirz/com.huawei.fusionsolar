@@ -812,7 +812,7 @@ power) and Notifications.
 | Battery SoC changed                      | LUNA2000 Modbus/EMMA            | `soc` (%)                                            | Fires on every SoC change                                                |
 | Battery charging state changed           | LUNA2000 Modbus/EMMA            | `state`                                              | `charging` / `discharging` / `idle`                                     |
 | Battery working mode changed             | LUNA2000 Modbus/EMMA            | `mode`                                               | Fires when the storage working mode changes                              |
-| Excess PV energy use changed             | LUNA2000 Modbus/EMMA            | `mode`                                               | Fires when switching between Feed to Grid / Charge Battery               |
+| Excess PV energy use in TOU mode changed | LUNA2000 Modbus/EMMA            | `mode`                                               | Fires when switching between Feed to Grid / Charge Battery               |
 | Remote dispatch mode changed             | LUNA2000 Modbus                 | `mode`                                               | Fires when the remote charge/discharge control mode changes              |
 | Battery SoC changed                      | Battery OpenAPI                 | `soc` (%)                                            | Fires on every SoC change                                                |
 | Battery charging state changed           | Battery OpenAPI                 | `state`                                              | `charging` / `discharging` / `idle`                                     |
@@ -846,7 +846,7 @@ power) and Notifications.
 | Battery is discharging                    | LUNA2000 Modbus                 | True when the battery is actively discharging                                       |
 | Battery status is                         | LUNA2000 Modbus / OpenAPI       | Checks the current battery operating state string                                   |
 | Storage working mode is                   | LUNA2000 Modbus/EMMA            | Checks the current storage working mode                                             |
-| Excess PV use is                          | LUNA2000 Modbus/EMMA            | Checks whether excess PV is set to feed-in or charge battery                        |
+| Excess PV energy use in TOU mode is       | LUNA2000 Modbus/EMMA            | Checks whether excess PV is set to feed-in or charge battery                        |
 | Remote charge/discharge mode is           | LUNA2000 Modbus                 | Checks the current remote dispatch control mode                                     |
 | Max charge power is above threshold       | LUNA2000 Modbus                 | True when register 47075 (max charge power) is above the given W value. Use "NOT below 1 W" to check if the limit has already been zeroed. |
 | Max charge power is below threshold       | LUNA2000 Modbus                 | True when register 47075 (max charge power) is below the given W value. Threshold 1 checks whether the limit is already set to 0. |

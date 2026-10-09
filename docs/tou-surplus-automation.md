@@ -32,7 +32,7 @@ overrides the working mode. Writes will be accepted and silently have no effect.
 
 ## Which action card is yours
 
-There are **two** cards with the identical title **“Set excess PV energy use (TOU)”** — one
+There are **two** cards with the identical title **“Set excess PV energy use in TOU mode”** — one
 per connection type. They are not interchangeable. Tell them apart by the hint shown under
 the title:
 
@@ -54,19 +54,19 @@ Both cards offer the same dropdown: **Feed to Grid** and **Charge Battery**.
 
 ```
 WHEN   EMS: battery is full
-AND    Excess PV energy use  is not  Feed to Grid
-THEN   Set excess PV energy use (TOU)  →  Feed to Grid
+AND    Excess PV energy use in TOU mode  is not  Feed to Grid
+THEN   Set excess PV energy use in TOU mode  →  Feed to Grid
 ```
 
 ### Flow 2 — battery has room again, charge it
 
 ```
 WHEN   EMS: battery is low
-AND    Excess PV energy use  is not  Charge Battery
-THEN   Set excess PV energy use (TOU)  →  Charge Battery
+AND    Excess PV energy use in TOU mode  is not  Charge Battery
+THEN   Set excess PV energy use in TOU mode  →  Charge Battery
 ```
 
-The condition card is called **“Excess PV energy use is / is not”** and works for both
+The condition card is called **“Excess PV energy use in TOU mode is / is not”** and works for both
 connection types, so there is only one of it.
 
 **Why the condition matters.** Without it, every trigger writes the register whether or not
@@ -97,8 +97,8 @@ on the battery's own SoC capability instead:
 ```
 WHEN   Battery SoC  changed
 AND    Battery SoC  is greater than  <your number>
-AND    Excess PV energy use  is not  Feed to Grid
-THEN   Set excess PV energy use (TOU)  →  Feed to Grid
+AND    Excess PV energy use in TOU mode  is not  Feed to Grid
+THEN   Set excess PV energy use in TOU mode  →  Feed to Grid
 ```
 
 The third line is doing real work here — a *changed* trigger fires on every poll, so

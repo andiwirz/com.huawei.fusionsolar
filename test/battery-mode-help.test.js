@@ -196,3 +196,56 @@ test('no battery mode card is left with a register-only hint', () => {
     }
   }
 });
+
+// ── short enough to read (1.2.306) ──────────────────────────────────────────
+
+// 1.2.284 gave every option its own explanation; by 1.2.305 the (i) had grown to 1700
+// characters and Andi found it too long, in the settings and on the card alike. Now: one
+// line to say what the mode is, one short line per option (the three a LUNA2000 must not
+// use share one). The checks above still demand that every option is named.
+test('the working-mode (i) stays short: one line per option, under 1000 characters', () => {
+  const hints = [
+    ...['luna2000_set_working_mode', 'luna2000_emma_set_working_mode'].map((id) => [id, action(id).hint]),
+    ...['luna2000_modbus', 'luna2000_emma_modbus'].map((id) => [id, labelRow(id, 'mode_storage_working').hint]),
+  ];
+  for (const [id, hint] of hints) {
+    for (const lang of LANGS) {
+      assert.ok(hint[lang].length <= 1000, `${id} (${lang}) is ${hint[lang].length} characters again`);
+      for (const line of hint[lang].split('\n')) {
+        assert.ok(line.length <= 230, `${id} (${lang}) has a line of ${line.length} characters: "${line}"`);
+      }
+    }
+  }
+});
+
+// The excess-PV setting does something only in Time of Use. The setting and the tile said so;
+// the cards said it in the tooltip at most, and the flow showed "PV-Überschuss-Nutzung auf
+// Batterie laden setzen" as if it always applied.
+test('the excess-PV cards say TOU in the title the flow shows', () => {
+  const cards = [
+    ...['luna2000_set_excess_pv', 'luna2000_emma_set_excess_pv'].map((id) => action(id)),
+    manifest.flow.conditions.find((c) => c.id === 'luna2000_excess_pv_is'),
+    manifest.flow.triggers.find((c) => c.id === 'luna2000_excess_pv_changed'),
+  ];
+  for (const c of cards) {
+    for (const lang of LANGS) {
+      assert.match(c.title[lang], /TOU/, `${c.id} title (${lang})`);
+      if (c.titleFormatted) assert.match(c.titleFormatted[lang], /TOU/, `${c.id} titleFormatted (${lang})`);
+    }
+  }
+  // …and the tooltip names the working mode by the label its card shows, in that card's language
+  for (const [id, modeCard] of [['luna2000_set_excess_pv', 'luna2000_set_working_mode'],
+    ['luna2000_emma_set_excess_pv', 'luna2000_emma_set_working_mode']]) {
+    const tou = action(modeCard).args.find((a) => a.type === 'dropdown').values.find((v) => v.id === '5').label;
+    const QUOTES = { en: ['"', '"'], de: ['„', '“'], nl: ['„', '”'] };
+    for (const lang of LANGS) {
+      assert.ok(action(id).hint[lang].includes(QUOTES[lang][0] + tou[lang] + QUOTES[lang][1]), `${id} (${lang})`);
+    }
+  }
+  // the tiles agree: the EMMA battery's said "PV-Überschuss-Nutzung" with no mode
+  for (const d of ['luna2000_modbus', 'luna2000_emma_modbus']) {
+    for (const lang of LANGS) {
+      assert.match(driver(d).capabilitiesOptions.storage_excess_pv_energy_use_in_tou.title[lang], /TOU/, `${d} tile (${lang})`);
+    }
+  }
+});
