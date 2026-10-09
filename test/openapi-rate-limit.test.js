@@ -115,6 +115,10 @@ test('a refused type does not put "no data for device type" on the device', asyn
 
 test('a genuinely silent type still says so', async () => {
   const { s, battery } = fakePlant();
+  // Since 1.2.280 the first empty answer with nothing cached gets one cycle of grace — this
+  // is the first poll after a start. Silent twice in a row, it is silent.
+  await s.poll({ station: OK_STATION, bat: NOTHING, sensor: SENSOR_DATA, emma: EMMA_DATA });
+  assert.strictEqual(battery.available, true, 'one empty answer right after a start took the battery offline');
   await s.poll({ station: OK_STATION, bat: NOTHING, sensor: SENSOR_DATA, emma: EMMA_DATA });
   assert.strictEqual(battery.available, false);
   assert.match(battery.reasons[0], /No data from FusionSolar for device type 39/,

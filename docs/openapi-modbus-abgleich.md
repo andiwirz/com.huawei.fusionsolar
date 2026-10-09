@@ -1,7 +1,7 @@
 # OpenAPI gegen Modbus — Abgleich und Änderungsliste
 
 **Entwicklernotiz, kein Benutzerdokument.** Aufgenommen bei App-Version 1.2.211, **zuletzt
-Punkt für Punkt gegen den Code nachgeprüft bei 1.2.279** (2026-10-09). Entstanden aus Issue #25
+Punkt für Punkt gegen den Code nachgeprüft bei 1.2.279** (2026-10-09), D2 bei 1.2.280. Entstanden aus Issue #25
 (Jamesquare78, Homey Energy zeigt die Batterie nicht in der Summe) und einer Messreihe auf einer
 Anlage, die **beide Pfade gleichzeitig** betreibt — Modbus über 10.160.13.72 und OpenAPI über
 eu5, Station `NE=141986968`. Dadurch messen beide Treibersätze dieselbe Hardware im selben
@@ -29,7 +29,7 @@ werden.
 | C2 | offen: „Full"/„Empty" fest englisch | ebd. ≈ Z. 249 und 251 |
 | C3 | erledigt (1.2.212); seit 1.2.213 kommt der SoH aus `battery_unit_info[].soh` | `test/openapi-unread-fields.test.js` |
 | D1 | offen: alle vier Hausbatterie-Treiber tragen `batteries: ["INTERNAL"]`; LUNA2000 Modbus setzt es sogar nach der Modulzahl per `setEnergy`. Vor dem Streichen klären, ob Homey es für die Hausbatterie braucht | `luna2000_modbus/device.js`, Modulzählung |
-| D2 | teilweise: abgewiesene Aufrufe (407/403/429) setzen seit 1.2.220 nicht mehr offline (Issue #28), und „ohne Daten" heisst seit 1.2.210, dass **jeder** vorhandene Typ fehlt. Offen: ein einziger ausgelassener Zyklus genügt dafür noch, ein Gerät ohne vorhandenen Typ bleibt stumm, `_devIdsByType` wird bis zum Neustart einmal geholt | `lib/openapi-coordinator.js`, `test/openapi-starved-type.test.js` |
+| D2 | erledigt (1.2.280). Im Betrieb überbrückt der Cache seit 1.2.197 bis zu drei leere Antworten; abgewiesene Aufrufe (407/403/429) setzen seit 1.2.220 nicht mehr offline (Issue #28); „ohne Daten" heisst seit 1.2.210, dass **jeder** vorhandene Typ fehlt. 1.2.280 schliesst den Rest: nach einem Start (kein Cache) bekommt die erste leere Antwort einen Zyklus Gnadenfrist; die Geräteliste wird täglich neu geholt und nach 15 Minuten nochmals, solange ein Gerät darin fehlt; fehlt es auch in der zweiten Liste, wird es mit „FusionSolar lists no device of type …" als nicht verfügbar markiert; eine leere Liste ersetzt nie eine volle | `lib/openapi-coordinator.js`, `test/openapi-device-list.test.js`, `test/openapi-starved-type.test.js` |
 | Abschnitt 5 | Wechselrichter und Leistungssensor sind konform. Offen: SDongle (kein energy-Block, `measure_power` ist der Hausverbrauch) und iSitePower Home (`cumulative`, der Export fest auf 0) | |
 | Ungenutzte Felder | seither genutzt: `rated_capacity` (1.2.257, `battery_rated_capacity`), `mppt_total_cap` (1.2.262). Weiter ungenutzt: `mppt_1_cap`/`mppt_2_cap`, `power_factor`, `reactive_power`, die Erträge in Geld. Die AC-Phasenwerte des Wechselrichters sind entfernt | |
 
@@ -320,16 +320,14 @@ Vergleichen in Ordnung, für den Dauerbetrieb nicht — eine Seite gehört auf
 
 ## 7 · Reihenfolge
 
-Stand 1.2.279 — erledigt sind die Vorzeichen (A1, B1), der Ertragszähler des Wechselrichters
-(anders gelöst, siehe Tabelle oben) und C3. Was bleibt, nach Wirkung geordnet:
+Stand 1.2.280 — erledigt sind die Vorzeichen (A1, B1), der Ertragszähler des Wechselrichters
+(anders gelöst, siehe Tabelle oben), C3 und die Verfügbarkeitsregel (D2). Was bleibt, nach
+Wirkung geordnet:
 
-1. **D2, der Rest** — ein einziger ausgelassener Zyklus setzt ein Gerät mit gültigen Daten
-   offline. Mehrere Zyklen in Folge verlangen, und das Gerät ohne vorhandenen Typ nicht stumm
-   lassen.
-2. **SDongle und iSitePower Home aus Energy nehmen** (Abschnitt 5) — beide melden den
+1. **SDongle und iSitePower Home aus Energy nehmen** (Abschnitt 5) — beide melden den
    Hausverbrauch ein zweites Mal.
-3. **C1/C2** — Batterie-Fassade. Risikoarm.
-4. **A4-Rest, A3, B7, B8** — die Zustandszeile beim ersten Abruf, Namen und Wortlaute.
-5. **D1** — erst nach Klärung, ob Homey `batteries` für die Hausbatterie braucht.
+2. **C1/C2** — Batterie-Fassade. Risikoarm.
+3. **A4-Rest, A3, B7, B8** — die Zustandszeile beim ersten Abruf, Namen und Wortlaute.
+4. **D1** — erst nach Klärung, ob Homey `batteries` für die Hausbatterie braucht.
 
 A2 bleibt bewusst offen, bis eine EMMA-Messung vorliegt.
