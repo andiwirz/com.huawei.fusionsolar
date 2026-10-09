@@ -109,6 +109,18 @@
       line-height: 1.5;
     }
 
+    .energy-warning {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      background: #fff8e6;
+      border: 1px solid #f5d48a;
+      color: #6b4a00;
+    }
+
     .status.success { background: #edf7f1; border: 1px solid #b2dfcb; color: #1a6638; display: block; }
     .status.error   { background: #fdf0ee; border: 1px solid #f5c2ba; color: #8b1a0e; display: block; }
 
@@ -162,6 +174,9 @@
 
   <h2 id="title">FusionSolar Plant</h2>
   <p class="subtitle" id="subtitle">Enter your Kiosk URL to connect your plant to Homey.</p>
+
+  <!-- Shown when a SUN2000 is already paired: this device then has to be excluded from Energy. -->
+  <div class="energy-warning" id="energy-warning"></div>
 
   <div class="field">
     <label id="label-name">Plant name</label>
@@ -238,6 +253,7 @@
         labelTotal: 'Total',
         errNoUrl: 'Please enter a Kiosk URL.',
         successMsg: '✓ Connected',
+        energyWarning: '⚠ A SUN2000 inverter is already paired ({names}) and already reports your solar production to Homey Energy. After adding this kiosk device, exclude it from Energy: open the device → Settings → Energy → "Exclude from Energy". Otherwise Homey counts the production twice.',
       },
       de: {
         title: 'FusionSolar Anlage',
@@ -263,6 +279,7 @@
         labelTotal: 'Gesamt',
         errNoUrl: 'Bitte gib eine Kiosk URL ein.',
         successMsg: '✓ Verbunden',
+        energyWarning: '⚠ In Homey ist bereits ein SUN2000-Wechselrichter gekoppelt ({names}), und er meldet die Solarproduktion schon an Homey Energy. Dieses Kiosk-Gerät nach dem Hinzufügen aus Energy ausnehmen: Gerät öffnen → Einstellungen → Energie → ausschliessen („Exclude from Energy“). Sonst zählt Homey die Produktion doppelt.',
       },
     };
 
@@ -286,6 +303,16 @@
     document.getElementById('kpi-label-daily').textContent = t.labelDaily;
     document.getElementById('kpi-label-month').textContent = t.labelMonth;
     document.getElementById('kpi-label-total').textContent = t.labelTotal;
+
+    // Asked as the view opens, because "Connect" adds the device straight away: the warning
+    // has to be read before that, not after.
+    Homey.emit('sun2000_present').then(function(r) {
+      var names = (r && r.names) || [];
+      if (!names.length) return;
+      var el = document.getElementById('energy-warning');
+      el.textContent = t.energyWarning.replace('{names}', names.join(', '));
+      el.style.display = 'block';
+    }).catch(function() { /* no warning rather than no pairing */ });
 
     async function connect() {
       const url  = document.getElementById('url').value.trim();

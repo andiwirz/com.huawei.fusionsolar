@@ -2,6 +2,7 @@
 
 const { Driver } = require('homey');
 const { parseKioskUrl, buildApiUrl, fetchKioskData, extractKpiValues } = require('../../lib/kiosk-api');
+const { sun2000Names } = require('../../lib/sun2000-presence');
 
 class FusionSolarKioskDriver extends Driver {
 
@@ -10,6 +11,10 @@ class FusionSolarKioskDriver extends Driver {
   }
 
   async onPair(session) {
+    // The pairing view asks this as it opens: a SUN2000 already paired means the kiosk
+    // device has to be excluded from Homey Energy, and the view says so before it is added.
+    session.setHandler('sun2000_present', async () => ({ names: sun2000Names(this.homey) }));
+
     // set_kiosk_url: validate URL, fetch live data, return kpi + kk
     session.setHandler('set_kiosk_url', async ({ url, name }) => {
       const kioskUrl = (url || '').trim();

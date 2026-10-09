@@ -41,6 +41,8 @@ Connection via the public Kiosk URL. No FusionSolar account required.
 
 A reading the kiosk endpoint does not deliver is **never reported as zero**. Its payload is JSON escaped inside more JSON, and a response that fails to unpack used to fall through to a complete set of zeros — nothing failed, the device stayed available, and the tile read `0 W`, indistinguishable from a roof in the dark. A missing figure now keeps its last known value, a response carrying no measurements at all marks the device unavailable with the real reason, and no flow fires on a value that never arrived. This mattered most for the lifetime counter, from which Homey derives the daily yield by difference: writing `0` and then the true reading again booked the whole lifetime output as a single day.
 
+**Beside a SUN2000, exclude the kiosk device from Homey Energy.** A SUN2000 paired by Modbus, through an EMMA or from the cloud already reports the plant's production to Energy; the kiosk device reports the same production again, and Homey counts it twice. Homey's own *Exclude from Energy* setting (device → Settings → Energy) fixes that, but only the owner can set it. So the pairing view warns before the kiosk device is added, and the device carries a warning for as long as a SUN2000 is paired and the exclusion is not seen. If Homey does not let the app see the exclusion, tick *Excluded from Energy* in the kiosk device's settings to clear the warning; the app log says once which of the two applies (`Homey Energy: "Exclude from Energy" …`).
+
 ---
 
 ### Inverter SUN2000 (OpenAPI)
@@ -704,7 +706,8 @@ The opposite direction is reported honestly too. What the EMS actually fires to 
 | Setting           | Default  | Description                                   |
 |-------------------|----------|-----------------------------------------------|
 | Kiosk URL         | –        | Public Kiosk URL of the plant                 |
-| Update interval   | 10 min   | How often data is fetched (min. 10 min)       |
+| Update interval   | 10 min   | How often data is fetched (min. 5 min)        |
+| Excluded from Energy | off   | Clears the Energy warning beside a SUN2000 once the device is excluded from Energy, if Homey does not let the app see that |
 
 ### OpenAPI (SUN2000 / LUNA2000 / iSitePower-M)
 
@@ -801,8 +804,8 @@ power) and Notifications.
 
 | Card                                     | Device                          | Tokens                                               | Description                                                              |
 |------------------------------------------|---------------------------------|------------------------------------------------------|--------------------------------------------------------------------------|
-| Power output changed                     | Kiosk                           | `power` (W)                                          | Fires on every power change                                              |
-| Daily yield updated                      | Kiosk                           | `daily_energy`                                       | Fires when daily yield is updated                                        |
+| Power output changed                     | Kiosk                           | `power` (W)                                          | Fires on every kiosk update (10 min by default), also when unchanged     |
+| Daily yield updated                      | Kiosk                           | `daily_energy`                                       | Fires on every kiosk update; Huawei refreshes the figure about every 30 min |
 | Power output changed                     | Inverter SUN2000 Modbus/EMMA    | `power` (W)                                          | Fires on every power change                                              |
 | Power output changed                     | Inverter SUN2000 OpenAPI        | `power` (W)                                          | Fires on every power change                                              |
 | Battery SoC changed                      | LUNA2000 Modbus/EMMA            | `soc` (%)                                            | Fires on every SoC change                                                |

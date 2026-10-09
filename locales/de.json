@@ -1054,5 +1054,8 @@
       "redacted": "<gesetzt, nicht angezeigt>",
       "redactNote": "API-Schlüssel, Passwörter und System-Codes sind durch <gesetzt, nicht angezeigt> ersetzt. Vor dem Veröffentlichen trotzdem durchsehen."
     }
+  },
+  "kiosk": {
+    "energyWarning": "Ein SUN2000-Wechselrichter ist ebenfalls gekoppelt und meldet die Solarproduktion bereits an Homey Energy. Dieses Gerät aus Energy ausnehmen (Einstellungen → Energie → „Exclude from Energy“), sonst zählt Homey die Produktion doppelt. Bleibt diese Meldung danach stehen, in den Einstellungen dieses Geräts „Aus Energy ausgenommen“ ankreuzen."
   }
 }

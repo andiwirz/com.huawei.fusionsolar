@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.294",
+  "version": "1.2.295",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -1960,6 +1960,31 @@
                 "en": "How often to fetch data. Huawei caches data for ~30 minutes.",
                 "de": "Wie oft Daten abgerufen werden. Huawei cached Daten ~30 Minuten.",
                 "nl": "Hoe vaak gegevens worden opgehaald. Huawei bewaart gegevens ongeveer 30 minuten in de cache."
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Homey Energy",
+            "de": "Homey Energy",
+            "nl": "Homey Energie"
+          },
+          "children": [
+            {
+              "id": "excluded_from_energy",
+              "type": "checkbox",
+              "label": {
+                "en": "Excluded from Energy",
+                "de": "Aus Energy ausgenommen",
+                "nl": "Uitgesloten van Energie"
+              },
+              "value": false,
+              "hint": {
+                "en": "With a SUN2000 inverter paired as well, this device reports the same solar production to Homey Energy a second time, so it has to be excluded there (Settings → Energy → \"Exclude from Energy\"), and the device shows a warning until it is. Tick this once that is done, if the warning stays: it only hides the warning, the exclusion itself is Homey's setting.",
+                "de": "Ist auch ein SUN2000-Wechselrichter gekoppelt, meldet dieses Gerät dieselbe Solarproduktion ein zweites Mal an Homey Energy; es muss dort ausgenommen werden (Einstellungen → Energie → „Exclude from Energy“), und bis dahin zeigt das Gerät eine Warnung. Hier ankreuzen, wenn das erledigt ist und die Warnung trotzdem stehen bleibt: Es blendet nur die Warnung aus, das Ausnehmen selbst ist Homeys Einstellung.",
+                "nl": "Is er ook een SUN2000-omvormer gekoppeld, dan meldt dit apparaat dezelfde zonneproductie een tweede keer aan Homey Energie; het moet daar worden uitgesloten (Instellingen → Energie → „Exclude from Energy”), en tot dan toont het apparaat een waarschuwing. Vink dit aan als dat gedaan is en de waarschuwing toch blijft: het verbergt alleen de waarschuwing, het uitsluiten zelf is de instelling van Homey."
               }
             }
           ]
