@@ -977,15 +977,15 @@ class LUNA2000ModbusDevice extends Device {
 
     this.homey.flow
       .getConditionCard('luna2000_working_mode_is')
-      .registerRunListener((args) => this.getCapabilityValue('storage_working_mode_settings') === args.mode);
+      .registerRunListener((args) => args.device.getCapabilityValue('storage_working_mode_settings') === args.mode);
 
     this.homey.flow
       .getConditionCard('luna2000_excess_pv_is')
-      .registerRunListener((args) => this.getCapabilityValue('storage_excess_pv_energy_use_in_tou') === args.mode);
+      .registerRunListener((args) => args.device.getCapabilityValue('storage_excess_pv_energy_use_in_tou') === args.mode);
 
     this.homey.flow
       .getConditionCard('luna2000_remote_mode_is')
-      .registerRunListener((args) => this.getCapabilityValue('remote_charge_discharge_control_mode') === args.mode);
+      .registerRunListener((args) => args.device.getCapabilityValue('remote_charge_discharge_control_mode') === args.mode);
 
     this.homey.flow
       .getConditionCard('luna2000_max_charge_power_above')

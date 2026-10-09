@@ -83,7 +83,7 @@ class DTSU666ModbusDevice extends Device {
 
     this.homey.flow
       .getConditionCard('dtsu666_meter_status_is')
-      .registerRunListener((args) => this.getCapabilityValue('dtsu666_meter_status') === args.status);
+      .registerRunListener((args) => args.device.getCapabilityValue('dtsu666_meter_status') === args.status);
   }
 
   // ─── Capabilities ──────────────────────────────────────────────────────────

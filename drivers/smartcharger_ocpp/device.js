@@ -1463,11 +1463,53 @@ class SmartChargerOcppDevice extends Device {
     this.log(`[OCPP] Charging limit set to ${amps}A`);
   }
 
+  // The "Set max charging current" card. 0 A pauses — what its tooltip promised all along, and
+  // what an EMS stop sends through "EMS wants to set charger current" ({ amps: 0 }), which
+  // setChargingLimit refuses (6–32 A only), so a flow wired that way failed on every stop.
+  // A session paused this way resumes at the next current above 0; one paused by hand, or by
+  // anything else, stays paused until it is resumed the usual way.
+  async setChargingLimitFromCard(amps) {
+    if (amps === 0) {
+      if (!this._txnId) {
+        this.log('[OCPP] 0 A with no session running — nothing to pause');
+        return;
+      }
+      const wasPaused = !!(this.stitchedSession && this.stitchedSession.paused);
+      await this.pauseCharging();
+      if (!wasPaused && this.stitchedSession && this.stitchedSession.paused) {
+        this.stitchedSession.zeroAmpPause = true;
+        await this._persistStitched();
+      }
+      return;
+    }
+    if (this.stitchedSession && this.stitchedSession.paused && this.stitchedSession.zeroAmpPause) {
+      if (!Number.isInteger(amps) || amps < MIN_AMPS || amps > MAX_AMPS) {
+        throw new Error(`Invalid amps: ${amps}. Must be a whole number between ${MIN_AMPS} and ${MAX_AMPS}.`);
+      }
+      this._validateProfileRequest(amps, this._getPhases());
+      this.log(`[OCPP] ${amps} A after a 0 A pause — resuming`);
+      this.stitchedSession.resumeAmps = amps;
+      return this.resumeCharging('user');
+    }
+    return this.setChargingLimit(amps);
+  }
+
+  // Finishing — the charger done, the cable still in — maps to 'idle' like an empty socket, so
+  // it is asked for by its raw name, the way _handleStateChange already does to tell a real
+  // unplug from the end of a session.
+  _carPluggedIn() {
+    const state = this._chargingState();
+    return state === 'connected' || state === 'charging'
+      || (state === 'idle' && this._prevRawStatus === 'Finishing');
+  }
+
   // ─── Offline watchdog ─────────────────────────────────────────────────────
 
   async _checkChargerOnline() {
     const server   = OcppServer.getInstance(this.homey);
-    const lastSeen = server ? server.lastMessageAt : null;
+    // This charger's own last message, not the server's: with two chargers on one Homey the
+    // server-wide time kept a silent one looking online for as long as the other talked.
+    const lastSeen = server ? server.lastMessageAtFor(this.getSetting('station_id') || '') : null;
     const silentMs = lastSeen ? (Date.now() - lastSeen) : null;
     const isOffline = !server || silentMs === null || silentMs > OFFLINE_AFTER_MS;
 
@@ -1678,13 +1720,10 @@ class SmartChargerOcppDevice extends Device {
       .registerRunListener(async (args) => args.device._chargingState() === 'charging');
 
     // Plugged in covers everything from the cable going in to it coming out: waiting for a
-    // start, charging, paused. Only 'idle' and 'error' are not plugged in — and 'error'
-    // means the charger stopped telling us, which is not the same as an empty socket.
+    // start, charging, paused, finished. 'error' means the charger stopped telling us, which
+    // is not the same as an empty socket — and not proof of a cable either.
     this.homey.flow.getConditionCard('ocpp_car_is_plugged_in')
-      .registerRunListener(async (args) => {
-        const state = args.device._chargingState();
-        return state === 'connected' || state === 'charging';
-      });
+      .registerRunListener(async (args) => args.device._carPluggedIn());
 
     this.homey.flow.getConditionCard('ocpp_session_status_is')
       .registerRunListener(async (args) =>
@@ -1707,7 +1746,7 @@ class SmartChargerOcppDevice extends Device {
     // instance happened to register last, the listener operates on the charger the Flow
     // actually names. The registration is still per device, which is now harmless.
     this.homey.flow.getActionCard('ocpp_set_max_current')
-      .registerRunListener(async (args) => args.device.setChargingLimit(args.amperes));
+      .registerRunListener(async (args) => args.device.setChargingLimitFromCard(Number(args.amperes)));
 
     this.homey.flow.getActionCard('ocpp_remote_start')
       .registerRunListener(async (args) => args.device.startCharging());

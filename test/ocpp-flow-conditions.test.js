@@ -54,10 +54,12 @@ function collectListeners() {
 const LISTENERS = collectListeners();
 
 // A stand-in for whichever charger the flow points at.
-function device({ state = 'idle', offline = false, sessionStatus = null } = {}) {
+function device({ state = 'idle', raw = null, offline = false, sessionStatus = null } = {}) {
   return {
     chargerOffline: offline,
+    _prevRawStatus: raw,
     _chargingState: () => state,
+    _carPluggedIn: ChargerDevice.prototype._carPluggedIn,
     getCapabilityValue: () => sessionStatus,
   };
 }
@@ -98,10 +100,13 @@ test('charging means current is flowing, not merely that a cable is in', async (
 });
 
 // Plugged in spans everything from the cable going in to it coming out.
-test('plugged in covers waiting and charging, and nothing else', async () => {
-  const run = (state) => LISTENERS.ocpp_car_is_plugged_in({ device: device({ state }) });
+test('plugged in covers waiting, charging and finished, and nothing else', async () => {
+  const run = (state, raw = null) => LISTENERS.ocpp_car_is_plugged_in({ device: device({ state, raw }) });
   assert.strictEqual(await run('connected'), true, 'a car waiting to start is plugged in');
   assert.strictEqual(await run('charging'), true, 'a charging car is plugged in');
+  assert.strictEqual(await run('idle', 'Available'), false);
+  // Finishing maps to idle like an empty socket, but the cable is still in (1.2.287).
+  assert.strictEqual(await run('idle', 'Finishing'), true, 'a finished car with the cable still in counts as unplugged');
   assert.strictEqual(await run('idle'), false);
   // A lost connection is not an empty socket — the charger simply stopped telling us.
   assert.strictEqual(await run('error'), false,

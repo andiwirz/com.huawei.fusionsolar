@@ -202,7 +202,8 @@ class LUNA2000EmmaModbusDevice extends Device {
     this.homey.flow
       .getActionCard('luna2000_emma_set_max_grid_charge_power')
       .registerRunListener(({ device, power }) => {
-        const kw  = Math.max(0, parseFloat(power) || 0);
+        // Register 40002 takes 0–50 kW (Huawei's EMMA table) — the card allowed 100 until 1.2.287.
+        const kw  = Math.min(50, Math.max(0, parseFloat(power) || 0));
         const raw = Math.round(kw * 1000);
         this.log(`Set max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);
         this._writeInProgress = true;
@@ -268,11 +269,11 @@ class LUNA2000EmmaModbusDevice extends Device {
 
     this.homey.flow
       .getConditionCard('luna2000_working_mode_is')
-      .registerRunListener((args) => this.getCapabilityValue('storage_working_mode_settings') === args.mode);
+      .registerRunListener((args) => args.device.getCapabilityValue('storage_working_mode_settings') === args.mode);
 
     this.homey.flow
       .getConditionCard('luna2000_excess_pv_is')
-      .registerRunListener((args) => this.getCapabilityValue('storage_excess_pv_energy_use_in_tou') === args.mode);
+      .registerRunListener((args) => args.device.getCapabilityValue('storage_excess_pv_energy_use_in_tou') === args.mode);
   }
 
   // ─── Polling ───────────────────────────────────────────────────────────────

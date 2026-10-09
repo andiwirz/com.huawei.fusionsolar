@@ -62,6 +62,7 @@ function otherCharger() {
     id: 'a-completely-different-charger',
     calls,
     setChargingLimit: async (...a) => { calls.push(['setChargingLimit', ...a]); },
+    setChargingLimitFromCard: async (...a) => { calls.push(['setChargingLimitFromCard', ...a]); },
     startCharging:    async (...a) => { calls.push(['startCharging', ...a]); },
     stopCharging:     async (...a) => { calls.push(['stopCharging', ...a]); },
     pauseCharging:    async (...a) => { calls.push(['pauseCharging', ...a]); },
@@ -106,7 +107,8 @@ test('no listener filters on the registering device any more', () => {
 test('the arguments are passed through, not dropped', async () => {
   const d1 = otherCharger();
   await ACTIONS.ocpp_set_max_current({ device: d1, amperes: 12 });
-  assert.deepStrictEqual(d1.calls, [['setChargingLimit', 12]]);
+  // Through setChargingLimitFromCard since 1.2.287, which turns 0 A into a pause.
+  assert.deepStrictEqual(d1.calls, [['setChargingLimitFromCard', 12]]);
 
   const d2 = otherCharger();
   await ACTIONS.ocpp_start_charging_at_phase({ device: d2, amperes: 10, phases: '1' });

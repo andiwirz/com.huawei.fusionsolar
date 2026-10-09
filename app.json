@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.286",
+  "version": "1.2.287",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -1551,6 +1551,14 @@
             "en": "Solar Dehumidifier",
             "de": "Solar-Entfeuchter",
             "nl": "Zonne-ontvochtiger"
+          }
+        },
+        {
+          "id": "solar_aircon",
+          "title": {
+            "en": "Solar Air Conditioning",
+            "de": "Solar-Klimaanlage",
+            "nl": "Zonne-airco"
           }
         },
         {
@@ -10852,9 +10860,9 @@
           "nl": "Maximale laadstroom instellen op [[amperes]] A (OCPP)"
         },
         "hint": {
-          "en": "Sets the maximum charging current via OCPP SetChargingProfile. Set to 0 to pause charging.",
-          "de": "Setzt den maximalen Ladestrom via OCPP SetChargingProfile. 0 hält den Ladevorgang an.",
-          "nl": "Stelt de maximale laadstroom in via OCPP SetChargingProfile. Op 0 zetten pauzeert het laden."
+          "en": "Sets the maximum charging current via OCPP SetChargingProfile (6–32 A). 0 A pauses a running session, as \"Pause charging (OCPP)\" does — which is what an EMS stop sends; a session paused that way resumes at the next current above 0. 1–5 A is refused. Without a running session, the value is used for the next start.",
+          "de": "Setzt den maximalen Ladestrom über OCPP SetChargingProfile (6–32 A). 0 A pausiert eine laufende Sitzung wie „Laden pausieren (OCPP)“ – das schickt auch ein EMS-Stopp; eine so pausierte Sitzung läuft beim nächsten Strom über 0 weiter. 1–5 A werden abgelehnt. Ohne laufende Sitzung gilt der Wert für den nächsten Start.",
+          "nl": "Stelt de maximale laadstroom in via OCPP SetChargingProfile (6–32 A). 0 A pauzeert een lopende sessie zoals „Laden pauzeren (OCPP)” – dat stuurt ook een EMS-stop; een zo gepauzeerde sessie gaat verder bij de volgende stroom boven 0. 1–5 A wordt geweigerd. Zonder lopende sessie geldt de waarde voor de volgende start."
         },
         "args": [
           {
@@ -11861,9 +11869,9 @@
           "nl": "Max. laadvermogen uit het net instellen op [[power]] kW"
         },
         "hint": {
-          "en": "Sets the maximum power the LUNA2000 battery may draw from the grid for charging via EMMA Modbus (register 40002). Huawei defines it for the working mode \"Time of Use (TOU)\".",
-          "de": "Setzt die maximale Leistung, mit der die LUNA2000-Batterie über das Netz geladen werden darf, über EMMA Modbus (Register 40002). Huawei definiert sie für den Betriebsmodus „Zeitabhängige Nutzung (TOU)“.",
-          "nl": "Stelt in met hoeveel vermogen de LUNA2000-batterij maximaal uit het net mag laden, via EMMA Modbus (register 40002). Huawei definieert het voor de bedrijfsmodus „Tijdgebonden gebruik (TOU)”."
+          "en": "Sets the maximum power the LUNA2000 battery may draw from the grid for charging via EMMA Modbus (register 40002), 0–50 kW. Huawei defines it for the working mode \"Time of Use (TOU)\".",
+          "de": "Setzt die maximale Leistung, mit der die LUNA2000-Batterie über das Netz geladen werden darf, über EMMA Modbus (Register 40002), 0–50 kW. Huawei definiert sie für den Betriebsmodus „Zeitabhängige Nutzung (TOU)“.",
+          "nl": "Stelt in met hoeveel vermogen de LUNA2000-batterij maximaal uit het net mag laden, via EMMA Modbus (register 40002), 0–50 kW. Huawei definieert het voor de bedrijfsmodus „Tijdgebonden gebruik (TOU)”."
         },
         "args": [
           {
@@ -11880,7 +11888,7 @@
               "nl": "Vermogen (kW)"
             },
             "min": 0,
-            "max": 100,
+            "max": 50,
             "step": 0.1,
             "placeholder": {
               "en": "e.g. 3.0",
@@ -13541,9 +13549,9 @@
           "nl": "Auto !{{is|is niet}} aangesloten"
         },
         "hint": {
-          "en": "True whenever the cable is connected — including while charging, while paused, and while waiting for a start.",
-          "de": "Wahr, sobald das Kabel steckt — auch während des Ladens, während einer Pause und während auf den Start gewartet wird.",
-          "nl": "Waar zodra de kabel is aangesloten — ook tijdens het laden, tijdens een pauze en terwijl op de start wordt gewacht."
+          "en": "True whenever the cable is connected — while waiting for a start, charging, paused, and after charging has finished (Finishing). False while the charger reports Unavailable or Faulted: it cannot tell then.",
+          "de": "Wahr, solange das Kabel steckt – beim Warten auf den Start, beim Laden, in einer Pause und nach dem Ende des Ladens (Finishing). Falsch, solange die Ladestation Unavailable oder Faulted meldet: Dann weiss sie es nicht.",
+          "nl": "Waar zolang de kabel is aangesloten – bij het wachten op de start, tijdens het laden, tijdens een pauze en na het einde van het laden (Finishing). Onwaar zolang de laadpaal Unavailable of Faulted meldt: dan weet hij het niet."
         },
         "args": [
           {
@@ -15064,6 +15072,14 @@
                 }
               },
               {
+                "id": "solar_aircon",
+                "label": {
+                  "en": "Solar Air Conditioning",
+                  "de": "Solar-Klimaanlage",
+                  "nl": "Zonne-airco"
+                }
+              },
+              {
                 "id": "solar_multi",
                 "label": {
                   "en": "Solar (multiple devices)",
@@ -15093,6 +15109,14 @@
                   "en": "Low-Tariff EV Charging",
                   "de": "Niedertarif-EV-Laden",
                   "nl": "Laagtarief laden"
+                }
+              },
+              {
+                "id": "instant_ev",
+                "label": {
+                  "en": "Instant Charging",
+                  "de": "Sofortladen",
+                  "nl": "Direct laden"
                 }
               },
               {

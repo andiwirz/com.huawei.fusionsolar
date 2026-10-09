@@ -325,7 +325,7 @@ class SUN2000ModbusDevice extends Device {
 
     this.homey.flow
       .getConditionCard('sun2000_status_is')
-      .registerRunListener((args) => this.getCapabilityValue('huawei_status') === args.status);
+      .registerRunListener((args) => args.device.getCapabilityValue('huawei_status') === args.status);
 
     const host   = () => this.getSetting('address');
     const port   = () => parseInt(this.getSetting('port'), 10) || 502;
