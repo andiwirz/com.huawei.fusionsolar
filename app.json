@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.289",
+  "version": "1.2.290",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -13009,9 +13009,9 @@
           "nl": "Vermogensgrens op het netaansluitpunt instellen op [[power]] W"
         },
         "hint": {
-          "en": "Sets the power limit at the grid connection point (register 47079, UINT32). Limits total system power flow at the grid-tied point.",
-          "de": "Setzt die Leistungsgrenze am Netzkopplungspunkt (Register 47079, UINT32). Begrenzt den gesamten Leistungsfluss am Netzanschluss.",
-          "nl": "Stelt de vermogensgrens op het netaansluitpunt in (register 47079, UINT32). Begrenst de totale vermogensstroom op het aansluitpunt."
+          "en": "Sets register 47079, which Huawei calls \"[Energy storage unit] Power limit of the grid-tied point\": 0 W up to the inverter's maximum active power (Pmax), default Pmax, supported only by certain models (Solar Inverter Modbus Interface Definitions V3.0; the SPC177 register list does not have it). The table says no more about what it limits. A model without it refuses the write, which shows only in the app log.",
+          "de": "Setzt Register 47079, bei Huawei „[Energy storage unit] Power limit of the grid-tied point“: 0 W bis zur maximalen Wirkleistung des Wechselrichters (Pmax), Standard Pmax, nur von bestimmten Modellen unterstützt (Solar Inverter Modbus Interface Definitions V3.0; die Registerliste SPC177 führt es nicht). Mehr sagt die Tabelle nicht dazu, was es begrenzt. Ein Modell ohne dieses Register lehnt den Schreibvorgang ab, was nur im App-Log steht.",
+          "nl": "Stelt register 47079 in, bij Huawei „[Energy storage unit] Power limit of the grid-tied point”: 0 W tot het maximale werkzaam vermogen van de omvormer (Pmax), standaard Pmax, alleen door bepaalde modellen ondersteund (Solar Inverter Modbus Interface Definitions V3.0; de registerlijst SPC177 heeft het niet). Meer zegt de tabel niet over wat het begrenst. Een model zonder dit register weigert het schrijven, wat alleen in het app-log staat."
         },
         "args": [
           {

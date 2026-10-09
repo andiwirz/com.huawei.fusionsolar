@@ -867,20 +867,26 @@ class LUNA2000ModbusDevice extends Device {
         })();
       });
 
+    // 47079, "[Energy storage unit] Power limit of the grid-tied point": I32, W, gain 1,
+    // [0, Pmax], default Pmax, "supported only by certain models" — row 91 of Huawei's Solar
+    // Inverter Modbus Interface Definitions V3.0, absent from SPC177. Written as U32, which for
+    // a value from 0 up is the same two words. Two flows use the card (Flow Card Usage,
+    // 2026-10-09), so it stays — and since 1.2.290 it writes to the battery the flow names.
     this.homey.flow
       .getActionCard('luna2000_set_power_limit_grid')
       .registerRunListener(({ device, power }) => {
         const powerW = Math.round(Math.max(0, power));
-        this.log(`Set grid-tied power limit: ${powerW} W → reg 47079`);
-        this._writeInProgress = true;
+        device.log(`Set grid-tied power limit: ${powerW} W → reg 47079`);
+        device._writeInProgress = true;
         (async () => {
           try {
-            await writeModbusU32(host(), port(), unitId(), 47079, powerW);
-            this.log('Grid-tied power limit written');
+            await writeModbusU32(device.getSetting('address'), parseInt(device.getSetting('port'), 10) || 502,
+              parseIntSafe(device.getSetting('modbus_id'), 1), 47079, powerW);
+            device.log('Grid-tied power limit written');
           } catch (err) {
-            this.error('Set grid-tied power limit failed:', err.message);
+            device.error('Set grid-tied power limit failed:', err.message);
           } finally {
-            this._writeInProgress = false;
+            device._writeInProgress = false;
           }
         })();
       });
