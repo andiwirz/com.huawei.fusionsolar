@@ -1,38 +1,8 @@
 'use strict';
 
-const { getDevice, cap } = require('../../lib/widget-data');
-
-function todayStr(homey) {
-  let tz = 'UTC';
-  try { tz = homey.clock.getTimezone() || 'UTC'; } catch {}
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: tz,
-    year: 'numeric', month: '2-digit', day: '2-digit',
-  }).format(new Date());
-}
-
-/**
- * Compute today's delta for a cumulative capability.
- * Baseline is written by app.js at midnight; here we only read it.
- * Returns null if no baseline exists for today yet.
- */
-function dailyDelta(homey, rawValue, settingKey) {
-  if (rawValue === null || rawValue === undefined) return null;
-
-  let stored = null;
-  try { stored = homey.settings.get(settingKey); } catch {}
-
-  if (!stored || stored.date !== todayStr(homey)) return null;
-
-  return Math.max(0, rawValue - stored.baseline);
-}
-
-// Dashboard language from Homey itself, not navigator.language in the widget — that is
-// the browser/OS language and can differ from the Homey app language. See
-// widgets/ems-device/api.js for the full rationale.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
+// Today's figures are deltas against the baselines app.js stores at midnight; the helper
+// (dailyDelta) lives in lib/widget-data.js with the other shared pieces.
+const { getDevice, cap, dailyDelta, lang } = require('../../lib/widget-data');
 
 // The two kinds of "PV today" a source can report; see pvToday below.
 const PV = 'pv';   // production at the panels
@@ -40,6 +10,11 @@ const AC = 'ac';   // what the inverter delivered — the battery already netted
 
 function reading(device, capId, kind) {
   const kwh = cap(device, capId, null);
+  return kwh === null ? null : { kwh, kind };
+}
+
+function deltaReading(homey, raw, key, kind) {
+  const kwh = dailyDelta(homey, raw, key);
   return kwh === null ? null : { kwh, kind };
 }
 
@@ -59,6 +34,13 @@ module.exports = {
     const sunOa       = getDevice(homey, 'sun2000_openapi_fusionsolar');
     const pmOa        = getDevice(homey, 'powermeter_openapi_fusionsolar');
     const lunaOa      = getDevice(homey, 'luna2000_openapi_fusionsolar');
+    // iSitePower and the kiosk were missing here (1.2.300). iSitePower has lifetime totals
+    // only, so its days come from midnight baselines like the grid counters.
+    const ispSolar    = getDevice(homey, 'isitepower_solar_openapi_fusionsolar');
+    const ispGrid     = getDevice(homey, 'isitepower_grid_openapi_fusionsolar');
+    const ispHome     = getDevice(homey, 'isitepower_home_openapi_fusionsolar');
+    const ispBatt     = getDevice(homey, 'isitepower_battery_openapi_fusionsolar');
+    const kiosk       = getDevice(homey, 'fusionsolar_kiosk');
 
     // PV today. On the OpenAPI inverter the station figure comes first: meter_power.daily
     // holds the PV production, meter_power.inv_daily only the inverter's AC output, and on
@@ -74,7 +56,9 @@ module.exports = {
                  ?? reading(sun2000emma, 'meter_power.pv_daily', PV)
                  ?? reading(sun2000emma, 'meter_power.daily', AC)
                  ?? reading(sunOa, 'meter_power.pv_daily', PV)
-                 ?? reading(sunOa, 'meter_power.inv_daily', AC);
+                 ?? reading(sunOa, 'meter_power.inv_daily', AC)
+                 ?? reading(kiosk, 'meter_power.daily', PV)
+                 ?? deltaReading(homey, cap(ispSolar, 'meter_power', null), 'eb_pv_baseline', PV);
     const pvTodayKwh = pvToday ? pvToday.kwh : null;
 
     // Grid export today: prefer sun2000 cumulative delta, fall back to EMMA inverter or EMMA meter
@@ -85,7 +69,8 @@ module.exports = {
     const rawExport = cap(sun2000, 'meter_power.grid_export', null)
                    ?? cap(sun2000emma, 'meter_power.grid_export', null)
                    ?? cap(pmOa, 'meter_power.exported', null)
-                   ?? cap(sunOa, 'meter_power.grid_export', null);
+                   ?? cap(sunOa, 'meter_power.grid_export', null)
+                   ?? cap(ispGrid, 'meter_power.exported', null);
     let gridExportKwh = dailyDelta(homey, rawExport, 'eb_grid_export_baseline')
                      ?? cap(pmEmma, 'meter_power.exported_today', null);
 
@@ -93,7 +78,8 @@ module.exports = {
     const rawImport = cap(sun2000, 'meter_power.grid_import', null)
                    ?? cap(sun2000emma, 'meter_power.grid_import', null)
                    ?? cap(pmOa, 'meter_power', null)
-                   ?? cap(sunOa, 'meter_power.grid_import', null);
+                   ?? cap(sunOa, 'meter_power.grid_import', null)
+                   ?? cap(ispGrid, 'meter_power', null);
     let gridImportKwh = dailyDelta(homey, rawImport, 'eb_grid_import_baseline')
                      ?? cap(pmEmma, 'meter_power.imported_today', null);
 
@@ -126,12 +112,13 @@ module.exports = {
     // was not consumed today. Where a battery is paired but its day counters are missing
     // that net is unknown, and so is the total; without a battery it is zero.
     let houseConsumptionKwh = cap(pmEmma, 'meter_power.consumption_today', null)
-                           ?? cap(pmOa,   'meter_power.consumption_today', null);
+                           ?? cap(pmOa,   'meter_power.consumption_today', null)
+                           ?? dailyDelta(homey, cap(ispHome, 'meter_power', null), 'eb_house_baseline');
     // Not selfConsumedKwh: that one waits for the first PV of the day, the house does not.
     const keptKwh = (pvTodayKwh !== null && gridExportKwh !== null)
       ? Math.max(0, pvTodayKwh - gridExportKwh) : null;
     if (houseConsumptionKwh === null && keptKwh !== null && gridImportKwh !== null) {
-      const hasBattery = !!(luna || lunaEmma || lunaOa);
+      const hasBattery = !!(luna || lunaEmma || lunaOa || ispBatt);
       let batteryNetKwh = 0;
       if (pvToday.kind === PV && hasBattery) {
         batteryNetKwh = (battChargedKwh !== null && battDischargedKwh !== null)
@@ -154,8 +141,15 @@ module.exports = {
       selfSufficiencyPct = Math.max(0, Math.min(100, selfSufficiencyPct));
     }
 
+    // The "values from midnight" hint belongs to a plant whose grid counters exist but
+    // whose baseline does not yet. A plant with no such counters at all (kiosk only,
+    // EMMA meter with its own day figures) used to see it for good (1.2.300).
+    const awaitingBaseline = (rawExport !== null && gridExportKwh === null)
+                          || (rawImport !== null && gridImportKwh === null);
+
     return {
       lang: lang(homey),
+      awaitingBaseline,
       pvTodayKwh,
       gridExportKwh,
       gridImportKwh,

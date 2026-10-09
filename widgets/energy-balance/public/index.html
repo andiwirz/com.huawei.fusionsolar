@@ -16,126 +16,116 @@
       -webkit-touch-callout: none;
     }
 
+  /* Sizes, colours and spacing from Homey's widget styling guide (--homey-*). Text is never
+     smaller than --homey-font-size-small (1.2.300; it went down to 10 px). */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: transparent;
-    padding: 12px 14px;
-  }
-
-  .bar-section {
-    margin-bottom: 7px;
-  }
+  #content { display: flex; flex-direction: column; gap: var(--homey-su-2); }
 
   .bar-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 3px;
+    gap: var(--homey-su-2);
+    margin-bottom: var(--homey-su-1);
   }
 
   .bar-label {
-    font-size: 11px;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--homey-su-2);
+    min-width: 0;
   }
 
   .bar-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
   }
 
   .bar-value {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .bar-track {
-    height: 7px;
-    border-radius: 4px;
-    background: var(--homey-line-color);
+    height: 6px;
+    border-radius: 3px;
+    background: var(--homey-line-color-light);
     overflow: hidden;
   }
 
   .bar-fill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: 3px;
     transition: width 0.4s ease;
     min-width: 0;
   }
 
-  /* Footer rows */
-  .footer {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  .hint {
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
+    text-align: center;
   }
 
   .chip-row {
     display: flex;
-    gap: 6px;
+    gap: var(--homey-su-2);
   }
 
-  /* Pct chips (Eigenverbrauch / Autarkie) */
-  .metric-chip {
+  /* Chips are outlined, not tinted: Homey's styling guide draws boxes with its line
+     colours, which follow light and dark mode by themselves. */
+  .chip {
     flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /* Homey doesn't expose a token for this subtle chip tint, and a fixed
-       mid-grey translucency reads fine on both light and dark card
-       backgrounds — no per-theme override needed. */
-    background: rgba(128,128,128,0.1);
-    border-radius: 10px;
-    padding: 5px 9px;
+    flex-direction: column;
+    align-items: flex-start;
+    border: var(--homey-line);
+    border-radius: var(--homey-border-radius-small);
+    padding: var(--homey-su-1) var(--homey-su-3);
   }
 
-  .metric-label {
-    font-size: 10px;
+  .chip-label {
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .metric-value {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
+    font-size: var(--homey-font-size-large);
+    line-height: var(--homey-line-height-large);
+    font-weight: var(--homey-font-weight-bold);
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Battery chips */
-  .batt-chip {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(128,128,128,0.1);
-    border-radius: 10px;
-    padding: 5px 9px;
-  }
+  .chip-head { display: flex; align-items: center; gap: var(--homey-su-1); min-width: 0; }
 
   .batt-icon {
-    width: 12px;
-    height: 12px;
+    width: var(--homey-icon-size-small, 14px);
+    height: var(--homey-icon-size-small, 14px);
     flex-shrink: 0;
   }
 
-  .batt-label {
-    font-size: 10px;
-    color: var(--homey-text-color-light);
-    flex: 1;
-  }
-
   .batt-value {
-    font-size: 12px;
-    font-weight: 700;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   /* Skeleton */
@@ -148,9 +138,13 @@
   body.loading .batt-value {
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
+  /* Values the app has not confirmed for two polls are dimmed, not shown as live. */
+  body.stale .bar-value, body.stale .metric-value, body.stale .batt-value { opacity: 0.45; }
 </style>
 </head>
-<body class="loading">
+<body class="homey-widget loading">
+
+<div id="content">
 
 <div class="bar-section">
   <div class="bar-header">
@@ -168,80 +162,86 @@
 <div class="bar-section">
   <div class="bar-header">
     <div class="bar-label">
-      <div class="bar-dot" style="background:#22C55E"></div>
+      <div class="bar-dot" style="background:var(--homey-color-green)"></div>
       <span id="label-export-today"></span>
     </div>
     <div class="bar-value" id="export-val">—</div>
   </div>
   <div class="bar-track">
-    <div class="bar-fill" id="export-fill" style="width:0%;background:#22C55E"></div>
+    <div class="bar-fill" id="export-fill" style="width:0%;background:var(--homey-color-green)"></div>
   </div>
 </div>
 
 <div class="bar-section">
   <div class="bar-header">
     <div class="bar-label">
-      <div class="bar-dot" style="background:#EF4444"></div>
+      <div class="bar-dot" style="background:var(--homey-color-red)"></div>
       <span id="label-import-today"></span>
     </div>
     <div class="bar-value" id="import-val">—</div>
   </div>
   <div class="bar-track">
-    <div class="bar-fill" id="import-fill" style="width:0%;background:#EF4444"></div>
+    <div class="bar-fill" id="import-fill" style="width:0%;background:var(--homey-color-red)"></div>
   </div>
 </div>
 
 <div class="bar-section">
   <div class="bar-header">
     <div class="bar-label">
-      <div class="bar-dot" style="background:#3B82F6"></div>
+      <div class="bar-dot" style="background:var(--homey-color-blue)"></div>
       <span id="label-house-today"></span>
     </div>
     <div class="bar-value" id="house-val">—</div>
   </div>
   <div class="bar-track">
-    <div class="bar-fill" id="house-fill" style="width:0%;background:#3B82F6"></div>
+    <div class="bar-fill" id="house-fill" style="width:0%;background:var(--homey-color-blue)"></div>
   </div>
 </div>
 
-<div id="baseline-hint" style="display:none;font-size:10px;color:var(--homey-text-color-light);margin-bottom:6px;text-align:center;"></div>
+<div class="hint" id="baseline-hint" style="display:none"></div>
 
-<div class="footer">
-  <!-- Row 1: Self-consumption / Self-sufficiency -->
-  <div class="chip-row">
-    <div class="metric-chip">
-      <div class="metric-label" id="label-selfcons"></div>
-      <div class="metric-value" id="sc-val" style="color:#22C55E">—</div>
-    </div>
-    <div class="metric-chip">
-      <div class="metric-label" id="label-selfsuff"></div>
-      <div class="metric-value" id="autarkie-val" style="color:#22C55E">—</div>
-    </div>
+<!-- Self-consumption / self-sufficiency -->
+<div class="chip-row">
+  <div class="chip">
+    <div class="chip-label" id="label-selfcons"></div>
+    <div class="metric-value" id="sc-val">—</div>
   </div>
-  <!-- Row 2: Battery charged / discharged (hidden when no LUNA) -->
-  <div class="chip-row" id="batt-row" style="display:none">
-    <div class="batt-chip">
-      <svg class="batt-icon" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <div class="chip">
+    <div class="chip-label" id="label-selfsuff"></div>
+    <div class="metric-value" id="autarkie-val">—</div>
+  </div>
+</div>
+<!-- Battery charged / discharged (hidden without a battery figure) -->
+<div class="chip-row" id="batt-row" style="display:none">
+  <div class="chip">
+    <div class="chip-head">
+      <svg class="batt-icon" viewBox="0 0 24 24" fill="none" style="stroke:var(--homey-color-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="19" x2="12" y2="5"/>
         <polyline points="5,12 12,5 19,12"/>
       </svg>
-      <span class="batt-label" id="label-charged"></span>
-      <span class="batt-value" id="batt-charged-val">—</span>
+      <span class="chip-label" id="label-charged"></span>
     </div>
-    <div class="batt-chip">
-      <svg class="batt-icon" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <span class="batt-value" id="batt-charged-val">—</span>
+  </div>
+  <div class="chip">
+    <div class="chip-head">
+      <svg class="batt-icon" viewBox="0 0 24 24" fill="none" style="stroke:#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/>
         <polyline points="19,12 12,19 5,12"/>
       </svg>
-      <span class="batt-label" id="label-discharged"></span>
-      <span class="batt-value" id="batt-discharged-val">—</span>
+      <span class="chip-label" id="label-discharged"></span>
     </div>
+    <span class="batt-value" id="batt-discharged-val">—</span>
   </div>
+</div>
+
+<div class="hint" id="status" style="display:none"></div>
+
 </div>
 
 <script>
 // Language comes from the API payload (Homey i18n.getLanguage()), not
-// navigator.language — see widgets/ems-device/api.js.
+// navigator.language — see lib/widget-data.js.
 var DICTS = (function() {
   var de = {
     pvToday:      'PV heute',
@@ -253,6 +253,8 @@ var DICTS = (function() {
     selfSuff:     'Autarkie',
     charged:      'Geladen',
     discharged:   'Entladen',
+    unreachable:  'App antwortet nicht',
+    stale:        '⚠ nicht aktuell',
   };
   var nl = {
     pvToday:      'PV vandaag',
@@ -264,6 +266,8 @@ var DICTS = (function() {
     selfSuff:     'Zelfvoorziening',
     charged:      'Geladen',
     discharged:   'Ontladen',
+    unreachable:  'App reageert niet',
+    stale:        '⚠ niet actueel',
   };
   var en = {
     pvToday:      'PV today',
@@ -275,6 +279,8 @@ var DICTS = (function() {
     selfSuff:     'Self-sufficiency',
     charged:      'Charged',
     discharged:   'Discharged',
+    unreachable:  'App not responding',
+    stale:        '⚠ not current',
   };
   return { de: de, nl: nl, en: en };
 })();
@@ -308,9 +314,62 @@ function applyStaticLabels() {
 }
 applyStaticLabels();
 
+/* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+   widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+   German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+   first answer never comes, dims values after two missed answers instead of showing them
+   as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+   changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+var _nf = {};
+function fmtNum(v, digits) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  var key = (activeLang || '') + '|' + digits;
+  if (!_nf[key]) {
+    try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+    catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+  }
+  return _nf[key].format(v);
+}
+function poller(opts) {
+  var busy = false, timer = null, loaded = false, misses = 0;
+  function tick() {
+    if (busy) return;
+    busy = true;
+    Promise.resolve().then(opts.run).then(function (data) {
+      busy = false; misses = 0; loaded = true;
+      document.body.classList.remove('stale');
+      opts.onOk(data);
+    }, function (err) {
+      busy = false; misses++;
+      if (!loaded) opts.onFail(true, err);
+      else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+    });
+  }
+  function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+  function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); return; }
+    tick(); start();
+  });
+  tick();
+  if (!document.hidden) start();
+  return { now: tick };
+}
+var _fitH = 0;
+function fitHeight(Homey, el) {
+  requestAnimationFrame(function () {
+    var h = Math.ceil(el.getBoundingClientRect().bottom);
+    if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+  });
+}
+/* ── end of the shared block ── */
+
+// A missing figure is an em dash, as in every other widget. It used to be "…", which reads
+// as "still loading" and stayed for good on plants that simply have no such counter.
+// One decimal, as the yield widget writes the same figure (1.2.300).
 function fmtKwh(v) {
-  if (v === null || v === undefined) return '…';
-  return v.toFixed(1) + ' kWh';
+  if (v === null || v === undefined) return '—';
+  return fmtNum(v, 1) + ' kWh';
 }
 
 function barPct(val, maxVal) {
@@ -320,17 +379,32 @@ function barPct(val, maxVal) {
 
 function pctColor(pct) {
   if (pct === null || pct === undefined) return '';
-  if (pct >= 80) return '#22C55E';
+  if (pct >= 80) return 'var(--homey-color-green)';
   if (pct >= 50) return '#F59E0B';
-  return '#EF4444';
+  return 'var(--homey-color-red)';
 }
 
 function onHomeyReady(Homey) {
-  Homey.ready({ height: 220 });
-  document.body.classList.add('loading');
+  var content = document.getElementById('content');
+  var statusEl = document.getElementById('status');
+
+  // Ready once, with the height of the first drawing; after that the height follows the
+  // optional rows (baseline hint, battery) — a fixed 220 px cut the battery row off.
+  var readied = false;
+  function settle() {
+    if (!readied) {
+      readied = true;
+      requestAnimationFrame(function () {
+        Homey.ready({ height: Math.ceil(content.getBoundingClientRect().bottom) + 16 });
+      });
+    } else {
+      fitHeight(Homey, document.body);
+    }
+  }
 
   function render(data) {
     document.body.classList.remove('loading');
+    statusEl.style.display = 'none';
 
     var pv    = data.pvTodayKwh;
     var exp   = data.gridExportKwh;
@@ -345,8 +419,10 @@ function onHomeyReady(Homey) {
     var vals   = [pv, exp, imp, house].filter(function(v) { return v !== null && v !== undefined; });
     var maxVal = vals.length > 0 ? Math.max.apply(null, vals.concat([0.1])) : 1;
 
-    // Show hint when grid values are still being calculated (no baseline yet)
-    var needsBaseline = (exp === null || imp === null);
+    // The hint where a baseline is genuinely still missing — the app says so. An older app
+    // without the flag falls back to the old guess.
+    var needsBaseline = typeof data.awaitingBaseline === 'boolean'
+      ? data.awaitingBaseline : (exp === null || imp === null);
     document.getElementById('baseline-hint').style.display = needsBaseline ? '' : 'none';
 
     document.getElementById('pv-val').textContent     = fmtKwh(pv);
@@ -364,7 +440,7 @@ function onHomeyReady(Homey) {
     // Eigenverbrauch %
     var scEl = document.getElementById('sc-val');
     if (sc !== null && sc !== undefined) {
-      scEl.textContent = sc + '%';
+      scEl.textContent = fmtNum(sc, 0) + ' %';
       scEl.style.color = pctColor(sc);
     } else {
       scEl.textContent = '—';
@@ -374,7 +450,7 @@ function onHomeyReady(Homey) {
     // Autarkie %
     var autEl = document.getElementById('autarkie-val');
     if (aut !== null && aut !== undefined) {
-      autEl.textContent = aut + '%';
+      autEl.textContent = fmtNum(aut, 0) + ' %';
       autEl.style.color = pctColor(aut);
     } else {
       autEl.textContent = '—';
@@ -390,26 +466,20 @@ function onHomeyReady(Homey) {
     } else {
       battRow.style.display = 'none';
     }
+    settle();
   }
 
-  function load() {
-    Homey.api('GET', '/', {})
-      .then(function(data) { applyLang(data && data.lang); if (data) render(data); })
-      .catch(function(err) { console.error('widget load error:', err); });
-  }
-
-  load();
-  // Polling stops entirely while the dashboard is hidden — it used to keep running
-  // around the clock — and catches up immediately on return.
-  var POLL_MS = 10000;
-  var pollTimer = null;
-  function startPolling() { if (!pollTimer) pollTimer = setInterval(load, POLL_MS); }
-  function stopPolling()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-  if (!document.hidden) startPolling();
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) { stopPolling(); return; }
-    load();
-    startPolling();
+  // Once a minute: these are day totals (1.2.300; it asked every 10 s).
+  poller({
+    ms: 60000,
+    run: function () { return Homey.api('GET', '/', {}); },
+    onOk: function (data) { applyLang(data && data.lang); if (data) render(data); },
+    onFail: function (first) {
+      document.body.classList.remove('loading');
+      statusEl.textContent = first ? T.unreachable : T.stale;
+      statusEl.style.display = '';
+      settle();
+    },
   });
 }
 </script>

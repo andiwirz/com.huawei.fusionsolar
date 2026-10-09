@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.299",
+  "version": "1.2.300",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -15225,7 +15225,7 @@
         "de": "Ladestatus",
         "nl": "Laderstatus"
       },
-      "height": 392,
+      "height": 480,
       "transparent": false,
       "settings": [],
       "images": {
@@ -15246,7 +15246,7 @@
         "de": "Ladesitzungen",
         "nl": "Laadsessies"
       },
-      "height": 340,
+      "height": 300,
       "transparent": false,
       "settings": [
         {
@@ -15317,7 +15317,7 @@
         "de": "Solar Energiefluss",
         "nl": "Solar Energiestroom"
       },
-      "height": 200,
+      "height": 252,
       "settings": [
         {
           "id": "power_threshold_w",
@@ -15356,7 +15356,7 @@
         "de": "Batteriestatus",
         "nl": "Batterijstatus"
       },
-      "height": 165,
+      "height": 178,
       "settings": [
         {
           "id": "battery_capacity_kwh",
@@ -15395,7 +15395,7 @@
         "de": "Tagesertrag",
         "nl": "Dagopbrengst"
       },
-      "height": 112,
+      "height": 145,
       "settings": [
         {
           "id": "co2_factor_g_per_kwh",
@@ -15434,7 +15434,7 @@
         "de": "Energiebilanz",
         "nl": "Energiebalans"
       },
-      "height": 220,
+      "height": 304,
       "settings": [],
       "images": {
         "light": "/widgets/energy-balance/preview-light.png",
@@ -15454,7 +15454,7 @@
         "de": "Netzampel",
         "nl": "Netstatus"
       },
-      "height": 132,
+      "height": 157,
       "settings": [
         {
           "id": "power_threshold_w",
@@ -15493,7 +15493,7 @@
         "de": "Sensor-Verlauf",
         "nl": "Sensordiagram"
       },
-      "height": 260,
+      "height": 264,
       "settings": [
         {
           "id": "series1",
@@ -15608,7 +15608,7 @@
         "de": "EMS-Gerät",
         "nl": "EMS-apparaat"
       },
-      "height": 300,
+      "height": 384,
       "transparent": false,
       "settings": [
         {
@@ -15660,7 +15660,7 @@
         "de": "EMS Batterienutzung",
         "nl": "EMS Batterijgebruik"
       },
-      "height": 220,
+      "height": 193,
       "transparent": false,
       "settings": [],
       "images": {
@@ -15685,7 +15685,7 @@
         "de": "EMS Prognose",
         "nl": "EMS-prognose"
       },
-      "height": 460,
+      "height": 405,
       "transparent": false,
       "settings": [],
       "images": {

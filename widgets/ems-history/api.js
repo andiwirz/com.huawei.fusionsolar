@@ -1,9 +1,6 @@
 'use strict';
 
-// Dashboard language from Homey itself, not navigator.language — see ems-device/api.js.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
+const { getEmsDevice, lang } = require('../../lib/widget-data');
 
 module.exports = {
   // ?since=<ts> returns only what came after it. The widget used to fetch the whole history
@@ -12,11 +9,10 @@ module.exports = {
   // start over with a full load.
   async getHistory({ homey, query }) {
     try {
-      const driver  = homey.drivers.getDriver('energy_management');
-      const devices = driver.getDevices();
+      const ems = getEmsDevice(homey);
       // A code the widget translates, not an English sentence on a German dashboard.
-      if (!devices.length) return { events: [], error: 'no_ems_device', lang: lang(homey) };
-      const all     = devices[0].getEmsHistory();
+      if (!ems) return { events: [], error: 'no_ems_device', lang: lang(homey) };
+      const all     = ems.getEmsHistory();
       const since   = Number(query && query.since) || 0;
       const newestTs = all.length ? all[all.length - 1].ts : 0;
       const events  = since ? all.filter((e) => e.ts > since) : all;

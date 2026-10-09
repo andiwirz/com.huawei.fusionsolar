@@ -220,8 +220,13 @@ class FusionSolarApp extends App {
       const stored = (key) => { try { return this.homey.settings.get(key); } catch { return null; } };
       const exportStored = stored('eb_grid_export_baseline');
       const importStored = stored('eb_grid_import_baseline');
+      // An iSitePower plant also needs its PV and house baselines (1.2.300).
+      const extraDone = (key, driverId) => !this._getDevice(driverId)
+        || (stored(key) && stored(key).date === today);
       if (exportStored && exportStored.date === today
-       && importStored && importStored.date === today) return; // already complete
+       && importStored && importStored.date === today
+       && extraDone('eb_pv_baseline', 'isitepower_solar_openapi_fusionsolar')
+       && extraDone('eb_house_baseline', 'isitepower_home_openapi_fusionsolar')) return; // already complete
 
       const result = this._saveMidnightBaseline();
       if (result.written.length === 2) return;                 // done, it logged its own lines
@@ -256,7 +261,12 @@ class FusionSolarApp extends App {
       const sun2000emma = this._getDevice('sun2000_emma_modbus');
       const pmOa        = this._getDevice('powermeter_openapi_fusionsolar');
       const sunOa       = this._getDevice('sun2000_openapi_fusionsolar');
-      if (!sun2000 && !sun2000emma && !pmOa && !sunOa) return { written, reason: 'no-source' };
+      // iSitePower keeps lifetime totals only, so its grid, PV and house days are deltas
+      // against these baselines too — the two widgets had nothing for it before (1.2.300).
+      const ispGrid     = this._getDevice('isitepower_grid_openapi_fusionsolar');
+      const ispSolar    = this._getDevice('isitepower_solar_openapi_fusionsolar');
+      const ispHome     = this._getDevice('isitepower_home_openapi_fusionsolar');
+      if (!sun2000 && !sun2000emma && !pmOa && !sunOa && !ispGrid) return { written, reason: 'no-source' };
 
       // Cumulative grid counters — MUST use the same source priority as the
       // energy-balance widget's rawExport/rawImport (sun2000 → sun2000emma →
@@ -273,11 +283,25 @@ class FusionSolarApp extends App {
       const gridExport = this._cap(sun2000, 'meter_power.grid_export')
                       ?? this._cap(sun2000emma, 'meter_power.grid_export')
                       ?? this._cap(pmOa, 'meter_power.exported')
-                      ?? this._cap(sunOa, 'meter_power.grid_export');
+                      ?? this._cap(sunOa, 'meter_power.grid_export')
+                      ?? this._cap(ispGrid, 'meter_power.exported');
       const gridImport = this._cap(sun2000, 'meter_power.grid_import')
                       ?? this._cap(sun2000emma, 'meter_power.grid_import')
                       ?? this._cap(pmOa, 'meter_power')
-                      ?? this._cap(sunOa, 'meter_power.grid_import');
+                      ?? this._cap(sunOa, 'meter_power.grid_import')
+                      ?? this._cap(ispGrid, 'meter_power');
+
+      // Not part of the "both written" verdict below: only an iSitePower plant has them.
+      const pvTotal    = this._cap(ispSolar, 'meter_power');
+      const houseTotal = this._cap(ispHome, 'meter_power');
+      if (pvTotal !== null) {
+        this.homey.settings.set('eb_pv_baseline', { date: today, baseline: pvTotal });
+        this.log(`Midnight baseline saved – PV (iSitePower): ${pvTotal} kWh`);
+      }
+      if (houseTotal !== null) {
+        this.homey.settings.set('eb_house_baseline', { date: today, baseline: houseTotal });
+        this.log(`Midnight baseline saved – house (iSitePower): ${houseTotal} kWh`);
+      }
 
       if (gridExport !== null) {
         this.homey.settings.set('eb_grid_export_baseline', { date: today, baseline: gridExport });

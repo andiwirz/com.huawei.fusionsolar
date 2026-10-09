@@ -1,17 +1,6 @@
 'use strict';
 
-function getEmsDevice(homey) {
-  try {
-    const driver  = homey.drivers.getDriver('energy_management');
-    const devices = driver.getDevices();
-    return devices.length > 0 ? devices[0] : null;
-  } catch { return null; }
-}
-
-// Dashboard language from Homey itself, not navigator.language — see ems-device/api.js.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
+const { getEmsDevice, lang } = require('../../lib/widget-data');
 
 module.exports = {
 

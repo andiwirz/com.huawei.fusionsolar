@@ -16,18 +16,15 @@
       -webkit-touch-callout: none;
     }
 
+  /* Sizes, colours and spacing from Homey's widget styling guide (--homey-*), so the
+     tile sits among Homey's own widgets and follows light and dark mode. Text is never
+     smaller than --homey-font-size-small (1.2.300; it used to go down to 9 px). */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: transparent;
-    padding: 13px 12px;
-  }
 
   .flow-wrap {
     position: relative;
     width: 100%;
-    height: 174px;
+    height: 236px;
   }
 
   /* ── Nodes ── */
@@ -36,38 +33,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
     transform: translate(-50%, -50%);
     z-index: 2;
     transition: opacity 0.4s;
   }
 
-  .node-icon { width: 22px; height: 22px; }
+  .node-icon { width: var(--homey-icon-size-medium, 20px); height: var(--homey-icon-size-medium, 20px); }
 
   .node-value {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    font-size: var(--homey-font-size-large);
+    line-height: var(--homey-line-height-large);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
     white-space: nowrap;
-    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
-  .node-label {
-    font-size: 9px;
-    color: var(--homey-text-color-light);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    white-space: nowrap;
-  }
-
+  .node-label,
   .node-sub {
-    font-size: 10px;
-    font-weight: 600;
-    white-space: nowrap;
-    min-height: 13px;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
+    white-space: nowrap;
   }
+  .node-sub { min-height: var(--homey-line-height-small); font-weight: var(--homey-font-weight-medium); }
 
   /* ── Hub circle ── */
   .hub {
@@ -76,13 +65,14 @@
     width: 32px; height: 32px;
     border-radius: 50%;
     background: var(--homey-line-color);
-    border: 2.5px solid transparent;
+    border: 2px solid transparent;
     transform: translate(-50%, -50%);
     z-index: 3;
-    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    transition: border-color 0.5s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--homey-text-color-light);
   }
 
   .hub-icon {
@@ -104,11 +94,23 @@
     pointer-events: none;
   }
 
+  /* A line in the top left corner when the app does not answer. */
+  .status {
+    position: absolute;
+    left: 0; top: 0;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
+  }
+
   /* ── Flow animations ──
      flow-fwd: dashes march from line-start toward line-end
      flow-rev: dashes march from line-end toward line-start  */
   @keyframes flow-fwd { to { stroke-dashoffset: -18; } }
   @keyframes flow-rev { to { stroke-dashoffset:  18; } }
+  @media (prefers-reduced-motion: reduce) {
+    .connections line { animation: none !important; }
+  }
 
   /* ── Skeleton ── */
   @keyframes skeleton-pulse {
@@ -118,11 +120,15 @@
   body.loading .node-value {
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
+  /* Values the app has not confirmed for two polls are dimmed, not shown as live. */
+  body.stale .node-value, body.stale .node-sub { opacity: 0.45; }
 </style>
 </head>
-<body class="loading">
+<body class="homey-widget-small loading">
 
 <div class="flow-wrap" id="flow-wrap">
+
+  <div class="status" id="status"></div>
 
   <!-- SVG — coordinates filled by JS after layout -->
   <svg class="connections" id="svg-conn">
@@ -141,9 +147,9 @@
   </div>
 
   <!-- PV (top center) -->
-  <div class="node" id="node-pv" style="left:50%;top:16%">
-    <svg class="node-icon" viewBox="0 0 24 24" fill="none"
-         stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <div class="node" id="node-pv" style="left:50%;top:14%">
+    <svg class="node-icon" id="pv-icon" viewBox="0 0 24 24" fill="none"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="4"/>
       <line x1="12" y1="2"  x2="12" y2="5"/>
       <line x1="12" y1="19" x2="12" y2="22"/>
@@ -159,9 +165,9 @@
   </div>
 
   <!-- Grid (middle left) -->
-  <div class="node" id="node-grid" style="left:12%;top:50%">
+  <div class="node" id="node-grid" style="left:16%;top:50%">
     <svg class="node-icon" id="grid-icon" viewBox="0 0 24 24" fill="none"
-         stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
     </svg>
     <div class="node-value" id="grid-val">—</div>
@@ -170,9 +176,9 @@
   </div>
 
   <!-- Battery (middle right) -->
-  <div class="node" id="node-batt" style="left:88%;top:50%">
+  <div class="node" id="node-batt" style="left:84%;top:50%">
     <svg class="node-icon" id="batt-icon" viewBox="0 0 24 24" fill="none"
-         stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="7" width="16" height="10" rx="2"/>
       <line x1="22" y1="10" x2="22" y2="14"/>
       <line x1="6"  y1="12" x2="12" y2="12"/>
@@ -184,9 +190,9 @@
   </div>
 
   <!-- House (bottom center) -->
-  <div class="node" id="node-house" style="left:50%;top:84%">
-    <svg class="node-icon" viewBox="0 0 24 24" fill="none"
-         stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <div class="node" id="node-house" style="left:50%;top:86%">
+    <svg class="node-icon" id="house-icon" viewBox="0 0 24 24" fill="none"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
       <polyline points="9,22 9,12 15,12 15,22"/>
     </svg>
@@ -198,11 +204,14 @@
 
 <script>
 // Language comes from the API payload (Homey i18n.getLanguage()), not
-// navigator.language — see widgets/ems-device/api.js.
+// navigator.language — see lib/widget-data.js.
 var DICTS = (function() {
-  var de = { pv: 'Solar', grid: 'Netz', batt: 'Batterie', house: 'Haus',  export: 'Einspeisung', import: 'Bezug'  };
-  var nl = { pv: 'Zon',   grid: 'Net',  batt: 'Batterij', house: 'Huis',  export: 'Teruglevering', import: 'Afname' };
-  var en = { pv: 'Solar', grid: 'Grid', batt: 'Battery',  house: 'House', export: 'Export',       import: 'Import' };
+  var de = { pv: 'Solar', grid: 'Netz', batt: 'Batterie', house: 'Haus',  export: 'Einspeisung', import: 'Bezug',
+             unreachable: '⚠ App antwortet nicht', stale: '⚠ nicht aktuell' };
+  var nl = { pv: 'Zon',   grid: 'Net',  batt: 'Batterij', house: 'Huis',  export: 'Levering', import: 'Afname',
+             unreachable: '⚠ App reageert niet', stale: '⚠ niet actueel' };
+  var en = { pv: 'Solar', grid: 'Grid', batt: 'Battery',  house: 'House', export: 'Export',       import: 'Import',
+             unreachable: '⚠ App not responding', stale: '⚠ not current' };
   return { de: de, nl: nl, en: en };
 })();
 function dictFor(code) {
@@ -228,21 +237,80 @@ function applyLang(code) {
   return true;
 }
 
+/* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+   widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+   German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+   first answer never comes, dims values after two missed answers instead of showing them
+   as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+   changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+var _nf = {};
+function fmtNum(v, digits) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  var key = (activeLang || '') + '|' + digits;
+  if (!_nf[key]) {
+    try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+    catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+  }
+  return _nf[key].format(v);
+}
+function poller(opts) {
+  var busy = false, timer = null, loaded = false, misses = 0;
+  function tick() {
+    if (busy) return;
+    busy = true;
+    Promise.resolve().then(opts.run).then(function (data) {
+      busy = false; misses = 0; loaded = true;
+      document.body.classList.remove('stale');
+      opts.onOk(data);
+    }, function (err) {
+      busy = false; misses++;
+      if (!loaded) opts.onFail(true, err);
+      else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+    });
+  }
+  function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+  function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); return; }
+    tick(); start();
+  });
+  tick();
+  if (!document.hidden) start();
+  return { now: tick };
+}
+var _fitH = 0;
+function fitHeight(Homey, el) {
+  requestAnimationFrame(function () {
+    var h = Math.ceil(el.getBoundingClientRect().bottom);
+    if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+  });
+}
+/* ── end of the shared block ── */
+
+// Data colours. Green, red and blue are Homey's own; amber for PV and orange for a
+// discharging battery have no Homey counterpart, and stay apart so the two read as two.
 var C = {
   pv:        '#F59E0B',
-  house:     '#3B82F6',
-  charge:    '#22C55E',
+  house:     'var(--homey-color-blue)',
+  charge:    'var(--homey-color-green)',
   discharge: '#F97316',
-  export:    '#22C55E',
-  import:    '#EF4444',
+  export:    'var(--homey-color-green)',
+  import:    'var(--homey-color-red)',
   idle:      'var(--homey-line-color)',
+  muted:     'var(--homey-text-color-light)',
 };
 
 function fmt(w) {
   if (w === null || w === undefined) return '—';
   var abs = Math.abs(w);
-  if (abs >= 1000) return (abs / 1000).toFixed(1) + ' kW';
-  return Math.round(abs) + ' W';
+  if (abs >= 1000) return fmtNum(abs / 1000, 1) + ' kW';
+  return fmtNum(Math.round(abs), 0) + ' W';
+}
+
+// An SVG presentation attribute does not resolve var(), the style property does.
+function setIcon(id, color) {
+  var el = document.getElementById(id);
+  if (el) el.style.stroke = color;
 }
 
 /* ── Line coordinate calculation ── */
@@ -286,9 +354,9 @@ function positionLines() {
   // hub bottom-center → house top-center  (perfectly vertical)
   setCoords('line-house', midX,       hub.bottom, midX,      house.top);
   // grid right-center → hub left-center
-  setCoords('line-grid',  grid.right, grid.cy,    hub.left,  hub.cy);
+  setCoords('line-grid',  grid.right, hub.cy,     hub.left,  hub.cy);
   // hub right-center → batt left-center
-  setCoords('line-batt',  hub.right,  hub.cy,     batt.left, batt.cy);
+  setCoords('line-batt',  hub.right,  hub.cy,     batt.left, hub.cy);
 }
 
 /* ── Animate a line ── */
@@ -302,8 +370,8 @@ function setLine(id, anim, color) {
 }
 
 function onHomeyReady(Homey) {
-  Homey.ready({ height: 200 });
-  document.body.classList.add('loading');
+  // The same height as the manifest: one height, no jump on the first load.
+  Homey.ready({ height: 252 });
 
   var thr = 50; // activity threshold in W
   try {
@@ -311,8 +379,15 @@ function onHomeyReady(Homey) {
     if (s && s.power_threshold_w) thr = parseFloat(s.power_threshold_w) || 50;
   } catch(e) {}
 
+  var statusEl = document.getElementById('status');
+  setIcon('pv-icon', C.pv);
+  setIcon('house-icon', C.house);
+  setIcon('grid-icon', C.muted);
+  setIcon('batt-icon', C.muted);
+
   function render(data) {
     document.body.classList.remove('loading');
+    statusEl.textContent = '';
 
     var pv    = data.pvPower;
     var batt  = data.batteryPower;
@@ -327,7 +402,7 @@ function onHomeyReady(Homey) {
     document.getElementById('grid-val').textContent  = fmt(grid !== null ? Math.abs(grid) : null);
 
     document.getElementById('batt-soc').textContent =
-      (soc !== null && soc !== undefined) ? Math.round(soc) + '%' : '';
+      (soc !== null && soc !== undefined) ? fmtNum(Math.round(soc), 0) + ' %' : '';
 
     // The same threshold as the line beside it — a fixed 50 W here said "Import" next
     // to an idle line whenever the setting was higher.
@@ -354,18 +429,18 @@ function onHomeyReady(Homey) {
     if (batt === null || batt === undefined) {
       setLine('line-batt', null, 'transparent');
       battNode.style.opacity = '0.25';
-      document.getElementById('batt-icon').setAttribute('stroke', '#9CA3AF');
+      setIcon('batt-icon', C.muted);
     } else {
       battNode.style.opacity = '1';
       if (batt > thr) {
         setLine('line-batt', 'flow-fwd', C.charge);
-        document.getElementById('batt-icon').setAttribute('stroke', C.charge);
+        setIcon('batt-icon', C.charge);
       } else if (batt < -thr) {
         setLine('line-batt', 'flow-rev', C.discharge);
-        document.getElementById('batt-icon').setAttribute('stroke', C.discharge);
+        setIcon('batt-icon', C.discharge);
       } else {
         setLine('line-batt', null, C.idle);
-        document.getElementById('batt-icon').setAttribute('stroke', '#9CA3AF');
+        setIcon('batt-icon', C.muted);
       }
     }
 
@@ -373,53 +448,32 @@ function onHomeyReady(Homey) {
     //    fwd = import (grid→hub) | rev = export (hub→grid) ──
     if (grid !== null && grid < -thr) {
       setLine('line-grid', 'flow-rev', C.export);
-      document.getElementById('grid-icon').setAttribute('stroke', C.export);
+      setIcon('grid-icon', C.export);
     } else if (grid !== null && grid > thr) {
       setLine('line-grid', 'flow-fwd', C.import);
-      document.getElementById('grid-icon').setAttribute('stroke', C.import);
+      setIcon('grid-icon', C.import);
     } else {
       setLine('line-grid', null, C.idle);
-      document.getElementById('grid-icon').setAttribute('stroke', '#9CA3AF');
+      setIcon('grid-icon', C.muted);
     }
 
-    // ── Hub border ──
-    // 🟢 Green:  PV producing AND no grid import
-    // 🟠 Orange: no PV, but battery discharging covers load (no import)
-    // 🔴 Red:    grid import active (battery empty or absent)
-    // ⬜ None:   night / standby
+    // ── Hub border ── (no glow: Homey's frame already carries the only shadow)
+    // Green:  PV producing AND no grid import
+    // Amber:  no PV, but battery discharging covers load (no import)
+    // Red:    grid import active (battery empty or absent)
+    // None:   night / standby
     var hub     = document.getElementById('hub');
     var hubIcon = document.getElementById('hub-icon');
     var importing = grid !== null && grid > thr;
     var pvOn      = pv   !== null && pv   > thr;
     var battDisch = batt !== null && batt < -thr;
 
-    if (pvOn && !importing) {
-      hub.style.borderColor     = C.charge;
-      hub.style.boxShadow       = '0 0 6px rgba(34,197,94,0.4)';
-      hubIcon.style.stroke      = C.charge;
-      hubIcon.style.opacity     = '0.8';
-    } else if (!pvOn && battDisch && !importing) {
-      hub.style.borderColor     = C.pv;
-      hub.style.boxShadow       = '0 0 6px rgba(245,158,11,0.4)';
-      hubIcon.style.stroke      = C.pv;
-      hubIcon.style.opacity     = '0.8';
-    } else if (importing) {
-      hub.style.borderColor     = C.import;
-      hub.style.boxShadow       = '0 0 6px rgba(239,68,68,0.4)';
-      hubIcon.style.stroke      = C.import;
-      hubIcon.style.opacity     = '0.8';
-    } else {
-      hub.style.borderColor     = 'transparent';
-      hub.style.boxShadow       = 'none';
-      hubIcon.style.stroke      = 'currentColor';
-      hubIcon.style.opacity     = '0.35';
-    }
-  }
-
-  function load() {
-    Homey.api('GET', '/', {})
-      .then(function(data) { applyLang(data && data.lang); if (data) render(data); })
-      .catch(function(err) { console.error('widget error:', err); });
+    var hubColor = (pvOn && !importing) ? C.charge
+      : (!pvOn && battDisch && !importing) ? C.pv
+      : importing ? C.import : null;
+    hub.style.borderColor = hubColor || 'transparent';
+    hubIcon.style.stroke  = hubColor || 'currentColor';
+    hubIcon.style.opacity = hubColor ? '0.8' : '0.35';
   }
 
   // Translated node labels; re-applied by applyLang on a language change so they never
@@ -431,18 +485,16 @@ function onHomeyReady(Homey) {
     requestAnimationFrame(positionLines);
   });
 
-  load();
-  // Polling stops entirely while the dashboard is hidden — it used to keep running
-  // around the clock — and catches up immediately on return.
-  var POLL_MS = 5000;
-  var pollTimer = null;
-  function startPolling() { if (!pollTimer) pollTimer = setInterval(load, POLL_MS); }
-  function stopPolling()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-  if (!document.hidden) startPolling();
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) { stopPolling(); return; }
-    load();
-    startPolling();
+  // Every 15 s: the readings behind it change once a minute at most on a default Modbus
+  // poll, and every five or ten minutes from the cloud (1.2.300; it asked every 5 s).
+  poller({
+    ms: 15000,
+    run: function () { return Homey.api('GET', '/', {}); },
+    onOk: function (data) { applyLang(data && data.lang); if (data) render(data); },
+    onFail: function (first) {
+      document.body.classList.remove('loading');
+      statusEl.textContent = first ? T.unreachable : T.stale;
+    },
   });
 }
 </script>

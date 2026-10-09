@@ -1,32 +1,10 @@
 'use strict';
 
-function getEmsDevice(homey) {
-  try {
-    const driver  = homey.drivers.getDriver('energy_management');
-    const devices = driver.getDevices();
-    return devices.length > 0 ? devices[0] : null;
-  } catch { return null; }
-}
-
-// The dashboard language comes from Homey itself, NOT from navigator.language inside the
-// widget — that is the browser/OS language and can differ from the Homey app language
-// (an English phone paired with a German Homey used to show English widgets). Returned
-// with every payload so the view picks its translations from the authoritative source.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
+// lang(): the dashboard language comes from Homey itself, NOT from navigator.language inside
+// the widget — see lib/widget-data.js. getEmsDevice and lang are shared by all EMS widgets.
+const { getEmsDevice, lang } = require('../../lib/widget-data');
 
 module.exports = {
-
-  async getDevices({ homey }) {
-    const device = getEmsDevice(homey);
-    if (!device) return { error: 'no_ems_device', devices: [], lang: lang(homey) };
-    try {
-      return { devices: await device.getEmsControllableDevices(), lang: lang(homey) };
-    } catch (e) {
-      return { error: e.message, devices: [], lang: lang(homey) };
-    }
-  },
 
   async getStatus({ homey, query }) {
     const device = getEmsDevice(homey);
@@ -45,6 +23,7 @@ module.exports = {
     if (!device) return { error: 'no_ems_device' };
     const { device: id, enabled } = body || {};
     if (!id) return { error: 'missing_params' };
+    if (typeof enabled !== 'boolean') return { error: 'invalid_value' };
     try {
       return await device.setEmsDeviceEnabled(id, enabled);
     } catch (e) {
@@ -85,6 +64,7 @@ module.exports = {
     const device = getEmsDevice(homey);
     if (!device) return { error: 'no_ems_device' };
     const { chargeNow } = body || {};
+    if (typeof chargeNow !== 'boolean') return { error: 'invalid_value' };
     try {
       return await device.setEmsChargeNow(chargeNow);
     } catch (e) {

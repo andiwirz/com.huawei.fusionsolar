@@ -3795,11 +3795,14 @@ test('setEmsBatteryZones — anything but a number from 0 to 100 is refused', as
   }
   assert.strictEqual(cfg.share_soc_low, 20);
 });
-test('setEmsBatteryZones — an older widget sending normalSoc lands on the same setting', async () => {
-  const cfg = { share_soc_low: 20, share_soc_high: 60 };
-  const d = makeWidgetDevice({ _getConfig: () => cfg, homey: { settings: { set: () => {} } } });
-  await d.setEmsBatteryZones({ normalSoc: 40 });
-  assert.strictEqual(cfg.share_soc_low, 40);
+test('getEmsBatteryStatus — the old three-zone fields are gone from the payload', async () => {
+  const d = makeWidgetDevice({
+    _getConfig: () => ({ battery_devices: [{ id: 'b1' }], share_soc_low: 20, share_soc_high: 60 }),
+    _getBattery: async () => ({ soc: 50, powerW: 0 }),
+  });
+  const s = await d.getEmsBatteryStatus();
+  assert.ok(!('normalSoc' in s) && !('reserveSoc' in s));
+  assert.strictEqual(s.stopSoc, 20);
 });
 
 // ── _buildPriorityRuns (Geräte-Priorität) ────────────────────────────────────

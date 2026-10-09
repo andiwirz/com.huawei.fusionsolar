@@ -1,13 +1,7 @@
 'use strict';
 
-const { getDevice, cap, setting } = require('../../lib/widget-data');
+const { getDevice, cap, setting, isReachable, lang } = require('../../lib/widget-data');
 
-// Dashboard language from Homey itself, not navigator.language in the widget — that is
-// the browser/OS language and can differ from the Homey app language. See
-// widgets/ems-device/api.js for the full rationale.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
 
 // The batteries report their state in Huawei's English words — "Running", "Sleep mode",
 // "Fault" — which the widget showed untranslated beside its own German "Laden". They go
@@ -56,7 +50,13 @@ module.exports = {
     const lunaEmma = getDevice(homey, 'luna2000_emma_modbus');
     const lunaOa   = getDevice(homey, 'luna2000_openapi_fusionsolar');
     const ispBatt  = getDevice(homey, 'isitepower_battery_openapi_fusionsolar');
-    const device   = luna || lunaEmma || lunaOa || ispBatt;
+    // The first battery that answers, not the first one paired. A Modbus LUNA that had
+    // dropped off hid a cloud one that was fine, and a single unreachable battery read
+    // "No battery" (1.2.300). When none answers the first paired one is still named, and
+    // the widget says it is unreachable rather than that there is none.
+    const paired   = [luna, lunaEmma, lunaOa, ispBatt].filter(Boolean);
+    const device   = paired.find(isReachable) || paired[0] || null;
+    const unreachable = !!device && !isReachable(device);
 
     const soc                = cap(device, 'measure_battery', null);
     const powerW             = cap(device, 'measure_power', null);
@@ -101,7 +101,16 @@ module.exports = {
     const socFloor   = num(setting(device, 'discharge_cutoff_capacity'));
     const socReserve = num(cap(device, 'measure_battery.backup', null));
 
+    // The EMMA battery says how many kWh are left to full and to empty — the estimate the
+    // widget would otherwise have to build from a capacity somebody typed in. meter_*
+    // names pass cap() even for a device that does not answer, so reachability is checked
+    // here: a figure from an hour ago is not what is left now.
+    const fresh = (v) => (lunaEmma && device === lunaEmma && isReachable(lunaEmma) ? v : null);
+    const toFullKwh  = fresh(cap(lunaEmma, 'meter_power.chargeable_capacity', null));
+    const toEmptyKwh = fresh(cap(lunaEmma, 'meter_power.dischargeable_capacity', null));
+
     return { soc, status, powerW, todayChargedKwh, todayDischargedKwh, capacityKwh,
-      socCeiling, socFloor, socReserve, lang: lang(homey) };
+      socCeiling, socFloor, socReserve, toFullKwh, toEmptyKwh, unreachable, paired: paired.length > 0,
+      lang: lang(homey) };
   }
 };

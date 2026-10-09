@@ -22,83 +22,51 @@
    was permanently stuck in light styling. The handful of accent dot colors
    with no direct --homey- equivalent are now gated on Homey's actual
    .homey-dark-mode marker class instead. */
+/* Sizes and spacing from Homey's widget styling guide too (1.2.300): no text below
+   --homey-font-size-small (it went down to 9 px), no second card inside Homey's frame, no
+   shadows, buttons big enough for a finger. The widget's name is Homey's title above the
+   tile, so it is not repeated inside it. The list scrolls inside the fixed height: a day
+   can hold a hundred events. */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  font-family: -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
-  background: transparent;
-  height: 100%;
-}
+html, body { height: 100%; color: var(--homey-text-color); }
 
 .card {
-  background: var(--homey-background-color);
-  border-radius: 16px;
-  padding: 12px 14px 4px;
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
-
-/* Dots have a 1px box-shadow — give them 2px breathing room so the shadow isn't clipped */
-.timeline {
-  padding-left: 2px;
-  margin-left: -2px;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  flex-shrink: 0;
-}
-.title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--homey-text-color);
-  letter-spacing: .3px;
-}
-.refresh-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--homey-text-color-light);
-  padding: 2px 4px;
-  border-radius: 6px;
-  line-height: 1;
-}
-.refresh-btn:hover { color: var(--homey-text-color); background: rgba(128,128,128,0.12); }
 
 /* ── Day nav ── */
 .day-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--homey-su-2);
   flex-shrink: 0;
-  gap: 4px;
+  gap: var(--homey-su-1);
 }
-.nav-btn {
+.nav-btn, .refresh-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
   background: none;
-  border: none;
+  border: var(--homey-line);
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 15px;
-  color: var(--homey-text-color-blue);
-  padding: 2px 6px;
-  border-radius: 6px;
+  font-size: var(--homey-font-size-small);
+  color: var(--homey-text-color-blue, var(--homey-color-blue));
   line-height: 1;
   flex-shrink: 0;
 }
-.nav-btn:hover { background: rgba(10,132,255,0.12); }
-.nav-btn:disabled { color: var(--homey-text-color-light); cursor: default; }
-.nav-btn:disabled:hover { background: none; }
+.refresh-btn { color: var(--homey-text-color-light); font-size: var(--homey-font-size-default); }
+.nav-btn:focus-visible, .refresh-btn:focus-visible { outline: 2px solid var(--homey-color-blue); outline-offset: 2px; }
+.nav-btn:disabled { color: var(--homey-text-color-light); opacity: 0.4; cursor: default; }
 
 .day-label-nav {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--homey-font-size-small);
+  line-height: var(--homey-line-height-small);
+  font-weight: var(--homey-font-weight-bold);
   color: var(--homey-text-color);
   text-align: center;
   flex: 1;
@@ -113,23 +81,23 @@ html, body {
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 6px;
+  padding-bottom: var(--homey-su-2);
+  touch-action: pan-y;
 }
 
 .day-label {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: var(--homey-font-size-small);
+  line-height: var(--homey-line-height-small);
+  font-weight: var(--homey-font-weight-medium);
   color: var(--homey-text-color-light);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  padding: 8px 0 4px 20px;
+  padding: var(--homey-su-2) 0 var(--homey-su-1) 22px;
 }
 
 .event-row {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 3px 0;
+  gap: var(--homey-su-2);
+  padding: var(--homey-su-1) 0;
   position: relative;
 }
 
@@ -138,27 +106,25 @@ html, body {
   content: '';
   position: absolute;
   left: 6px;
-  top: 16px;
-  bottom: -3px;
+  top: 18px;
+  bottom: -4px;
   width: 1px;
-  background: var(--homey-line-color-light, rgba(128,128,128,0.15));
+  background: var(--homey-line-color-light);
 }
 .event-row:last-child::before { display: none; }
 
 /* System events get a separator feel */
-.event-row.ev-system {
-  margin: 4px 0 2px;
-}
-.event-row.ev-system::before { background: var(--homey-line-color, rgba(128,128,128,0.3)); }
+.event-row.ev-system { margin: var(--homey-su-1) 0 2px; }
+.event-row.ev-system::before { background: var(--homey-line-color); }
 
 .dot {
   width: 13px;
   height: 13px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 4px;
   border: 2px solid var(--homey-background-color);
-  box-shadow: 0 0 0 1px var(--homey-line-color, rgba(128,128,128,0.3));
+  outline: 1px solid var(--homey-line-color);
 }
 
 /* System events: diamond shape instead of circle */
@@ -167,7 +133,7 @@ html, body {
   transform: rotate(45deg);
   width: 10px;
   height: 10px;
-  margin-top: 3px;
+  margin-top: 5px;
   margin-left: 1px;
 }
 
@@ -176,12 +142,15 @@ html, body {
 .event-top {
   display: flex;
   align-items: baseline;
-  gap: 5px;
+  gap: var(--homey-su-1);
 }
 
+.event-mode, .event-time, .event-detail {
+  font-size: var(--homey-font-size-small);
+  line-height: var(--homey-line-height-small);
+}
 .event-mode {
-  font-size: 11.5px;
-  font-weight: 600;
+  font-weight: var(--homey-font-weight-medium);
   color: var(--homey-text-color);
   white-space: nowrap;
   overflow: hidden;
@@ -189,34 +158,29 @@ html, body {
 }
 
 /* System events dimmer label */
-.ev-system .event-mode {
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--homey-text-color-light);
-}
+.ev-system .event-mode { color: var(--homey-text-color-light); }
 
 .event-time {
-  font-size: 9.5px;
   color: var(--homey-text-color-light);
   white-space: nowrap;
   flex-shrink: 0;
   margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 .event-detail {
-  font-size: 10px;
   color: var(--homey-text-color-light);
-  margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .empty {
-  font-size: 12px;
+  font-size: var(--homey-font-size-small);
+  line-height: var(--homey-line-height-small);
   color: var(--homey-text-color-light);
   text-align: center;
-  padding: 24px 0;
+  padding: var(--homey-su-6) 0;
   flex: 1;
   display: flex;
   align-items: center;
@@ -256,16 +220,13 @@ html, body {
 .homey-dark-mode .dot-disabled { background: #4a4a4f; }
 </style>
 </head>
-<body>
+<body class="homey-widget">
 <div class="card">
-  <div class="header">
-    <div class="title" id="title">⚡ EMS History</div>
-    <button class="refresh-btn" id="refresh-btn">↻</button>
-  </div>
   <div class="day-nav">
     <button class="nav-btn" id="nav-prev">◀</button>
     <div class="day-label-nav" id="nav-day-label">—</div>
     <button class="nav-btn" id="nav-next" disabled>▶</button>
+    <button class="refresh-btn" id="refresh-btn">↻</button>
   </div>
   <div class="timeline" id="timeline">
     <div class="empty" id="initialLoading">…</div>
@@ -286,7 +247,7 @@ var allEvents = [];
 // app language. See widgets/ems-device/api.js for the full rationale.
 var DICTS = (function () {
   var de = {
-    title: '⚡ EMS Verlauf', refresh: 'Aktualisieren', prevDay: 'Vorheriger Tag', nextDay: 'Nächster Tag',
+    refresh: 'Aktualisieren', prevDay: 'Vorheriger Tag', nextDay: 'Nächster Tag',
     loading: 'Lädt…', failedToLoad: 'Laden fehlgeschlagen', errorPrefix: 'Fehler: ',
     today: 'Heute', yesterday: 'Gestern', noEventsFor: 'Keine Ereignisse für',
     appUpdated: 'App aktualisiert', appStarted: 'App gestartet',
@@ -306,7 +267,7 @@ var DICTS = (function () {
     },
   };
   var nl = {
-    title: '⚡ EMS Geschiedenis', refresh: 'Vernieuwen', prevDay: 'Vorige dag', nextDay: 'Volgende dag',
+    refresh: 'Vernieuwen', prevDay: 'Vorige dag', nextDay: 'Volgende dag',
     loading: 'Laden…', failedToLoad: 'Laden mislukt', errorPrefix: 'Fout: ',
     today: 'Vandaag', yesterday: 'Gisteren', noEventsFor: 'Geen gebeurtenissen voor',
     appUpdated: 'App bijgewerkt', appStarted: 'App gestart',
@@ -326,7 +287,7 @@ var DICTS = (function () {
     },
   };
   var en = {
-    title: '⚡ EMS History', refresh: 'Refresh', prevDay: 'Previous day', nextDay: 'Next day',
+    refresh: 'Refresh', prevDay: 'Previous day', nextDay: 'Next day',
     loading: 'Loading…', failedToLoad: 'Failed to load', errorPrefix: 'Error: ',
     today: 'Today', yesterday: 'Yesterday', noEventsFor: 'No events for',
     appUpdated: 'App updated', appStarted: 'App started',
@@ -357,8 +318,8 @@ var T = dictFor(navigator.language); // placeholder until the first payload arri
 // the phone's language — and stayed in it on a German Homey; the day label stayed "—"
 // until a day arrow was tapped (1.2.299). All of them follow the language now.
 function applyStaticTexts() {
-  document.getElementById('title').textContent      = T.title;
   document.getElementById('refresh-btn').title       = T.refresh;
+  document.getElementById('refresh-btn').setAttribute('aria-label', T.refresh);
   document.getElementById('nav-prev').title           = T.prevDay;
   document.getElementById('nav-next').title           = T.nextDay;
   var initial = document.getElementById('initialLoading');
@@ -411,7 +372,7 @@ function navLabel(offset) {
   if (offset === 0) return T.today;
   if (offset === 1) return T.yesterday;
   var d = new Date(dayStart(offset));
-  return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(activeLang || undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 function fmtDayLabel(ts) {
@@ -422,7 +383,7 @@ function fmtDayLabel(ts) {
   var ds        = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   if (ds === today)     return T.today;
   if (ds === yesterday) return T.yesterday;
-  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  return d.toLocaleDateString(activeLang || undefined, { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
 // ── Extract numeric info from status text ──────────────────────────────────
@@ -558,11 +519,16 @@ function updateNav() {
   render();
 }
 
+// A short buzz on a tap, where the device has it (Homey's widget API, 1.2.300).
+function haptic() { try { Homey.hapticFeedback(); } catch (e) {} }
+
 document.getElementById('nav-prev').addEventListener('click', function() {
+  haptic();
   dayOffset++;
   updateNav();
 });
 document.getElementById('nav-next').addEventListener('click', function() {
+  haptic();
   if (dayOffset > 0) { dayOffset--; updateNav(); }
 });
 
@@ -571,7 +537,12 @@ document.getElementById('nav-next').addEventListener('click', function() {
 // only when something arrived or the day changed.
 var newestTs = 0;
 var renderedFor = '';
+// One request at a time: a slow answer used to be overtaken by the next poll (1.2.300).
+var loading = false;
 async function load(full) {
+  if (loading) return;
+  loading = true;
+  var again = false;
   try {
     var since = full ? 0 : newestTs;
     var result = await Homey.api('GET', since ? '/history?since=' + since : '/history');
@@ -586,7 +557,8 @@ async function load(full) {
     if (result.full) {
       allEvents = events;
     } else if (typeof result.newestTs === 'number' && result.newestTs < newestTs) {
-      return load(true); // the history shrank behind our back — start over
+      again = true; // the history shrank behind our back — start over
+      return;
     } else if (events.length) {
       allEvents = allEvents.concat(events).slice(-400);
     }
@@ -597,10 +569,13 @@ async function load(full) {
     document.getElementById('timeline').innerHTML =
       '<div class="empty">' + esc(T.errorPrefix + (err.message || String(err))) + '</div>';
     renderedFor = '';
+  } finally {
+    loading = false;
+    if (again) load(true);
   }
 }
 
-document.getElementById('refresh-btn').addEventListener('click', function () { load(true); });
+document.getElementById('refresh-btn').addEventListener('click', function () { haptic(); load(true); });
 
 // Auto-refresh every 30 s (only re-fetches, keeps current day view). Stops entirely
 // while the dashboard is hidden — an open widget used to keep polling around the clock —

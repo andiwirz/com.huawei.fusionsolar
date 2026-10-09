@@ -957,7 +957,10 @@ Behaviour shared by every widget:
 
 - **Language** follows the language set in the Homey app itself (`homey.i18n.getLanguage()`, delivered with each API response), *not* the browser or phone language — an English phone paired with a German Homey still renders German widgets. Available in English, German and Dutch.
 - **Theme** follows the dashboard's light/dark setting via Homey's own `--homey-*` CSS variables, not the OS-level `prefers-color-scheme`.
-- **Polling stops entirely while the dashboard isn't on screen** and resumes with an immediate refresh when you return, so an open widget doesn't keep updating in the background. The per-widget intervals below therefore apply only while the widget is actually visible.
+- **Polling stops entirely while the dashboard isn't on screen** and resumes with an immediate refresh when you return, so an open widget doesn't keep updating in the background. The per-widget intervals below therefore apply only while the widget is actually visible. One request at a time: a slow answer is never overtaken by the next.
+- **When the app does not answer**, a widget says so on its first load instead of pulsing forever, and after two missed answers it dims its figures and marks them "not current" instead of showing them as live.
+- **Numbers and dates** are written the way the dashboard language writes them — 8,8 kW and 9. Okt. in German, 8.8 kW and Oct 9 in English.
+- **Homey's widget styling guide** throughout (since 1.2.300): Homey's padding classes, text sizes (nothing smaller than 14 px, the axes of the charts included), colours, lines and radii; no second card inside Homey's frame and no inner shadows; buttons and switches big enough for a finger, with haptic feedback where the device offers it. Each widget announces one height — the manifest's, or the one it measured on its first drawing — so nothing jumps on load.
 
 ---
 
@@ -980,7 +983,8 @@ A hub-layout widget showing real-time power flows between PV, house, grid and ba
   - 🔴 Red: grid import active
   - No border: night / standby
 - **Battery node** shows SoC % below the power value; faded when no LUNA2000 is paired
-- Updates every **5 seconds**
+- Sources beyond Modbus: the grid reading of an EMMA or cloud inverter when no meter device is paired, and a kiosk device's PV figure as the last resort
+- Updates every **15 seconds** — the readings behind it change once a minute at most on a default Modbus poll
 
 | Widget setting           | Default | Description                                              |
 |--------------------------|---------|----------------------------------------------------------|
@@ -998,7 +1002,7 @@ A compact status widget with a pulsing colour circle indicating the current grid
 - ⚪ **Grey, no pulse** — no grid reading at all (no meter paired). Its own state on purpose: with nothing measured, both comparisons above are false, and the widget used to fall through to "self-sufficient" — announcing that the house covers its own load on the strength of no measurement whatsoever
 - Stats row shows current PV power, battery power + SoC, and house consumption
 - Battery stat is hidden when no LUNA2000 is paired
-- Updates every **5 seconds**
+- Updates every **15 seconds**
 
 | Widget setting           | Default | Description                                              |
 |--------------------------|---------|----------------------------------------------------------|
@@ -1025,7 +1029,9 @@ minutes at best, so the cloud is consulted only where nothing closer answers.
 - **Eigenverbrauch %** — share of PV energy used on-site (not exported)
 - **Autarkie %** — share of the house consumption that did not come from the grid: 1 − import ÷ consumption, against the very figures shown beside it
 - Battery charged / discharged row is shown only when a LUNA2000 is paired
-- Updates every **10 seconds**
+- iSitePower plants have their day too, from midnight baselines of their lifetime totals (PV, house, grid)
+- The "values from midnight" hint shows only where a baseline is really still missing; a figure that does not exist is an em dash, not "…"
+- Updates **once a minute** — these are day totals
 
 ---
 
@@ -1034,11 +1040,12 @@ minutes at best, so the cloud is consulted only where nothing closer answers.
 Detailed battery state at a glance.
 
 - **SoC bar** — colour coded: green ≥ 40 %, orange 20–40 %, red < 20 %
-- **Charge / discharge power** with direction label and animated glow icon
-- **Time remaining** — estimated time to full (when charging) or empty (when discharging), shown prominently below the SoC bar
+- **Charge / discharge power** with direction label and a pulsing icon
+- **Time remaining** — estimated time to full (when charging) or empty (when discharging), shown prominently below the SoC bar. An EMMA battery's own kWh to full and to empty come first
 - **Today's stats** — energy charged and discharged today (kWh)
-- Shows **"Keine Batterie"** when no LUNA2000 is paired
-- Updates every **10 seconds**
+- **State** in the dashboard language — Huawei's "Running" becomes charging, discharging or standby by the power
+- Shows the first battery that answers; **"Battery unreachable"** when none does, **"No battery"** only when none is paired
+- Updates every **15 seconds**
 
 | Widget setting             | Default | Description                                                   |
 |----------------------------|---------|---------------------------------------------------------------|
@@ -1057,7 +1064,8 @@ At-a-glance summary of today's solar production.
   device under its own name.
 - **Optimizer count** — online / total (shown only when optimizers are detected)
 - **CO₂ saved** — calculated from today's yield × emission factor
-- Updates every **10 seconds**
+- iSitePower plants: today from a midnight baseline of the lifetime total
+- Updates **once a minute** — these are day totals
 
 | Widget setting              | Default     | Description                                                        |
 |-----------------------------|-------------|--------------------------------------------------------------------|
@@ -1067,13 +1075,13 @@ At-a-glance summary of today's solar production.
 
 ### Charger Status (Ladestatus)
 
-Live state of an EV charger (OCPP or EMMA): charging power, session energy, active current/phase limit and connection state at a glance.
+Live state of an EV charger (OCPP or EMMA): charging power, session energy, active current/phase limit and connection state at a glance. Phases and limits are written in the dashboard language. Updates every **10 seconds**; the session clock ticks every second.
 
 ---
 
 ### Charging Sessions (Ladesitzungen)
 
-A scrollable history of charging sessions — energy delivered, duration and end reason per session. Prefers a paired OCPP charger, whose history is the richer one, and otherwise falls back to the EMS's own charge sessions, so the widget is useful with any charger brand. A session in progress appears at the top, labelled *charging* or *paused*. Where a feed-in tariff is configured, the cost line is followed by its two halves — what was paid and what was given up by not exporting.
+A scrollable history of charging sessions — energy delivered, duration and end reason per session. Prefers a paired OCPP charger, whose history is the richer one, and otherwise falls back to the EMS's own charge sessions, so the widget is useful with any charger brand. Every session in progress appears at the top, labelled *charging* or *paused* — two chargers running at once show as two. The charger's stop reasons are translated (*Car disconnected*, *Stopped remotely* …). The widget grows with its rows instead of scrolling inside a fixed box. Updates every **30 seconds**. Where a feed-in tariff is configured, the cost line is followed by its two halves — what was paid and what was given up by not exporting.
 
 ---
 
@@ -1141,7 +1149,7 @@ falls back to English for the parts Homey renders from `app.json`.
 | Surface | What it covers | en | de | nl |
 |---|---|---|---|---|
 | `locales/*.json` | App code, pairing, the entire settings page | 667 | 667 | **667** |
-| Widgets (12) | All dashboard widget text | 128 | 128 | **128** |
+| Widgets (12) | All dashboard widget text | 225 | 225 | **225** |
 | `app.json` | Driver names, device settings, capability titles, flow cards | 1361 | 1349 | **1349** |
 
 ### What a Dutch user sees today

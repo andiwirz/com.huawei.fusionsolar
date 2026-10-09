@@ -1,13 +1,11 @@
 'use strict';
 
-const { getDevice } = require('../../lib/widget-data');
+const { getDevice, lang } = require('../../lib/widget-data');
 
-// Dashboard language from Homey itself, not navigator.language in the widget — that is
-// the browser/OS language and can differ from the Homey app language. See
-// widgets/ems-device/api.js for the full rationale.
-function lang(homey) {
-  try { return homey.i18n.getLanguage() || 'en'; } catch (e) { return 'en'; }
-}
+// The widget shows five or ten rows; twenty is the most any setting asks for. The EMS keeps
+// up to 200 sessions and all of them used to go out every ten seconds (1.2.300).
+const MAX_ROWS = 20;
+
 
 /**
  * One EMS charge session in the shape this widget already renders.
@@ -41,9 +39,9 @@ module.exports = {
     // as a side effect.
     const device = getDevice(homey, 'smartcharger_ocpp');
     if (device && device.getSessionHistory) {
-      const history = await device.getSessionHistory();
+      const history = (await device.getSessionHistory()).slice(0, MAX_ROWS);
       const current = device.getCurrentSessionInfo();
-      return { history, current, lang: lang(homey) };
+      return { history, current, currents: current ? [current] : [], lang: lang(homey) };
     }
 
     // Otherwise the EMS's own sessions, which cover every charger it steers whatever the
@@ -51,15 +49,18 @@ module.exports = {
     // — that is to say, for most installations.
     const ems = getDevice(homey, 'energy_management');
     if (!ems || typeof ems.getEmsChargeSessions !== 'function') {
-      return { error: 'No charger registered', lang: lang(homey) };
+      return { error: 'no_charger', lang: lang(homey) };
     }
     const rows = ems.getEmsChargeSessions();
-    const live = rows.find((s) => s.running) || null;
+    // Every session in progress — two chargers can run at once, and the second one used to
+    // vanish (only the first was sent). `current` stays for an older widget build.
+    // `paused` is the widget's word for "plugged in but not drawing", which for an
+    // EMS-steered charger is a normal state between two solar windows.
+    const currents = rows.filter((s) => s.running).map((s) => ({ ...emsRow(s), paused: s.charging === false }));
     return {
-      history: rows.filter((s) => !s.running).map(emsRow),
-      // `paused` is the widget's word for "plugged in but not drawing", which for an
-      // EMS-steered charger is a normal state between two solar windows.
-      current: live ? { ...emsRow(live), paused: live.charging === false } : null,
+      history: rows.filter((s) => !s.running).slice(0, MAX_ROWS).map(emsRow),
+      current: currents[0] || null,
+      currents,
       lang: lang(homey),
     };
   },

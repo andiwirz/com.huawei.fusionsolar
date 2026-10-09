@@ -19,57 +19,61 @@
      guide), which the dashboard sets according to the user's light/dark theme
      choice — NOT the OS-level prefers-color-scheme, which widgets don't get to
      read reliably. Never hardcode light/dark pairs here again. */
+  /* Sizes and spacing from Homey's widget styling guide too (1.2.300): no text below
+     --homey-font-size-small, no second card inside Homey's own frame. */
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
-    background: transparent;
-    color: var(--homey-text-color);
+  html, body { margin: 0; color: var(--homey-text-color); }
+  .card { display: flex; flex-direction: column; }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: var(--homey-su-2); }
+  .title, .soc {
+    font-size: var(--homey-font-size-default); line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-bold);
   }
-  .card { background: var(--homey-background-color); border-radius: 16px; padding: 14px; }
-  .head { display: flex; align-items: center; justify-content: space-between; }
-  .title { font-size: 15px; font-weight: 700; }
-  .soc { font-size: 15px; font-weight: 700; }
-  .soc.green  { color: var(--homey-text-color-green); }
-  .soc.orange { color: var(--homey-text-color-orange); }
-  .soc.red    { color: var(--homey-text-color-red); }
-  .kwh-line { font-size: 11px; color: var(--homey-text-color-light); margin-top: 2px; min-height: 14px; }
+  .soc { font-variant-numeric: tabular-nums; }
+  .soc.green  { color: var(--homey-color-green); }
+  .soc.red    { color: var(--homey-color-red); }
+  .kwh-line, .status-line, .zone-field .pct, .zone-field label, .no-data {
+    font-size: var(--homey-font-size-small); line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
+  }
+  .kwh-line { min-height: var(--homey-line-height-small); }
 
-  .bar-wrap { position: relative; margin-top: 12px; height: 16px; }
+  .bar-wrap { position: relative; margin-top: var(--homey-su-3); height: 16px; }
   .bar-track {
     position: absolute; inset: 0; border-radius: 8px; overflow: hidden;
-    background: rgba(128,128,128,0.14); display: flex;
+    background: var(--homey-line-color-light); display: flex;
   }
   .bar-fill { height: 100%; transition: width 0.3s ease; }
-  .bar-fill.green  { background: var(--homey-color-green, #22c55e); }
-  .bar-fill.orange { background: var(--homey-color-orange, #f5a524); }
-  .bar-fill.red    { background: var(--homey-color-red, #ef4444); }
+  .bar-fill.green  { background: var(--homey-color-green); }
+  .bar-fill.red    { background: var(--homey-color-red); }
   .bar-marker {
-    position: absolute; top: -3px; width: 2px; height: 22px; background: var(--homey-line-color, rgba(128,128,128,0.5));
+    position: absolute; top: -3px; width: 2px; height: 22px; background: var(--homey-text-color-light);
   }
 
-  .zones-row { display: flex; justify-content: space-between; margin-top: 8px; }
-  .zone-field { display: flex; align-items: center; gap: 4px; }
-  .zone-field label { font-size: 10px; color: var(--homey-text-color-light); text-transform: uppercase; letter-spacing: 0.3px; }
+  .zones-row { display: flex; justify-content: space-between; margin-top: var(--homey-su-3); }
+  .zone-field { display: flex; align-items: center; gap: var(--homey-su-2); }
   .zone-field input {
     -webkit-user-select: text; user-select: text;
-    width: 46px; font-size: 12px; font-weight: 600; text-align: right;
-    padding: 3px 5px; border-radius: 6px; border: 1px solid var(--homey-line-color, rgba(128,128,128,0.3));
-    background: rgba(128,128,128,0.08); color: var(--homey-text-color);
+    width: 64px; font: inherit; font-size: var(--homey-font-size-default); font-weight: var(--homey-font-weight-medium);
+    text-align: right; padding: var(--homey-su-1) var(--homey-su-2); border-radius: var(--homey-border-radius-small);
+    border: var(--homey-line); background: transparent; color: var(--homey-text-color);
   }
-  .zone-field .pct { font-size: 11px; color: var(--homey-text-color-light); }
+  .zone-field input:focus-visible { outline: 2px solid var(--homey-color-blue); outline-offset: 1px; }
 
-  .divider { height: 1px; background: var(--homey-line-color-light, rgba(128,128,128,0.2)); margin-top: 12px; }
-  .status-line { font-size: 12px; color: var(--homey-text-color-light); margin-top: 10px; display: flex; align-items: center; gap: 6px; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .status-dot.charge { background: var(--homey-color-green, #22c55e); }
+  .status-line {
+    display: flex; align-items: center; gap: var(--homey-su-2);
+    margin-top: var(--homey-su-3); padding-top: var(--homey-su-3); border-top: var(--homey-line);
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.charge { background: var(--homey-color-green); }
   .status-dot.hold   { background: var(--homey-color-orange, #f5a524); }
-  .status-dot.idle   { background: rgba(128,128,128,0.35); }
+  .status-dot.idle   { background: var(--homey-line-color); }
 
-  .no-data { font-size: 12px; color: var(--homey-text-color-light); text-align: center; padding: 20px 4px; }
+  .no-data { text-align: center; padding: var(--homey-su-4) var(--homey-su-1); }
+  body.stale .soc, body.stale .kwh-line { opacity: 0.45; }
 </style>
 </head>
-<body>
+<body class="homey-widget">
   <div class="card" id="card">
     <div class="no-data" id="noData" style="display:none"></div>
     <div id="content" style="display:none">
@@ -92,7 +96,6 @@
         </div>
       </div>
 
-      <div class="divider"></div>
       <div class="status-line">
         <span class="status-dot" id="statusDot"></span>
         <span id="statusText">—</span>
@@ -111,21 +114,21 @@ function onHomeyReady(Homey) {
       stop: 'Stopp unter', kwhOf: 'von',
       zoneGreen: 'Solar frei', zoneRed: 'Geschützt — lädt Batterie',
       priceCharge: 'Preisgeladen', priceHold: 'Entladen gesperrt (Preis)', priceIdle: 'Preisladen aktiviert', writeFailed: 'Änderung fehlgeschlagen',
-      aboveRamp: 'Höchstens {max} % — darüber beginnt die Rampe nicht mehr', invalidValue: 'Bitte 0 bis 100 % eingeben',
+      aboveRamp: 'Höchstens {max} % — darüber beginnt die Rampe nicht mehr', invalidValue: 'Bitte 0 bis 100 % eingeben', stale: '⚠ nicht aktuell',
     };
     var nl = {
       title: 'Batterijgebruik', noBattery: 'Geen batterij geconfigureerd', unreachable: 'EMS-apparaat niet bereikbaar',
       stop: 'Stop onder', kwhOf: 'van',
       zoneGreen: 'Zon vrij', zoneRed: 'Beschermd — batterij laadt',
       priceCharge: 'Prijsladen actief', priceHold: 'Ontladen geblokkeerd (prijs)', priceIdle: 'Prijsladen ingeschakeld', writeFailed: 'Wijziging mislukt',
-      aboveRamp: 'Hoogstens {max} % — daarboven begint de helling niet meer', invalidValue: 'Voer 0 tot 100 % in',
+      aboveRamp: 'Hoogstens {max} % — daarboven begint de helling niet meer', invalidValue: 'Voer 0 tot 100 % in', stale: '⚠ niet actueel',
     };
     var en = {
       title: 'Battery Usage', noBattery: 'No battery configured', unreachable: 'EMS device unreachable',
       stop: 'Stop below', kwhOf: 'of',
       zoneGreen: 'Solar free', zoneRed: 'Protected — battery charging',
       priceCharge: 'Price-charging', priceHold: 'Discharge held (price)', priceIdle: 'Price-charging enabled', writeFailed: 'Change failed',
-      aboveRamp: 'At most {max} % — above that the ramp would no longer start', invalidValue: 'Enter 0 to 100 %',
+      aboveRamp: 'At most {max} % — above that the ramp would no longer start', invalidValue: 'Enter 0 to 100 %', stale: '⚠ not current',
     };
     return { de: de, nl: nl, en: en };
   })();
@@ -144,6 +147,56 @@ function onHomeyReady(Homey) {
     stopLabel.textContent  = T.stop;
     return true;
   }
+
+  /* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+     widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+     German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+     first answer never comes, dims values after two missed answers instead of showing them
+     as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+     changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+  var _nf = {};
+  function fmtNum(v, digits) {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    var key = (activeLang || '') + '|' + digits;
+    if (!_nf[key]) {
+      try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+      catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+    }
+    return _nf[key].format(v);
+  }
+  function poller(opts) {
+    var busy = false, timer = null, loaded = false, misses = 0;
+    function tick() {
+      if (busy) return;
+      busy = true;
+      Promise.resolve().then(opts.run).then(function (data) {
+        busy = false; misses = 0; loaded = true;
+        document.body.classList.remove('stale');
+        opts.onOk(data);
+      }, function (err) {
+        busy = false; misses++;
+        if (!loaded) opts.onFail(true, err);
+        else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+      });
+    }
+    function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+    function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { stop(); return; }
+      tick(); start();
+    });
+    tick();
+    if (!document.hidden) start();
+    return { now: tick };
+  }
+  var _fitH = 0;
+  function fitHeight(Homey, el) {
+    requestAnimationFrame(function () {
+      var h = Math.ceil(el.getBoundingClientRect().bottom);
+      if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+    });
+  }
+  /* ── end of the shared block ── */
 
   var card    = document.getElementById('card');
   var noData  = document.getElementById('noData');
@@ -227,13 +280,13 @@ function onHomeyReady(Homey) {
     noData.style.display  = 'none';
 
     var soc = s.soc != null ? Math.round(s.soc) : null;
-    socVal.textContent = soc != null ? soc + '%' : '—';
+    socVal.textContent = soc != null ? fmtNum(soc, 0) + ' %' : '—';
     socVal.className   = 'soc ' + s.zone;
     barFill.className  = 'bar-fill ' + s.zone;
     barFill.style.width = (soc != null ? soc : 0) + '%';
 
     kwhLine.textContent = (s.energyKwh != null && s.capacityKwh != null)
-      ? s.energyKwh.toFixed(1) + ' ' + T.kwhOf + ' ' + s.capacityKwh.toFixed(1) + ' kWh'
+      ? fmtNum(s.energyKwh, 1) + ' ' + T.kwhOf + ' ' + fmtNum(s.capacityKwh, 1) + ' kWh'
       : '';
 
     markerNormal.style.left = s.stopSoc + '%';
@@ -256,42 +309,34 @@ function onHomeyReady(Homey) {
     syncHeight();
   }
 
-  // Homey.setHeight() crosses the iframe boundary — only call it on an actual change.
-  var lastHeight = 0;
+  // Ready once, with the height of the first drawing — it used to announce 190 px, under
+  // a manifest of 220, and then grow: a jump on every first load (1.2.300).
+  var readied = false;
   function syncHeight() {
-    requestAnimationFrame(function () {
-      var h = Math.ceil(card.getBoundingClientRect().bottom) + 4;
-      if (h === lastHeight) return;
-      lastHeight = h;
-      Homey.setHeight(h);
-    });
+    if (!readied) {
+      readied = true;
+      requestAnimationFrame(function () {
+        Homey.ready({ height: Math.ceil(card.getBoundingClientRect().bottom) + 16 });
+      });
+      return;
+    }
+    fitHeight(Homey, document.body);
   }
 
-  async function refresh() {
-    try {
-      var s = await Homey.api('GET', '/status');
-      render(s);
-    } catch (err) {
-      render({ error: 'unreachable' });
-    }
-  }
+  function refresh() { poll.now(); }
 
   // The EMS recomputes only every TICK_MS (15 s), so a faster poll re-fetches identical
   // data; writes confirm themselves immediately via writeZones(). Stop entirely while
   // the dashboard is hidden and catch up on return.
-  var POLL_MS = 15000;
-  var timer = null;
-  function startPolling() { if (!timer) timer = setInterval(refresh, POLL_MS); }
-  function stopPolling()  { if (timer) { clearInterval(timer); timer = null; } }
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { stopPolling(); return; }
-    refresh();
-    startPolling();
+  var poll = poller({
+    ms: 15000,
+    run: function () { return Homey.api('GET', '/status'); },
+    onOk: render,
+    onFail: function (first) {
+      if (first) render({ error: 'unreachable' });
+      else if (Date.now() >= errorUntil) statusText.textContent = T.stale;
+    },
   });
-
-  Homey.ready({ height: 190 });
-  refresh();
-  if (!document.hidden) startPolling();
 }
 </script>
 </body>

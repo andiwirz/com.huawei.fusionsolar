@@ -17,28 +17,21 @@
 
   /* Colors come from Homey's own --homey-* variables (widget styling guide),
      which follow the dashboard's light/dark setting — NOT the OS-level
-     prefers-color-scheme, which widgets don't reliably get. */
+     prefers-color-scheme, which widgets don't reliably get. Sizes and spacing come
+     from the guide too: no text below --homey-font-size-small, and no second card
+     inside Homey's own frame (1.2.300). */
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
-    background: transparent;
-    color: var(--homey-text-color);
-  }
-  .card {
-    background: var(--homey-background-color);
-    border-radius: 16px;
-    padding: 12px;
-  }
+  html, body { margin: 0; color: var(--homey-text-color); }
+  .card { display: flex; flex-direction: column; }
   .photo-wrap {
     position: relative;
     width: 100%;
     /* Full portrait photo, no cropping: height locked to the photo's
        aspect ratio (1056/992) via padding-top, robust in any webview */
     padding-top: 106.45%;
-    border-radius: 12px;
+    border-radius: var(--homey-border-radius-default);
     overflow: hidden;
-    background: #2a2a2e;
+    background: #2a2a2e; /* behind the photo while it loads — the photos are dark */
   }
   .photo-wrap img {
     position: absolute;
@@ -57,23 +50,37 @@
   /* Idle: slightly muted photo */
   .muted img { filter: grayscale(35%) brightness(0.95); }
 
-  .status-label { font-size: 15px; font-weight: 700; margin-top: 10px; }
-  .status-label.error { color: var(--homey-text-color-red); }
+  .status-label {
+    font-size: var(--homey-font-size-default); line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-bold); margin-top: var(--homey-su-3);
+  }
+  .status-label.error { color: var(--homey-text-color-danger, var(--homey-color-red)); }
   .sub {
-    font-size: 11px; color: var(--homey-text-color-light); margin-top: 2px;
+    font-size: var(--homey-font-size-small); line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
     /* Always occupy one line, even when empty — states differ in whether
        they have a sub-line (Charging doesn't, Paused/Smart do), and the
        widget height is measured once, so a variable text block leaves a
        trail in some states and would clip in others */
-    min-height: 14px;
+    min-height: var(--homey-line-height-small);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .divider { height: 1px; background: var(--homey-line-color-light, rgba(128,128,128,0.2)); margin-top: 10px; }
-  .stats { display: flex; justify-content: space-between; margin-top: 9px; }
-  .stat-value { font-size: 16px; font-weight: 700; color: var(--homey-text-color-blue); }
-  .stat-label { font-size: 9px; color: var(--homey-text-color-light); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 1px; }
+  .stats {
+    display: flex; justify-content: space-between; gap: var(--homey-su-2);
+    margin-top: var(--homey-su-3); padding-top: var(--homey-su-3); border-top: var(--homey-line);
+  }
+  .stat-value {
+    font-size: var(--homey-font-size-default); line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-bold); color: var(--homey-text-color-blue, var(--homey-color-blue));
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .stat-label { font-size: var(--homey-font-size-small); line-height: var(--homey-line-height-small); color: var(--homey-text-color-light); }
+  /* Values the app has not confirmed for two polls are dimmed, not shown as live. */
+  body.stale .stat-value, body.stale .status-label { opacity: 0.45; }
+  @media (prefers-reduced-motion: reduce) { .charging #imgBlue, .finishing #imgBlue { animation: none; opacity: 0.6; } }
 </style>
 </head>
-<body>
+<body class="homey-widget-small">
   <div class="card" id="card">
     <div class="photo-wrap" id="photoWrap">
       <img id="imgBase" src="img/idle.jpg" alt="">
@@ -81,7 +88,6 @@
     </div>
     <div class="status-label" id="statusLabel">—</div>
     <div class="sub" id="statusSub"></div>
-    <div class="divider"></div>
     <div class="stats">
       <div>
         <div class="stat-value" id="statPower">—</div>
@@ -115,7 +121,8 @@ function onHomeyReady(Homey) {
   const DICTS = (function () {
     const de = {
       power: 'Leistung', amps: 'Ampere', session: 'Sitzung',
-      notAvailable: 'Nicht verfügbar', unreachable: 'Lader nicht erreichbar',
+      notAvailable: 'Nicht verfügbar', unreachable: 'Lader nicht erreichbar', noCharger: 'Kein Lader gekoppelt', stale: '⚠ nicht aktuell',
+      phases: { 1: '1-phasig', 2: '2-phasig', 3: '3-phasig' },
       charging: 'Lädt', paused: 'Pausiert', resumesAt: 'Setzt fort bei ',
       states: {
         not_connected: ['Leerlauf', 'Kein Auto verbunden'],
@@ -131,7 +138,8 @@ function onHomeyReady(Homey) {
     };
     const nl = {
       power: 'Vermogen', amps: 'Ampère', session: 'Sessie',
-      notAvailable: 'Niet beschikbaar', unreachable: 'Lader niet bereikbaar',
+      notAvailable: 'Niet beschikbaar', unreachable: 'Lader niet bereikbaar', noCharger: 'Geen lader gekoppeld', stale: '⚠ niet actueel',
+      phases: { 1: '1-fase', 2: '2-fasen', 3: '3-fasen' },
       charging: 'Laadt', paused: 'Gepauzeerd', resumesAt: 'Hervat bij ',
       states: {
         not_connected: ['Inactief', 'Geen auto verbonden'],
@@ -147,7 +155,8 @@ function onHomeyReady(Homey) {
     };
     const en = {
       power: 'Power', amps: 'Amps', session: 'Session',
-      notAvailable: 'Not available', unreachable: 'Charger unreachable',
+      notAvailable: 'Not available', unreachable: 'Charger unreachable', noCharger: 'No charger paired', stale: '⚠ not current',
+      phases: { 1: '1-phase', 2: '2-phase', 3: '3-phase' },
       charging: 'Charging', paused: 'Paused', resumesAt: 'Resumes at ',
       states: {
         not_connected: ['Idle', 'No car connected'],
@@ -167,7 +176,7 @@ function onHomeyReady(Homey) {
     const l = String(code || '');
     return l.indexOf('de') === 0 ? DICTS.de : l.indexOf('nl') === 0 ? DICTS.nl : DICTS.en;
   }
-  let activeLang = null;
+  var activeLang = null;
   let T = dictFor(navigator.language); // placeholder until the first payload arrives
   function applyLang(code) {
     if (!code || code === activeLang) return false;
@@ -186,7 +195,68 @@ function onHomeyReady(Homey) {
   }
   applyStaticLabels();
 
+  /* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+     widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+     German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+     first answer never comes, dims values after two missed answers instead of showing them
+     as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+     changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+  var _nf = {};
+  function fmtNum(v, digits) {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    var key = (activeLang || '') + '|' + digits;
+    if (!_nf[key]) {
+      try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+      catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+    }
+    return _nf[key].format(v);
+  }
+  function poller(opts) {
+    var busy = false, timer = null, loaded = false, misses = 0;
+    function tick() {
+      if (busy) return;
+      busy = true;
+      Promise.resolve().then(opts.run).then(function (data) {
+        busy = false; misses = 0; loaded = true;
+        document.body.classList.remove('stale');
+        opts.onOk(data);
+      }, function (err) {
+        busy = false; misses++;
+        if (!loaded) opts.onFail(true, err);
+        else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+      });
+    }
+    function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+    function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { stop(); return; }
+      tick(); start();
+    });
+    tick();
+    if (!document.hidden) start();
+    return { now: tick };
+  }
+  var _fitH = 0;
+  function fitHeight(Homey, el) {
+    requestAnimationFrame(function () {
+      var h = Math.ceil(el.getBoundingClientRect().bottom);
+      if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+    });
+  }
+  /* ── end of the shared block ── */
+
   let sessionStartTime = null;
+
+  // The drivers send "Tri-Phase" / "Mono-Phase" and an English "7.4 kW" for the limit;
+  // the widget says both in its own language from the numbers (1.2.300).
+  function phaseText(s) {
+    return (s.phases && T.phases[s.phases]) || s.phaseLabel || '';
+  }
+  function limitText(s) {
+    const m = /([\d.]+)\s*kW/.exec(String(s.limitKw || ''));
+    const amps = s.requestedAmps + ' A';
+    return m ? fmtNum(parseFloat(m[1]), 1) + ' kW (' + amps + ')' : amps;
+  }
 
   function fmtDuration(ms) {
     const mins = Math.floor(ms / 60000);
@@ -207,7 +277,7 @@ function onHomeyReady(Homey) {
     if (!s || s.error) {
       statusLabel.textContent = T.notAvailable;
       statusLabel.className = 'status-label';
-      statusSub.textContent = s && s.error ? s.error : '';
+      statusSub.textContent = !s ? '' : s.error === 'no_charger' ? T.noCharger : (s.error || '');
       card.className = 'card';
       photoWrap.className = 'photo-wrap muted';
       sessionStartTime = null;
@@ -247,11 +317,11 @@ function onHomeyReady(Homey) {
 
     statusLabel.className = 'status-label' + (st === 'error' ? ' error' : '');
     if (st === 'charging' && s.requestedAmps) {
-      statusLabel.textContent = T.charging + ' \u00b7 ' + (s.limitKw ? s.limitKw + ' (' + s.requestedAmps + 'A)' : s.requestedAmps + 'A') + ' / ' + s.phaseLabel;
+      statusLabel.textContent = T.charging + ' \u00b7 ' + limitText(s) + ' / ' + phaseText(s);
       statusSub.textContent = '';
     } else if (st === 'paused' && s.requestedAmps) {
       statusLabel.textContent = T.paused;
-      statusSub.textContent = T.resumesAt + (s.limitKw ? s.limitKw + ' (' + s.requestedAmps + 'A)' : s.requestedAmps + 'A') + ' / ' + s.phaseLabel;
+      statusSub.textContent = T.resumesAt + limitText(s) + ' / ' + phaseText(s);
     } else {
       statusLabel.textContent = label;
       statusSub.textContent = sub;
@@ -261,8 +331,8 @@ function onHomeyReady(Homey) {
     // and show placeholders otherwise — row always visible for stable height
     if (st === 'charging' || st === 'finishing' || st === 'paused') {
       const kw = (s.powerW || 0) / 1000;
-      statPower.textContent = kw >= 1 ? kw.toFixed(1) + ' kW' : Math.round(s.powerW || 0) + ' W';
-      statAmps.textContent = (s.currentA != null ? Math.round(s.currentA * 10) / 10 : '—') + ' A';
+      statPower.textContent = kw >= 1 ? fmtNum(kw, 1) + ' kW' : fmtNum(Math.round(s.powerW || 0), 0) + ' W';
+      statAmps.textContent = s.currentA != null ? fmtNum(Math.round(s.currentA * 10) / 10, 1) + ' A' : '—';
       sessionStartTime = s.sessionStartTime || null;
     } else {
       statPower.textContent = '—';
@@ -272,35 +342,25 @@ function onHomeyReady(Homey) {
     tickTimer();
   }
 
-  async function refresh() {
-    try {
-      const s = await Homey.api('GET', '/status');
-      applyLang(s && s.lang);
-      render(s);
-    } catch (err) {
-      render({ error: T.unreachable });
-    }
-  }
-
-  // Polling (and the 1 s countdown tick) stop entirely while the dashboard is hidden —
-  // this widget used to keep both running around the clock — and catch up on return.
-  var pollTimer = null, tickTimerId = null;
-  function startPolling() {
-    if (!pollTimer)    pollTimer    = setInterval(refresh, 5000);
-    if (!tickTimerId)  tickTimerId  = setInterval(tickTimer, 1000);
-  }
-  function stopPolling() {
-    if (pollTimer)   { clearInterval(pollTimer);   pollTimer = null; }
-    if (tickTimerId) { clearInterval(tickTimerId); tickTimerId = null; }
-  }
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { stopPolling(); return; }
-    refresh();
-    startPolling();
+  // Every 10 s (it asked every 5 s; a charger's meter values arrive every 10 to 60 s). The
+  // 1 s tick only advances the session clock on screen. Both rest while the dashboard is
+  // hidden and catch up on return.
+  poller({
+    ms: 10000,
+    run: function () { return Homey.api('GET', '/status'); },
+    onOk: function (s) { applyLang(s && s.lang); render(s); },
+    onFail: function (first) {
+      if (first) render({ error: T.unreachable });
+      else statusSub.textContent = T.stale;
+    },
   });
-
-  refresh();
-  if (!document.hidden) startPolling();
+  var tickTimerId = null;
+  function startTick() { if (!tickTimerId) tickTimerId = setInterval(tickTimer, 1000); }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { clearInterval(tickTimerId); tickTimerId = null; return; }
+    startTick();
+  });
+  if (!document.hidden) startTick();
 
   // Size the widget to fit the full photo plus the status/stats area,
   // whatever width the dashboard gives us. padding-top-based aspect
@@ -311,7 +371,7 @@ function onHomeyReady(Homey) {
     // visible trail instead. getBoundingClientRect().bottom is exact —
     // ceil it and add only a hairline for webview chrome.
     const rect = document.getElementById('card').getBoundingClientRect();
-    Homey.ready({ height: Math.ceil(rect.bottom) + 2 });
+    Homey.ready({ height: Math.ceil(rect.bottom) + 8 });
   });
 }
 </script>

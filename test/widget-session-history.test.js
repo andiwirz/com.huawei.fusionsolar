@@ -85,7 +85,7 @@ test('an OCPP charger still wins — its history is the richer one', async () =>
 
 test('neither paired — the widget is told so rather than shown an empty list', async () => {
   const out = await widgetApi.getSessions({ homey: makeHomey({}) });
-  assert.match(out.error, /No charger registered/);
+  assert.match(out.error, /no_charger/);
   assert.strictEqual(out.lang, 'de');
 });
 
@@ -93,5 +93,5 @@ test('an EMS device from before this shape is not called blindly', async () => {
   // getDevice returns whatever is paired; a device without the method would throw inside
   // the widget request and leave the card stuck on its loading state.
   const out = await widgetApi.getSessions({ homey: makeHomey({ ems: {} }) });
-  assert.match(out.error, /No charger registered/);
+  assert.match(out.error, /no_charger/);
 });

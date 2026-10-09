@@ -16,144 +16,145 @@
       -webkit-touch-callout: none;
     }
 
+  /* Sizes, colours and spacing from Homey's widget styling guide (--homey-*). The state of
+     charge uses the largest size the guide has for numbers, 32 px (it was 36 px); no text is
+     smaller than --homey-font-size-small; and the icon pulses instead of glowing — Homey's
+     frame carries the only shadow on the dashboard (1.2.300). */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: transparent;
-    padding: 14px;
-  }
+  #content { display: flex; flex-direction: column; gap: var(--homey-su-3); }
 
   /* --- SoC row --- */
   .soc-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
+    gap: var(--homey-su-3);
   }
 
   .soc-left {
     display: flex;
     align-items: center;
-    gap: 7px;
-    min-width: 80px;
+    gap: var(--homey-su-2);
+    min-width: 92px;
   }
 
   .soc-icon {
-    width: 22px;
-    height: 22px;
+    width: var(--homey-icon-size-medium, 20px);
+    height: var(--homey-icon-size-medium, 20px);
     flex-shrink: 0;
   }
 
   .soc-number {
-    font-size: 36px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    line-height: 1;
+    font-size: var(--homey-font-size-xxlarge);
+    line-height: var(--homey-line-height-xxlarge);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .soc-bar-wrap {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--homey-su-1);
   }
 
   .soc-track {
-    height: 14px;
-    border-radius: 8px;
-    background: var(--homey-line-color);
+    height: 12px;
+    border-radius: 6px;
+    background: var(--homey-line-color-light);
     overflow: hidden;
   }
 
   .soc-fill {
     height: 100%;
-    border-radius: 8px;
+    border-radius: 6px;
     transition: width 0.4s ease;
-    background: #22C55E;
+    background: var(--homey-color-green);
   }
 
   .soc-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--homey-su-2);
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
   }
 
-  .soc-status {
-    font-size: 11px;
-    color: var(--homey-text-color-light);
-  }
-
-  .soc-remaining {
-    font-size: 12px;
-    color: var(--homey-text-color);
-    font-weight: 600;
-  }
+  .soc-status { color: var(--homey-text-color-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .soc-remaining { color: var(--homey-text-color); font-weight: var(--homey-font-weight-medium); white-space: nowrap; }
 
   /* --- Power row --- */
   .power-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
+    gap: var(--homey-su-2);
   }
 
   .power-icon {
-    width: 18px;
-    height: 18px;
+    width: var(--homey-icon-size-medium, 20px);
+    height: var(--homey-icon-size-medium, 20px);
     flex-shrink: 0;
   }
 
   .power-value {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    line-height: 1;
+    font-size: var(--homey-font-size-large);
+    line-height: var(--homey-line-height-large);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
   }
 
   .power-label {
-    font-size: 11px;
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
-    margin-left: 2px;
   }
 
   /* --- Stats row --- */
   .stats-row {
     display: flex;
-    gap: 8px;
+    gap: var(--homey-su-2);
   }
 
+  /* Outlined, not tinted: the guide draws boxes with its line colours. */
   .row-tile {
     flex: 1;
-    background: var(--homey-line-color);
-    border-radius: 12px;
-    padding: 8px 10px;
+    min-width: 0;
+    border: var(--homey-line);
+    border-radius: var(--homey-border-radius-small);
+    padding: var(--homey-su-1) var(--homey-su-3);
     display: flex;
     flex-direction: column;
-    gap: 3px;
   }
 
   .stat-label {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 11px;
+    gap: var(--homey-su-1);
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .stat-icon {
-    width: 12px;
-    height: 12px;
+    width: var(--homey-icon-size-small, 14px);
+    height: var(--homey-icon-size-small, 14px);
     flex-shrink: 0;
   }
 
   .stat-value {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+    font-size: var(--homey-font-size-default);
+    line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-bold);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
   }
 
   /* --- Skeleton --- */
@@ -166,25 +167,24 @@
   body.loading .stat-value {
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
+  /* Values the app has not confirmed for two polls are dimmed, not shown as live. */
+  body.stale .soc-number, body.stale .power-value, body.stale .stat-value { opacity: 0.45; }
 
-  /* --- Power icon animation --- */
-  @keyframes glow-green {
-    0%, 100% { filter: drop-shadow(0 0 0px rgba(34,197,94,0)); }
-    50%       { filter: drop-shadow(0 0 4px rgba(34,197,94,0.9)); }
+  /* --- Power icon: a slow pulse while energy flows --- */
+  @keyframes flow-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
   }
-  @keyframes glow-orange {
-    0%, 100% { filter: drop-shadow(0 0 0px rgba(249,115,22,0)); }
-    50%       { filter: drop-shadow(0 0 4px rgba(249,115,22,0.9)); }
-  }
-  .glow-green  { animation: glow-green  2s ease-in-out infinite; }
-  .glow-orange { animation: glow-orange 2s ease-in-out infinite; }
+  .pulsing { animation: flow-pulse 2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .pulsing { animation: none; } }
 </style>
 </head>
-<body class="loading">
+<body class="homey-widget loading">
 
+<div id="content">
 <div class="soc-row">
   <div class="soc-left">
-    <svg class="soc-icon" id="soc-batt-icon" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="soc-icon" id="soc-batt-icon" viewBox="0 0 24 24" fill="none" style="stroke:var(--homey-color-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="7" width="16" height="10" rx="2"/>
       <line x1="22" y1="10" x2="22" y2="14"/>
     </svg>
@@ -202,7 +202,7 @@
 </div>
 
 <div class="power-row">
-  <svg class="power-icon" id="power-icon" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg class="power-icon" id="power-icon" viewBox="0 0 24 24" fill="none" style="stroke:var(--homey-text-color-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
   </svg>
   <span class="power-value" id="power-val">—</span>
@@ -212,7 +212,7 @@
 <div class="stats-row">
   <div class="row-tile">
     <div class="stat-label">
-      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" style="stroke:var(--homey-color-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="19" x2="12" y2="5"/>
         <polyline points="5,12 12,5 19,12"/>
       </svg>
@@ -222,7 +222,7 @@
   </div>
   <div class="row-tile">
     <div class="stat-label">
-      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" style="stroke:#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/>
         <polyline points="19,12 12,19 5,12"/>
       </svg>
@@ -231,6 +231,7 @@
     <div class="stat-value" id="discharged-val">—</div>
   </div>
 </div>
+</div>
 
 <script>
 // Language comes from the API payload (Homey i18n.getLanguage()), not
@@ -238,6 +239,9 @@
 var DICTS = (function() {
   var de = {
     noBattery:   'Keine Batterie',
+    unreachable: 'Batterie nicht erreichbar',
+    appDown:     'App antwortet nicht',
+    stale:       '⚠ nicht aktuell',
     charging:    'Laden',
     discharging: 'Entladen',
     standby:     'Standby',
@@ -250,6 +254,9 @@ var DICTS = (function() {
   };
   var nl = {
     noBattery:   'Geen batterij',
+    unreachable: 'Batterij niet bereikbaar',
+    appDown:     'App reageert niet',
+    stale:       '⚠ niet actueel',
     charging:    'Laden',
     discharging: 'Ontladen',
     standby:     'Standby',
@@ -262,6 +269,9 @@ var DICTS = (function() {
   };
   var en = {
     noBattery:   'No battery',
+    unreachable: 'Battery unreachable',
+    appDown:     'App not responding',
+    stale:       '⚠ not current',
     charging:    'Charging',
     discharging: 'Discharging',
     standby:     'Standby',
@@ -296,15 +306,65 @@ function applyStaticLabels() {
 }
 applyStaticLabels();
 
+/* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+   widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+   German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+   first answer never comes, dims values after two missed answers instead of showing them
+   as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+   changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+var _nf = {};
+function fmtNum(v, digits) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  var key = (activeLang || '') + '|' + digits;
+  if (!_nf[key]) {
+    try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+    catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+  }
+  return _nf[key].format(v);
+}
+function poller(opts) {
+  var busy = false, timer = null, loaded = false, misses = 0;
+  function tick() {
+    if (busy) return;
+    busy = true;
+    Promise.resolve().then(opts.run).then(function (data) {
+      busy = false; misses = 0; loaded = true;
+      document.body.classList.remove('stale');
+      opts.onOk(data);
+    }, function (err) {
+      busy = false; misses++;
+      if (!loaded) opts.onFail(true, err);
+      else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+    });
+  }
+  function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+  function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); return; }
+    tick(); start();
+  });
+  tick();
+  if (!document.hidden) start();
+  return { now: tick };
+}
+var _fitH = 0;
+function fitHeight(Homey, el) {
+  requestAnimationFrame(function () {
+    var h = Math.ceil(el.getBoundingClientRect().bottom);
+    if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+  });
+}
+/* ── end of the shared block ── */
+
 function fmtKwh(v) {
   if (v === null || v === undefined) return '—';
-  return v.toFixed(1) + ' kWh';
+  return fmtNum(v, 1) + ' kWh';
 }
 function fmtW(w) {
   if (w === null || w === undefined) return '—';
-  const abs = Math.abs(w);
-  if (abs >= 1000) return (abs / 1000).toFixed(1) + ' kW';
-  return Math.round(abs) + ' W';
+  var abs = Math.abs(w);
+  if (abs >= 1000) return fmtNum(abs / 1000, 1) + ' kW';
+  return fmtNum(Math.round(abs), 0) + ' W';
 }
 function fmtRemaining(hours) {
   if (hours === null || !isFinite(hours) || hours <= 0) return '';
@@ -316,8 +376,8 @@ function fmtRemaining(hours) {
 }
 
 function onHomeyReady(Homey) {
-  Homey.ready({ height: 165 });
-  document.body.classList.add('loading');
+  // The same height as the manifest: one height, no jump on the first load.
+  Homey.ready({ height: 178 });
 
   // Reported by gsommer as issue #33: charging at 2 kW from 50 %, a 15 kWh battery was
   // told it would be full in a little over an hour. It was not the arithmetic. This line
@@ -337,11 +397,12 @@ function onHomeyReady(Homey) {
   function render(data) {
     document.body.classList.remove('loading');
 
-    // No battery device
+    // No battery device — or one that does not answer, which is not the same thing and
+    // used to read "No battery" too (1.2.300).
     if (data.soc === null && data.powerW === null) {
       document.getElementById('soc-num').textContent      = '—';
       document.getElementById('soc-fill').style.width     = '0%';
-      document.getElementById('batt-status').textContent  = T.noBattery;
+      document.getElementById('batt-status').textContent  = data.unreachable ? T.unreachable : T.noBattery;
       document.getElementById('batt-remaining').textContent = '';
       document.getElementById('power-val').textContent    = '—';
       document.getElementById('power-dir').textContent    = '';
@@ -352,15 +413,15 @@ function onHomeyReady(Homey) {
 
     // SoC
     var soc = data.soc;
-    var socColor = '#22C55E';
+    var socColor = 'var(--homey-color-green)';
     if (soc !== null && soc !== undefined) {
-      document.getElementById('soc-num').textContent = Math.round(soc) + '%';
+      document.getElementById('soc-num').textContent = fmtNum(Math.round(soc), 0) + ' %';
       document.getElementById('soc-fill').style.width = Math.min(100, Math.max(0, soc)) + '%';
-      if      (soc < 20) socColor = '#EF4444';
+      if      (soc < 20) socColor = 'var(--homey-color-red)';
       else if (soc < 40) socColor = '#F97316';
-      else               socColor = '#22C55E';
+      else               socColor = 'var(--homey-color-green)';
       document.getElementById('soc-fill').style.background = socColor;
-      document.getElementById('soc-batt-icon').setAttribute('stroke', socColor);
+      document.getElementById('soc-batt-icon').style.stroke = socColor;
     } else {
       document.getElementById('soc-num').textContent = '—';
     }
@@ -396,7 +457,14 @@ function onHomeyReady(Homey) {
     // an empty string for anything that is not a positive number of hours, so a missing
     // capacity draws nothing either way. It stays because reading the condition should not
     // require knowing that.
-    if (soc !== null && pw !== null && capacityKwh) {
+    // An EMMA battery says itself how many kWh are left to full and to empty; that wins
+    // over any capacity, reported or typed (1.2.300).
+    var toFull = num(data.toFullKwh), toEmpty = num(data.toEmptyKwh);
+    if (pw !== null && pw > 50 && toFull !== null) {
+      remaining = fmtRemaining(toFull / (pw / 1000));
+    } else if (pw !== null && pw < -50 && toEmpty !== null) {
+      remaining = fmtRemaining(toEmpty / (Math.abs(pw) / 1000));
+    } else if (soc !== null && pw !== null && capacityKwh) {
       // Both Math.max(0, ...) guards are the same kind of belt and braces as the test above:
       // a battery sitting outside its own window — somebody lowered the maximum while it was
       // full, or raised the reserve above where it stands — produces a negative distance, and
@@ -418,17 +486,17 @@ function onHomeyReady(Homey) {
     var powerIcon = document.getElementById('power-icon');
     var powerDir  = document.getElementById('power-dir');
     if (pw > 50) {
-      powerIcon.setAttribute('stroke', '#22C55E');
-      powerIcon.setAttribute('class', 'power-icon glow-green');
+      powerIcon.style.stroke = 'var(--homey-color-green)';
+      powerIcon.setAttribute('class', 'power-icon pulsing');
       powerDir.textContent = T.charging;
-      powerDir.style.color = '#22C55E';
+      powerDir.style.color = 'var(--homey-color-green)';
     } else if (pw < -50) {
-      powerIcon.setAttribute('stroke', '#F97316');
-      powerIcon.setAttribute('class', 'power-icon glow-orange');
+      powerIcon.style.stroke = '#F97316';
+      powerIcon.setAttribute('class', 'power-icon pulsing');
       powerDir.textContent = T.discharging;
       powerDir.style.color = '#F97316';
     } else {
-      powerIcon.setAttribute('stroke', '#9CA3AF');
+      powerIcon.style.stroke = 'var(--homey-text-color-light)';
       powerIcon.setAttribute('class', 'power-icon');
       powerDir.textContent = T.standby;
       powerDir.style.color = '';
@@ -438,24 +506,16 @@ function onHomeyReady(Homey) {
     document.getElementById('discharged-val').textContent = fmtKwh(data.todayDischargedKwh);
   }
 
-  function load() {
-    Homey.api('GET', '/', {})
-      .then(function(data) { applyLang(data && data.lang); if (data) render(data); })
-      .catch(function(err) { console.error('widget load error:', err); });
-  }
-
-  load();
-  // Polling stops entirely while the dashboard is hidden — it used to keep running
-  // around the clock — and catches up immediately on return.
-  var POLL_MS = 10000;
-  var pollTimer = null;
-  function startPolling() { if (!pollTimer) pollTimer = setInterval(load, POLL_MS); }
-  function stopPolling()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-  if (!document.hidden) startPolling();
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) { stopPolling(); return; }
-    load();
-    startPolling();
+  // Every 15 s: a battery's readings change once a minute at most on a default Modbus poll,
+  // and every five minutes from the cloud (1.2.300; it asked every 10 s).
+  poller({
+    ms: 15000,
+    run: function () { return Homey.api('GET', '/', {}); },
+    onOk: function (data) { applyLang(data && data.lang); if (data) render(data); },
+    onFail: function (first) {
+      document.body.classList.remove('loading');
+      document.getElementById('batt-status').textContent = first ? T.appDown : T.stale;
+    },
   });
 }
 </script>

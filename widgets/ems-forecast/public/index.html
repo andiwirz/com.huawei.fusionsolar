@@ -21,54 +21,64 @@
      read reliably. Never hardcode light/dark pairs here. The bar hues below
      (green→red for price) are content-driven, not theme colors, same approach
      as the settings page's own price-forecast chart. */
+  /* Sizes and spacing from Homey's widget styling guide too (1.2.300): no text below
+     --homey-font-size-small (the axes were 8 px), no second card inside Homey's frame. */
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    font-family: -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
-    background: transparent;
-    color: var(--homey-text-color);
+  html, body { margin: 0; color: var(--homey-text-color); }
+  .card { display: flex; flex-direction: column; }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: var(--homey-su-2); }
+  .title {
+    font-size: var(--homey-font-size-default); line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-bold);
   }
-  .card { background: var(--homey-background-color); border-radius: 16px; padding: 14px; }
-  .head { display: flex; align-items: center; justify-content: space-between; }
-  .title { font-size: 15px; font-weight: 700; }
   .refresh-btn {
-    border: none; background: rgba(128,128,128,0.12); color: var(--homey-text-color-light);
-    width: 24px; height: 24px; border-radius: 8px; font-size: 13px; line-height: 1;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border: var(--homey-line); background: transparent; color: var(--homey-text-color-light);
+    width: 32px; height: 32px; border-radius: 50%; font-size: var(--homey-font-size-default); line-height: 1;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .refresh-btn:focus-visible { outline: 2px solid var(--homey-color-blue); outline-offset: 2px; }
   .refresh-btn:active { transform: scale(0.92); }
   .refresh-btn.spin { animation: emsfc-spin 0.6s linear; }
   @keyframes emsfc-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .refresh-btn.spin { animation: none; } }
 
-  .section { margin-top: 14px; }
-  .section:first-of-type { margin-top: 12px; }
-  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-  .sec-label { font-size: 12px; font-weight: 600; color: var(--homey-text-color); }
-  .sec-status { font-size: 10px; color: var(--homey-text-color-light); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sec-status.warn { color: var(--homey-text-color-orange, #f5a524); }
-
-  .minmax-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--homey-text-color-light); margin: 4px 0 2px; }
-  .chart { display: flex; align-items: flex-end; height: 54px; gap: 1px; position: relative; }
-  .bar { flex: 1; min-width: 2px; border-radius: 1px 1px 0 0; position: relative; }
-  .bar-now-label {
-    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-    font-size: 9px; font-weight: 600; color: var(--homey-color-blue, #007aff); white-space: nowrap;
+  .section { margin-top: var(--homey-su-3); }
+  .section + .section { padding-top: var(--homey-su-3); border-top: var(--homey-line); }
+  .sec-label {
+    font-size: var(--homey-font-size-small); line-height: var(--homey-line-height-small);
+    font-weight: var(--homey-font-weight-bold); color: var(--homey-text-color);
   }
-  .axis-row { display: flex; gap: 1px; margin-top: 2px; }
-  .axis-cell { flex: 1; min-width: 2px; font-size: 8px; color: var(--homey-text-color-light); text-align: center; white-space: nowrap; }
+  .sec-status, .minmax-row, .axis-cell, .flat-unit, .sec-no-data, .no-data {
+    font-size: var(--homey-font-size-small); line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
+  }
+  .sec-status { min-height: var(--homey-line-height-small); }
+  .sec-status.warn { color: var(--homey-text-color-warning, #f5a524); }
+
+  .minmax-row { display: flex; justify-content: space-between; margin: var(--homey-su-2) 0 var(--homey-su-1); font-variant-numeric: tabular-nums; }
+  /* Room above the bars for the "now" figure. */
+  .chart { display: flex; align-items: flex-end; height: 56px; gap: 1px; position: relative; }
+  .bar { flex: 1; min-width: 2px; border-radius: 1px 1px 0 0; position: relative; }
+  /* The figure for now sits between max and min, in the colour of its bar. Above the bar it
+     was cut off at the left edge, where "now" always is. */
+  .minmax-row .now { color: var(--homey-color-blue); font-weight: var(--homey-font-weight-bold); }
+  .axis-row { display: flex; gap: 1px; margin-top: var(--homey-su-1); }
+  .axis-cell { flex: 1; min-width: 2px; text-align: center; white-space: nowrap; overflow: visible; }
 
   /* Flat, single-value display for the price section in "fixed"/"variable" tariff
      mode, where there's no future timeline to chart — just the one current price. */
-  .flat-row { display: flex; align-items: baseline; gap: 6px; padding: 10px 0 4px; }
-  .flat-value { font-size: 22px; font-weight: 700; }
-  .flat-unit { font-size: 12px; color: var(--homey-text-color-light); }
+  .flat-row { display: flex; align-items: baseline; gap: var(--homey-su-2); padding: var(--homey-su-2) 0 var(--homey-su-1); }
+  .flat-value {
+    font-size: var(--homey-font-size-large); line-height: var(--homey-line-height-large);
+    font-weight: var(--homey-font-weight-bold); font-variant-numeric: tabular-nums;
+  }
 
-  .divider { height: 1px; background: var(--homey-line-color-light, rgba(128,128,128,0.2)); margin-top: 14px; }
-  .sec-no-data { font-size: 11px; color: var(--homey-text-color-light); text-align: center; padding: 18px 4px; }
-  .no-data { font-size: 12px; color: var(--homey-text-color-light); text-align: center; padding: 20px 4px; }
+  .sec-no-data { text-align: center; padding: var(--homey-su-4) var(--homey-su-1); }
+  .no-data { text-align: center; padding: var(--homey-su-4) var(--homey-su-1); }
+  body.stale .flat-value, body.stale .sec-status { opacity: 0.45; }
 </style>
 </head>
-<body>
+<body class="homey-widget">
   <div class="card" id="card">
     <div class="no-data" id="noData" style="display:none"></div>
     <div id="content" style="display:none">
@@ -78,10 +88,8 @@
       </div>
 
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-label" id="solarLabel">—</div>
-          <div class="sec-status" id="solarStatus"></div>
-        </div>
+        <div class="sec-label" id="solarLabel">—</div>
+        <div class="sec-status" id="solarStatus"></div>
         <div id="solarBody">
           <div class="minmax-row" id="solarMinMax"></div>
           <div class="chart" id="solarChart"></div>
@@ -90,13 +98,9 @@
         <div class="sec-no-data" id="solarNoData" style="display:none"></div>
       </div>
 
-      <div class="divider"></div>
-
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-label" id="priceLabel">—</div>
-          <div class="sec-status" id="priceStatus"></div>
-        </div>
+        <div class="sec-label" id="priceLabel">—</div>
+        <div class="sec-status" id="priceStatus"></div>
         <div class="flat-row" id="priceFlat" style="display:none">
           <div class="flat-value" id="priceFlatValue">—</div>
           <div class="flat-unit" id="priceFlatUnit"></div>
@@ -167,6 +171,59 @@ function onHomeyReady(Homey) {
     return true;
   }
 
+  /* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+   widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+   German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+   first answer never comes, dims values after two missed answers instead of showing them
+   as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+   changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+var _nf = {};
+function fmtNum(v, digits) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  var key = (activeLang || '') + '|' + digits;
+  if (!_nf[key]) {
+    try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+    catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+  }
+  return _nf[key].format(v);
+}
+function poller(opts) {
+  var busy = false, timer = null, loaded = false, misses = 0;
+  function tick() {
+    if (busy) return;
+    busy = true;
+    Promise.resolve().then(opts.run).then(function (data) {
+      busy = false; misses = 0; loaded = true;
+      document.body.classList.remove('stale');
+      opts.onOk(data);
+    }, function (err) {
+      busy = false; misses++;
+      if (!loaded) opts.onFail(true, err);
+      else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+    });
+  }
+  function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+  function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); return; }
+    tick(); start();
+  });
+  tick();
+  if (!document.hidden) start();
+  return { now: tick };
+}
+var _fitH = 0;
+function fitHeight(Homey, el) {
+  requestAnimationFrame(function () {
+    var h = Math.ceil(el.getBoundingClientRect().bottom);
+    if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+  });
+}
+/* ── end of the shared block ── */
+
+  // A short buzz on a tap, where the device has it (Homey's widget API, 1.2.300).
+  function haptic() { try { Homey.hapticFeedback(); } catch (e) {} }
+
   var card       = document.getElementById('card');
   var noData     = document.getElementById('noData');
   var content    = document.getElementById('content');
@@ -203,10 +260,10 @@ function onHomeyReady(Homey) {
     noData.textContent    = msg;
   }
 
+  // One line: how old the data is. The figure for now moved next to max and min, and the
+  // slot count said little — the status ran over two lines on a phone (1.2.300).
   function statusLine(nowText, count, ageMin, stale) {
     var parts = [];
-    if (nowText != null) parts.push(T.now + ' ' + nowText);
-    parts.push(count + ' ' + T.slotsAhead);
     parts.push(ageMin == null ? T.neverUpdated : (T.updated + ' ' + ageMin + ' ' + T.minAgo));
     if (stale) parts.push(T.staleWarn);
     return parts.join(' · ');
@@ -227,8 +284,11 @@ function onHomeyReady(Homey) {
     var max = Math.max.apply(null, values);
     var range = (max - min) || 1;
 
+    var nowSlot = null;
+    slots.forEach(function (s) { if (s.start <= nowMs && nowMs < s.end) nowSlot = s; });
     minMaxEl.innerHTML =
       '<span>▲ ' + opts.formatValue(max) + '</span>' +
+      (nowSlot ? '<span class="now">' + esc(T.now + ' ' + opts.formatValue(nowSlot.value)) + '</span>' : '') +
       '<span>▼ ' + opts.formatValue(min) + '</span>';
 
     var barsHtml = '';
@@ -239,19 +299,20 @@ function onHomeyReady(Homey) {
       var bg     = opts.colorFn(pct, isNow);
       var title  = opts.formatLabel(s, isNow);
       barsHtml += '<div class="bar" title="' + esc(title) + '" style="height:' + height + '%;background:' + bg + '">' +
-        (isNow ? '<span class="bar-now-label">' + esc(opts.formatValue(s.value)) + '</span>' : '') +
         '</div>';
     });
     chartEl.innerHTML = barsHtml;
 
-    var labelInterval = slots.length <= 12 ? 2 : slots.length <= 24 ? 3 : 4;
+    // As many hour labels as fit at the guide's text size: one every ~36 px.
+    var slotPx = (chartEl.clientWidth || 300) / slots.length;
+    var labelInterval = Math.max(1, Math.ceil(36 / Math.max(1, slotPx)));
     var lastIdx = slots.length - 1;
     var axisHtml = '';
     slots.forEach(function (s, i) {
       var isRegular = i % labelInterval === 0 && i !== lastIdx;
       var tooCloseToEnd = isRegular && (lastIdx - i) < labelInterval;
       var showLabel = (isRegular && !tooCloseToEnd) || i === lastIdx;
-      var txt = showLabel ? esc(new Date(s.start).toLocaleTimeString(undefined, { hour: '2-digit' })) : '';
+      var txt = showLabel ? esc(String(new Date(s.start).getHours())) : '';
       axisHtml += '<div class="axis-cell">' + txt + '</div>';
     });
     axisEl.innerHTML = axisHtml;
@@ -280,7 +341,7 @@ function onHomeyReady(Homey) {
     solarNoData.style.display = 'none';
     solarStatus.className = 'sec-status' + ((pv.stale || pv.error) ? ' warn' : '');
     solarStatus.textContent = statusLine(
-      pv.nowKw != null ? pv.nowKw.toFixed(2) + ' kW' : null,
+      pv.nowKw != null ? fmtNum(pv.nowKw, 2) + ' kW' : null,
       future.length, pv.ageMin, pv.stale
     ) + (pv.error ? ' · ⚠ ' + T.solarError : '');
     var slots = (pv.slots || [])
@@ -288,10 +349,10 @@ function onHomeyReady(Homey) {
       .slice(0, 48)
       .map(function (s) { return { start: s.end - s.h * 3600000, end: s.end, value: s.kw }; });
     renderChart(solarChart, solarAxis, solarMinMax, slots, nowMs, {
-      formatValue: function (v) { return v.toFixed(2) + ' kW'; },
+      formatValue: function (v) { return fmtNum(v, 2) + ' kW'; },
       formatLabel: function (s, isNow) {
-        return new Date(s.start).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) +
-          ': ' + s.value.toFixed(2) + ' kW' + (isNow ? ' (' + T.now + ')' : '');
+        return new Date(s.start).toLocaleString(activeLang || undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) +
+          ': ' + fmtNum(s.value, 2) + ' kW' + (isNow ? ' (' + T.now + ')' : '');
       },
       colorFn: function (pct, isNow) {
         return isNow ? 'var(--homey-color-blue, #007aff)' : 'var(--homey-color-orange, #f5a524)';
@@ -329,10 +390,10 @@ function onHomeyReady(Homey) {
     priceStatus.className = 'sec-status' + (warn ? ' warn' : '');
     priceStatus.textContent = statusText;
     renderChart(priceChart, priceAxis, priceMinMax, slots, Date.now(), {
-      formatValue: function (v) { return v.toFixed(3) + ' ' + currency; },
+      formatValue: function (v) { return fmtNum(v, 3) + ' ' + currency; },
       formatLabel: function (s, isNow) {
-        return new Date(s.start).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) +
-          ': ' + s.value.toFixed(3) + ' ' + currency + (isNow ? ' (' + T.now + ')' : '');
+        return new Date(s.start).toLocaleString(activeLang || undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) +
+          ': ' + fmtNum(s.value, 3) + ' ' + currency + (isNow ? ' (' + T.now + ')' : '');
       },
       colorFn: function (pct, isNow) {
         if (isNow) return 'var(--homey-color-blue, #007aff)';
@@ -349,7 +410,7 @@ function onHomeyReady(Homey) {
 
     if (mode === 'fixed' || mode === 'variable') {
       if (price.price == null || price.configured === false) { showPriceNoData(T.notConfiguredPrice); return; }
-      showPriceFlat(price.price.toFixed(3), currency + '/kWh', mode === 'fixed' ? T.priceModeFixed : T.priceModeVariable);
+      showPriceFlat(fmtNum(price.price, 3), currency + '/kWh', mode === 'fixed' ? T.priceModeFixed : T.priceModeVariable);
       return;
     }
 
@@ -377,20 +438,23 @@ function onHomeyReady(Homey) {
       .slice(0, 48)
       .map(function (s) { return { start: s.start, end: s.end, value: s.price }; });
     showPriceChart(fcSlots, currency, statusLine(
-      price.nowPrice != null ? Number(price.nowPrice).toFixed(3) : null,
+      price.nowPrice != null ? fmtNum(Number(price.nowPrice), 3) : null,
       price.slotCount || 0, price.ageMin, price.stale
     ), price.stale);
   }
 
-  // Homey.setHeight() crosses the iframe boundary — only call it on an actual change.
-  var lastHeight = 0;
+  // Ready once, with the height of the first drawing. The widget announced 460 px — too
+  // tall for a phone, and more than it drew — and then shrank (1.2.300).
+  var readied = false;
   function syncHeight() {
-    requestAnimationFrame(function () {
-      var h = Math.ceil(card.getBoundingClientRect().bottom) + 4;
-      if (h === lastHeight) return;
-      lastHeight = h;
-      Homey.setHeight(h);
-    });
+    if (!readied) {
+      readied = true;
+      requestAnimationFrame(function () {
+        Homey.ready({ height: Math.ceil(card.getBoundingClientRect().bottom) + 16 });
+      });
+      return;
+    }
+    fitHeight(Homey, document.body);
   }
 
   function render(data) {
@@ -404,38 +468,23 @@ function onHomeyReady(Homey) {
     syncHeight();
   }
 
-  async function refresh() {
-    try {
-      var data = await Homey.api('GET', '/forecast');
-      render(data);
-    } catch (err) {
-      render({ error: 'unreachable' });
-    }
-  }
-
-  refreshBtn.addEventListener('click', function () {
-    refreshBtn.classList.remove('spin');
-    void refreshBtn.offsetWidth; // restart animation
-    refreshBtn.classList.add('spin');
-    refresh();
-  });
-
   // Forecasts refresh server-side at most every ~1h (price) / ~3h (Solcast), so a fast
   // poll would just re-render identical data — 60s keeps it responsive without waste.
   // While the dashboard is hidden we stop entirely and catch up on return.
-  var POLL_MS = 60000;
-  var timer = null;
-  function startPolling() { if (!timer) timer = setInterval(refresh, POLL_MS); }
-  function stopPolling()  { if (timer) { clearInterval(timer); timer = null; } }
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { stopPolling(); return; }
-    refresh();
-    startPolling();
+  var poll = poller({
+    ms: 60000,
+    run: function () { return Homey.api('GET', '/forecast'); },
+    onOk: render,
+    onFail: function (first) { if (first) render({ error: 'unreachable' }); },
   });
 
-  Homey.ready({ height: 460 });
-  refresh();
-  if (!document.hidden) startPolling();
+  refreshBtn.addEventListener('click', function () {
+    haptic();
+    refreshBtn.classList.remove('spin');
+    void refreshBtn.offsetWidth; // restart animation
+    refreshBtn.classList.add('spin');
+    poll.now();
+  });
 }
 </script>
 </body>

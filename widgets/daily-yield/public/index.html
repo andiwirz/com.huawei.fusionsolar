@@ -16,65 +16,50 @@
       -webkit-touch-callout: none;
     }
 
+  /* Sizes, colours and spacing from Homey's widget styling guide (--homey-*). The hero
+     figure uses the largest size the guide has for numbers, 32 px (it was 36 px), and no
+     text is smaller than --homey-font-size-small (1.2.300). */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: transparent;
-    padding: 14px;
-  }
+  #content { display: flex; flex-direction: column; gap: var(--homey-su-3); }
 
   .main-row {
     display: flex;
     align-items: flex-end;
-    gap: 16px;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    gap: var(--homey-su-4);
   }
 
-  .daily-block {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .daily-label {
-    font-size: 11px;
+  .label {
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
     color: var(--homey-text-color-light);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
   }
 
   .daily-value {
-    font-size: 36px;
-    font-weight: 700;
-    letter-spacing: -1px;
+    font-size: var(--homey-font-size-xxlarge);
+    line-height: var(--homey-line-height-xxlarge);
+    font-weight: var(--homey-font-weight-bold);
     color: #F59E0B;
-    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .daily-unit {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--homey-font-size-small);
+    font-weight: var(--homey-font-weight-medium);
     color: var(--homey-text-color-light);
   }
 
-  .total-block {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding-bottom: 4px;
-  }
-
-  .total-label {
-    font-size: 11px;
-    color: var(--homey-text-color-light);
-  }
+  .total-block { text-align: right; }
 
   .total-value {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
+    font-size: var(--homey-font-size-default);
+    line-height: var(--homey-line-height-default);
+    font-weight: var(--homey-font-weight-medium);
     color: var(--homey-text-color);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   /* CO₂ + Optimizer row */
@@ -82,53 +67,41 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 8px;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: var(--homey-su-2);
+    padding-top: var(--homey-su-3);
+    border-top: var(--homey-line);
   }
+  .meta-row:empty, .meta-row.empty { display: none; }
 
-  .co2-chip {
+  .co2-chip,
+  .opt-chip {
     display: flex;
     align-items: center;
-    gap: 5px;
-    background: var(--homey-line-color);
-    border-radius: 8px;
-    padding: 4px 9px;
+    gap: var(--homey-su-1);
+    font-size: var(--homey-font-size-small);
+    line-height: var(--homey-line-height-small);
+    color: var(--homey-text-color-light);
   }
 
   .co2-icon {
-    width: 13px;
-    height: 13px;
+    width: var(--homey-icon-size-small, 14px);
+    height: var(--homey-icon-size-small, 14px);
     flex-shrink: 0;
   }
 
   .co2-text {
-    font-size: 12px;
-    font-weight: 600;
-    color: #22C55E;
-  }
-
-  .co2-label {
-    font-size: 11px;
-    color: var(--homey-text-color-light);
-  }
-
-  .opt-chip {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    font-weight: var(--homey-font-weight-bold);
+    color: var(--homey-color-green);
+    font-variant-numeric: tabular-nums;
   }
 
   .opt-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #22C55E;
+    background: var(--homey-color-green);
     flex-shrink: 0;
-  }
-
-  .opt-text {
-    font-size: 11px;
-    color: var(--homey-text-color-light);
   }
 
   /* Skeleton */
@@ -140,48 +113,57 @@
   body.loading .total-value {
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
+  /* Values the app has not confirmed for two polls are dimmed, not shown as live. */
+  body.stale .daily-value, body.stale .total-value, body.stale .co2-text { opacity: 0.45; }
 </style>
 </head>
-<body class="loading">
+<body class="homey-widget loading">
 
+<div id="content">
 <div class="main-row">
   <div class="daily-block">
-    <div class="daily-label" id="label-daily"></div>
+    <div class="label" id="label-daily"></div>
     <div class="daily-value">
       <span id="daily-val">—</span><span class="daily-unit" id="daily-unit"></span>
     </div>
   </div>
   <div class="total-block">
-    <div class="total-label" id="label-total"></div>
+    <div class="label" id="label-total"></div>
     <div class="total-value" id="total-val">—</div>
   </div>
 </div>
 
-<div class="meta-row">
+<div class="meta-row" id="meta-row">
   <!-- CO₂ chip -->
   <div class="co2-chip" id="co2-chip" style="display:none">
-    <svg class="co2-icon" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2a10 10 0 1 0 10 10"/>
-      <path d="M12 8v4l3 3"/>
+    <svg class="co2-icon" viewBox="0 0 24 24" fill="none" style="stroke:var(--homey-color-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
     </svg>
     <span class="co2-text" id="co2-val"></span>
-    <span class="co2-label" id="label-co2"></span>
+    <span id="label-co2"></span>
   </div>
 
   <!-- Optimizer chip -->
   <div class="opt-chip" id="opt-chip" style="display:none">
     <div class="opt-dot" id="opt-dot"></div>
-    <span class="opt-text" id="opt-text"></span>
+    <span id="opt-text"></span>
   </div>
+
+  <div class="label" id="status" style="display:none"></div>
+</div>
 </div>
 
 <script>
 // Language comes from the API payload (Homey i18n.getLanguage()), not
-// navigator.language — see widgets/ems-device/api.js.
+// navigator.language — see lib/widget-data.js.
 var DICTS = (function() {
-  var de = { daily: 'Heute erzeugt',   total: 'Gesamt', co2: 'CO₂ gespart',  optimizers: 'Optimierer'  };
-  var nl = { daily: 'Vandaag opgewekt', total: 'Totaal', co2: 'CO₂ bespaard', optimizers: 'Optimizers'  };
-  var en = { daily: 'Generated today',  total: 'Total',  co2: 'CO₂ saved',    optimizers: 'Optimizers'  };
+  var de = { daily: 'Heute erzeugt',   total: 'Gesamt', co2: 'CO₂ gespart',  optimizers: 'Optimierer',
+             unreachable: 'App antwortet nicht', stale: '⚠ nicht aktuell' };
+  var nl = { daily: 'Vandaag opgewekt', total: 'Totaal', co2: 'CO₂ bespaard', optimizers: 'Optimizers',
+             unreachable: 'App reageert niet', stale: '⚠ niet actueel' };
+  var en = { daily: 'Generated today',  total: 'Total',  co2: 'CO₂ saved',    optimizers: 'Optimizers',
+             unreachable: 'App not responding', stale: '⚠ not current' };
   return { de: de, nl: nl, en: en };
 })();
 function dictFor(code) {
@@ -207,24 +189,93 @@ function applyStaticLabels() {
 }
 applyStaticLabels();
 
+/* ── Shared by this app's widgets (the same block in each — a widget cannot load another
+   widget's files). fmtNum writes numbers the way the dashboard language does: 8,8 kW in
+   German, 8.8 kW in English (1.2.300). poller asks one request at a time, says so when the
+   first answer never comes, dims values after two missed answers instead of showing them
+   as live, and rests while the dashboard is hidden. fitHeight follows content whose height
+   changes, through Homey.setHeight, and only when it does. ───────────────────────────── */
+var _nf = {};
+function fmtNum(v, digits) {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  var key = (activeLang || '') + '|' + digits;
+  if (!_nf[key]) {
+    try { _nf[key] = new Intl.NumberFormat(activeLang || undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+    catch (e) { _nf[key] = { format: function (x) { return x.toFixed(digits); } }; }
+  }
+  return _nf[key].format(v);
+}
+function poller(opts) {
+  var busy = false, timer = null, loaded = false, misses = 0;
+  function tick() {
+    if (busy) return;
+    busy = true;
+    Promise.resolve().then(opts.run).then(function (data) {
+      busy = false; misses = 0; loaded = true;
+      document.body.classList.remove('stale');
+      opts.onOk(data);
+    }, function (err) {
+      busy = false; misses++;
+      if (!loaded) opts.onFail(true, err);
+      else if (misses >= 2) { document.body.classList.add('stale'); opts.onFail(false, err); }
+    });
+  }
+  function start() { if (!timer) timer = setInterval(tick, opts.ms); }
+  function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); return; }
+    tick(); start();
+  });
+  tick();
+  if (!document.hidden) start();
+  return { now: tick };
+}
+var _fitH = 0;
+function fitHeight(Homey, el) {
+  requestAnimationFrame(function () {
+    var h = Math.ceil(el.getBoundingClientRect().bottom);
+    if (h > 0 && h !== _fitH) { _fitH = h; Homey.setHeight(h); }
+  });
+}
+/* ── end of the shared block ── */
+
+// One decimal, as the energy balance writes the same figure (1.2.300; this one used two).
 function fmtKwh(v) {
   if (v === null || v === undefined) return { num: '—', unit: '' };
-  if (v >= 1000) return { num: (v / 1000).toFixed(1), unit: ' MWh' };
-  return { num: v.toFixed(2), unit: ' kWh' };
+  if (v >= 1000) return { num: fmtNum(v / 1000, 1), unit: ' MWh' };
+  return { num: fmtNum(v, 1), unit: ' kWh' };
 }
 
 function onHomeyReady(Homey) {
-  Homey.ready({ height: 112 });
-  document.body.classList.add('loading');
-
   var co2Factor = 401; // default: DE Strommix g/kWh
   try {
     var s = Homey.getSettings();
     if (s && s.co2_factor_g_per_kwh) co2Factor = parseFloat(s.co2_factor_g_per_kwh) || 401;
   } catch(e) {}
 
+  var content  = document.getElementById('content');
+  var statusEl = document.getElementById('status');
+  var metaRow  = document.getElementById('meta-row');
+
+  // Ready once, with the height of the first drawing; the CO₂ and optimizer line comes
+  // and goes with the data, and the height follows it.
+  var readied = false;
+  function settle() {
+    var shown = [].some.call(metaRow.children, function (c) { return c.style.display !== 'none'; });
+    metaRow.classList.toggle('empty', !shown);
+    if (!readied) {
+      readied = true;
+      requestAnimationFrame(function () {
+        Homey.ready({ height: Math.ceil(content.getBoundingClientRect().bottom) + 16 });
+      });
+    } else {
+      fitHeight(Homey, document.body);
+    }
+  }
+
   function render(data) {
     document.body.classList.remove('loading');
+    statusEl.style.display = 'none';
 
     var daily = fmtKwh(data.dailyKwh);
     document.getElementById('daily-val').textContent  = daily.num;
@@ -234,12 +285,12 @@ function onHomeyReady(Homey) {
     document.getElementById('total-val').textContent =
       (total.num !== '—') ? total.num + total.unit : '—';
 
-    // CO₂ — recalculate client-side using configured factor
+    // CO₂ — calculated here, from the factor in the widget's settings
     var co2Chip = document.getElementById('co2-chip');
     if (data.dailyKwh !== null && data.dailyKwh !== undefined) {
-      var co2Kg = Math.round(data.dailyKwh * co2Factor) / 1000;
+      var co2Kg = data.dailyKwh * co2Factor / 1000;
       co2Chip.style.display = 'flex';
-      document.getElementById('co2-val').textContent = co2Kg.toFixed(2) + ' kg';
+      document.getElementById('co2-val').textContent = fmtNum(co2Kg, 1) + ' kg';
     } else {
       co2Chip.style.display = 'none';
     }
@@ -252,30 +303,24 @@ function onHomeyReady(Homey) {
       optChip.style.display = 'flex';
       document.getElementById('opt-text').textContent = onl + '/' + tot + ' ' + T.optimizers;
       document.getElementById('opt-dot').style.background =
-        (onl >= tot) ? '#22C55E' : (onl > 0 ? '#F59E0B' : '#EF4444');
+        (onl >= tot) ? 'var(--homey-color-green)' : (onl > 0 ? '#F59E0B' : 'var(--homey-color-red)');
     } else {
       optChip.style.display = 'none';
     }
+    settle();
   }
 
-  function load() {
-    Homey.api('GET', '/', {})
-      .then(function(data) { applyLang(data && data.lang); if (data) render(data); })
-      .catch(function(err) { console.error('widget load error:', err); });
-  }
-
-  load();
-  // Polling stops entirely while the dashboard is hidden — it used to keep running
-  // around the clock — and catches up immediately on return.
-  var POLL_MS = 10000;
-  var pollTimer = null;
-  function startPolling() { if (!pollTimer) pollTimer = setInterval(load, POLL_MS); }
-  function stopPolling()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
-  if (!document.hidden) startPolling();
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) { stopPolling(); return; }
-    load();
-    startPolling();
+  // Once a minute: these are day totals (1.2.300; it asked every 10 s).
+  poller({
+    ms: 60000,
+    run: function () { return Homey.api('GET', '/', {}); },
+    onOk: function (data) { applyLang(data && data.lang); if (data) render(data); },
+    onFail: function (first) {
+      document.body.classList.remove('loading');
+      statusEl.textContent = first ? T.unreachable : T.stale;
+      statusEl.style.display = '';
+      settle();
+    },
   });
 }
 </script>
