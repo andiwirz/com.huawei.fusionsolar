@@ -902,6 +902,8 @@ power) and Notifications.
 
 Each step waits for the one before it, and a step that fails starts nothing — the timeline says which value could not be written, instead of the run starting on a value left from an earlier one. After a stop, a discharge started with *Set force charge/discharge* needs a power again (a start card, or *Set force discharge power*), as in the HA integration.
 
+**Retired in 1.2.304:** *Set force charge/discharge* and the three cards that fed it (*Set force charge target percentage*, *Set force charge power*, *Set force discharge power*). The start cards above bring their own power and target, and *Stop force charge/discharge* stops — the same set the HA integration has. Retired cards are no longer offered for new flows; existing flows keep working as described above.
+
 #### Battery LUNA2000 (EMMA Modbus)
 
 | Card                              | Description                                                                                        |

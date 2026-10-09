@@ -1,4 +1,9 @@
 {
+  "1.2.304": {
+    "en": "LUNA2000 (Modbus): \"Set force charge/discharge\" and the three cards that fed it (target percentage, charge power, discharge power) are retired. For new flows use the start cards — charging or discharging for minutes or until SoC % — and \"Stop force charge/discharge\", the same set the Home Assistant integration has. Existing flows with the retired cards keep working. \"Start charging until SoC %\" is now highlighted instead.",
+    "de": "LUNA2000 (Modbus): „Zwangsladen/Entladen steuern“ und die drei Karten, die ihm Werte lieferten (Ziel-SoC, Ladeleistung, Entladeleistung), sind stillgelegt. Für neue Flows die Start-Karten – Laden oder Entladen für Minuten bzw. bis SoC % – und „Zwangsladen/-entladen stoppen“ verwenden, derselbe Satz wie in der Home-Assistant-Integration. Bestehende Flows mit den stillgelegten Karten laufen weiter. Hervorgehoben ist jetzt „Laden bis SoC % starten“.",
+    "nl": "LUNA2000 (Modbus): „Geforceerd laden/ontladen aansturen” en de drie kaarten die het waarden leverden zijn buiten gebruik. Gebruik voor nieuwe flows de startkaarten en „Geforceerd laden/ontladen stoppen”. Bestaande flows blijven werken."
+  },
   "1.2.303": {
     "en": "LUNA2000 (Modbus): new action card \"Stop force charge/discharge\" — the Home Assistant integration's stop as a card of its own. It does exactly what \"Set force charge/discharge\" with \"Stop\" does: stop, then clear the discharge power, the duration and the mode.",
     "de": "LUNA2000 (Modbus): neue Aktionskarte „Zwangsladen/-entladen stoppen“ – der Stopp der Home-Assistant-Integration als eigene Karte. Sie macht genau dasselbe wie „Zwangsladen/Entladen steuern“ mit „Stopp“: stoppen, danach Entladeleistung, Dauer und Modus zurücksetzen.",

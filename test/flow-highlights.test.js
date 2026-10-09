@@ -18,7 +18,9 @@ const assert = require('node:assert');
 const app    = require('../app.json');
 
 const CHOSEN = {
-  actions: ['luna2000_set_working_mode', 'luna2000_set_force_charge_discharge', 'luna2000_set_charge_from_grid',
+  // 'luna2000_set_force_charge_discharge' (72 flows) was retired in 1.2.304 for the HA-style
+  // start and stop cards; 'luna2000_start_force_charge' (21 flows) took its place.
+  actions: ['luna2000_set_working_mode', 'luna2000_start_force_charge', 'luna2000_set_charge_from_grid',
     'luna2000_set_max_discharge_power', 'luna2000_set_max_charge_power', 'sun2000_set_active_power_mode'],
   conditions: ['luna2000_soc_above', 'luna2000_soc_below', 'sun2000_power_above_for'],
   triggers: ['sun2000_status_changed'],

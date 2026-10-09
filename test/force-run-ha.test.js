@@ -150,6 +150,34 @@ test('the stop card stops exactly as the "Stopp" option does', async () => {
   }
 });
 
+// The build-your-own set, retired in 1.2.304 on Andi's call: "steuern" plus the three cards
+// that fed it. Retired means not offered for new flows — existing ones keep running, so
+// their listeners stay.
+test('the four build-your-own cards are retired, still run, and point to their successors', async () => {
+  const app = require('../app.json');
+  const RETIRED = ['luna2000_set_force_charge_discharge', 'luna2000_set_force_charge_soc',
+    'luna2000_set_force_charge_power', 'luna2000_set_force_discharge_power'];
+  const d = makeDevice();
+  const title = (id) => app.flow.actions.find((c) => c.id === id).title;
+  for (const id of RETIRED) {
+    const c = app.flow.actions.find((x) => x.id === id);
+    assert.strictEqual(c.deprecated, true, id);
+    assert.ok(!c.highlight, `${id} is still highlighted`);
+    assert.strictEqual(typeof d.cards[id], 'function', `${id} lost its run listener — existing flows would break`);
+  }
+  for (const l of ['en', 'de', 'nl']) {
+    const h = app.flow.actions.find((x) => x.id === 'luna2000_set_force_charge_discharge').hint[l];
+    for (const next of ['luna2000_start_force_charge', 'luna2000_start_force_discharge', 'luna2000_start_force_charge_duration',
+      'luna2000_start_force_discharge_duration', 'luna2000_stop_force_charge_discharge']) {
+      assert.ok(h.includes(title(next)[l]), `${l}: the retired card does not name "${title(next)[l]}"`);
+    }
+  }
+  for (const id of ['luna2000_stop_force_charge_discharge', 'luna2000_start_force_charge', 'luna2000_start_force_discharge',
+    'luna2000_start_force_charge_duration', 'luna2000_start_force_discharge_duration']) {
+    assert.ok(!app.flow.actions.find((x) => x.id === id).deprecated, `${id} is retired too`);
+  }
+});
+
 test('the cards\' tooltips say what they now write', () => {
   const app = require('../app.json');
   const hint = (id) => app.flow.actions.find((c) => c.id === id).hint;
