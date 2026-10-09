@@ -130,6 +130,26 @@ test('stop is HA\'s: stop first, then discharge power, minutes and mode cleared'
   assert.deepStrictEqual(none.writes, []);
 });
 
+// HA's stop_forcible_charge as a card of its own (1.2.303) — before, a stop was an option in
+// the dropdown of "Zwangsladen/Entladen steuern".
+test('the stop card stops exactly as the "Stopp" option does', async () => {
+  const card = await run('luna2000_stop_force_charge_discharge', {});
+  const option = await run('luna2000_set_force_charge_discharge', { mode: '0' });
+  assert.deepStrictEqual(card.writes, [[47100, 0], [47249, 0], [47083, 0], [47246, 0]]);
+  assert.deepStrictEqual(card.writes, option.writes);
+  assert.strictEqual(card.d.caps.storage_force_charge_discharge, '0');
+
+  const app = require('../app.json');
+  const c = app.flow.actions.find((x) => x.id === 'luna2000_stop_force_charge_discharge');
+  assert.strictEqual(c.title.de, 'Zwangsladen/-entladen stoppen');
+  assert.deepStrictEqual(c.args, [{ type: 'device', name: 'device', filter: 'driver_id=luna2000_modbus' }]);
+  const steuern = app.flow.actions.find((x) => x.id === 'luna2000_set_force_charge_discharge');
+  for (const l of ['en', 'de', 'nl']) {
+    assert.match(c.hint[l], /47249/);
+    assert.ok(c.hint[l].includes(steuern.title[l]), `the stop card's tooltip names the other card (${l})`);
+  }
+});
+
 test('the cards\' tooltips say what they now write', () => {
   const app = require('../app.json');
   const hint = (id) => app.flow.actions.find((c) => c.id === id).hint;

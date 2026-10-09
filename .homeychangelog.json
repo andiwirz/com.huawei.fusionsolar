@@ -1,4 +1,9 @@
 {
+  "1.2.303": {
+    "en": "LUNA2000 (Modbus): new action card \"Stop force charge/discharge\" — the Home Assistant integration's stop as a card of its own. It does exactly what \"Set force charge/discharge\" with \"Stop\" does: stop, then clear the discharge power, the duration and the mode.",
+    "de": "LUNA2000 (Modbus): neue Aktionskarte „Zwangsladen/-entladen stoppen“ – der Stopp der Home-Assistant-Integration als eigene Karte. Sie macht genau dasselbe wie „Zwangsladen/Entladen steuern“ mit „Stopp“: stoppen, danach Entladeleistung, Dauer und Modus zurücksetzen.",
+    "nl": "LUNA2000 (Modbus): nieuwe actiekaart „Geforceerd laden/ontladen stoppen” – de stop van de Home Assistant-integratie als eigen kaart."
+  },
   "1.2.302": {
     "en": "LUNA2000 (Modbus): forced charging and discharging now work like the Home Assistant integration. Every start card sets the mode the battery needs (register 47246: run for minutes, or to a target SoC) — on a battery set to target SoC, the minute cards used to ignore their minutes. A step that fails starts nothing, and the timeline says which value could not be written. \"Set force charge/discharge\" charges and discharges to the target SoC already set; its stop also clears the discharge power, the minutes and the mode, as HA does.",
     "de": "LUNA2000 (Modbus): Zwangsladen und -entladen arbeiten jetzt wie in der Home-Assistant-Integration. Jede Start-Karte setzt den Modus, den die Batterie braucht (Register 47246: für Minuten oder bis Ziel-SoC) – bei einer Batterie auf „Ziel-SoC“ haben die Minuten-Karten die Minuten bisher ignoriert. Schlägt ein Schritt fehl, startet nichts, und die Zeitleiste sagt, welcher Wert nicht geschrieben werden konnte. „Zwangsladen/Entladen steuern“ lädt und entlädt bis zum gesetzten Ziel-SoC; sein Stopp setzt wie bei HA auch Entladeleistung, Minuten und Modus zurück.",

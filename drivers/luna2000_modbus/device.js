@@ -508,46 +508,59 @@ class LUNA2000ModbusDevice extends Device {
         })();
       };
 
+      const reflectForceMode = async (value) => {
+        self._updatingFromModbus = true;
+        try { await self._set('storage_force_charge_discharge', String(value)); } catch (_) {}
+        finally { self._updatingFromModbus = false; }
+      };
+
+      // HA's stop: the stop command, then the discharge power, the minutes and the mode cleared,
+      // so the next run starts from known values. Shared by the stop card and the "Stopp" of
+      // "Zwangsladen/Entladen steuern".
+      const forceStop = (label) => {
+        self.log(`${label}: 47100 = 0, then clear discharge power, minutes and mode (as HA)`);
+        self._pendingForceMode = null;
+        const h = host(), p = port(), u = unitId();
+        self._writeInProgress = true;
+        (async () => {
+          try {
+            try {
+              await writeModbusRegister(h, p, u, 47100, 0);
+            } catch (err) {
+              self.error(`${label}: stop write (reg 47100) failed:`, err.message);
+              return;
+            }
+            await reflectForceMode(0);
+            // The battery is stopped; the clean-up afterwards is best effort.
+            for (const [fn, reg, v, what] of [
+              [writeModbusU32, 47249, 0, 'discharge power'],
+              [writeModbusRegister, 47083, 0, 'duration'],
+              [writeModbusRegister, 47246, MODE_DURATION, 'mode'],
+            ]) {
+              try { await fn(h, p, u, reg, v); } catch (err) {
+                self.error(`${label}: clearing ${what} (reg ${reg}) failed:`, err.message);
+              }
+            }
+            self.log(`${label} sent`);
+          } finally {
+            self._writeInProgress = false;
+          }
+        })();
+      };
+
+      // "Zwangsladen/-entladen stoppen" — HA's stop_forcible_charge as a card of its own
+      // (1.2.303). Before, a stop was an option in the dropdown of the card below.
+      cards['luna2000_stop_force_charge_discharge'] = () => forceStop('Force stop');
+
       // "Zwangsladen/Entladen steuern" — the one card HA has no counterpart for. Charging and
       // discharging run to the target SoC in 47101 (set by "Zwangslade-Ziel-SoC setzen" or the
       // last start card), at the power already in 47247/47249: the card sets mode 1 first, so it
       // does the same on every battery whatever mode the last card left behind. Stop is HA's.
       cards['luna2000_set_force_charge_discharge'] = ({ mode }) => {
         const value = parseInt(mode, 10);
-        const reflect = async () => {
-          self._updatingFromModbus = true;
-          try { await self._set('storage_force_charge_discharge', String(value)); } catch (_) {}
-          finally { self._updatingFromModbus = false; }
-        };
+        const reflect = () => reflectForceMode(value);
         if (value === 0) {
-          self.log('Force stop: 47100 = 0, then clear discharge power, minutes and mode (as HA)');
-          self._pendingForceMode = null;
-          const h = host(), p = port(), u = unitId();
-          self._writeInProgress = true;
-          (async () => {
-            try {
-              try {
-                await writeModbusRegister(h, p, u, 47100, 0);
-              } catch (err) {
-                self.error('Force stop: stop write (reg 47100) failed:', err.message);
-                return;
-              }
-              await reflect();
-              // The battery is stopped; the clean-up afterwards is best effort.
-              for (const [fn, reg, v, what] of [
-                [writeModbusU32, 47249, 0, 'discharge power'],
-                [writeModbusRegister, 47083, 0, 'duration'],
-                [writeModbusRegister, 47246, MODE_DURATION, 'mode'],
-              ]) {
-                try { await fn(h, p, u, reg, v); } catch (err) {
-                  self.error(`Force stop: clearing ${what} (reg ${reg}) failed:`, err.message);
-                }
-              }
-              self.log('Force stop sent');
-            } finally {
-              self._writeInProgress = false;
-            }
-          })();
+          forceStop('Force stop');
           return;
         }
         const label = value === 1 ? 'Force charge (to target SoC)' : 'Force discharge (to target SoC)';

@@ -898,7 +898,7 @@ power) and Notifications.
 | Start charging / discharging for minutes | power (47247 / 47249) → minutes (47083) → mode 47246 = 0 → start (47100) |
 | Start charging / discharging until SoC % | target SoC (47101) → power (47247 / 47249) → mode 47246 = 1 → start (47100) |
 | Set force charge/discharge → charge / discharge | mode 47246 = 1 → start (47100): runs to the target SoC already set, at the power already set |
-| Set force charge/discharge → stop | stop (47100 = 0) → discharge power 0 (47249) → minutes 0 (47083) → mode 47246 = 0 |
+| Stop force charge/discharge — or *Set force charge/discharge* → stop | stop (47100 = 0) → discharge power 0 (47249) → minutes 0 (47083) → mode 47246 = 0 |
 
 Each step waits for the one before it, and a step that fails starts nothing — the timeline says which value could not be written, instead of the run starting on a value left from an earlier one. After a stop, a discharge started with *Set force charge/discharge* needs a power again (a start card, or *Set force discharge power*), as in the HA integration.
 

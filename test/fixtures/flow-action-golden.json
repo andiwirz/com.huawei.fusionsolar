@@ -699,6 +699,50 @@
    "2"
   ]
  ],
+ "luna2000_modbus luna2000_stop_force_charge_discharge {}": [
+  [
+   "write",
+   "reg",
+   "192.0.2.1",
+   502,
+   1,
+   47100,
+   0
+  ],
+  [
+   "set",
+   "A",
+   "storage_force_charge_discharge",
+   "0"
+  ],
+  [
+   "write",
+   "u32",
+   "192.0.2.1",
+   502,
+   1,
+   47249,
+   0
+  ],
+  [
+   "write",
+   "reg",
+   "192.0.2.1",
+   502,
+   1,
+   47083,
+   0
+  ],
+  [
+   "write",
+   "reg",
+   "192.0.2.1",
+   502,
+   1,
+   47246,
+   0
+  ]
+ ],
  "luna2000_modbus luna2000_start_force_charge {\"power\":37000,\"target_soc\":37}": [
   [
    "write",

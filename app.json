@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.302",
+  "version": "1.2.303",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -12179,6 +12179,26 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_stop_force_charge_discharge",
+        "title": {
+          "en": "Stop force charge/discharge",
+          "de": "Zwangsladen/-entladen stoppen",
+          "nl": "Geforceerd laden/ontladen stoppen"
+        },
+        "hint": {
+          "en": "Stops a forced charge or discharge of the LUNA2000, the way the Home Assistant integration does: the stop command (register 47100 = 0), then the discharge power (47249), the duration (47083) and the mode (47246 = 0) are cleared, so the next run starts from known values. The same as \"Set force charge/discharge\" with \"Stop\".",
+          "de": "Stoppt ein Zwangsladen oder -entladen der LUNA2000 so, wie es die Home-Assistant-Integration tut: Stoppbefehl (Register 47100 = 0), danach werden Entladeleistung (47249), Dauer (47083) und Modus (47246 = 0) zurückgesetzt, damit der nächste Lauf von bekannten Werten ausgeht. Dasselbe wie „Zwangsladen/Entladen steuern“ mit „Stopp“.",
+          "nl": "Stopt geforceerd laden of ontladen van de LUNA2000 zoals de Home Assistant-integratie dat doet: het stopcommando (register 47100 = 0), daarna worden het ontlaadvermogen (47249), de duur (47083) en de modus (47246 = 0) teruggezet, zodat de volgende run van bekende waarden uitgaat. Hetzelfde als „Geforceerd laden/ontladen aansturen” met „Stop”."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
           }
         ]
       },

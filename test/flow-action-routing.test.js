@@ -225,5 +225,5 @@ test('a card registered by device A and run for device B acts on B, and only on 
 
 test('every Modbus action card of the three drivers was exercised', () => {
   const n = DRIVERS.reduce((sum, d) => sum + cardsFor(d).length, 0);
-  assert.strictEqual(n, 13 + 26 + 3);
+  assert.strictEqual(n, 13 + 27 + 3); // LUNA2000 +1: the stop card (1.2.303)
 });
