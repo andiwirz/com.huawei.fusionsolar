@@ -344,11 +344,11 @@ class SmartChargerOcppDevice extends Device {
     this.log('[OCPP] Device initialized');
   }
 
-  async onSettings({ newSettings, changedKeys }) {
-    const stationId = this.getSetting('station_id');
+  async onSettings({ oldSettings, newSettings, changedKeys }) {
+    // newSettings: getSetting() still holds the old Station ID until this method resolves.
+    const stationId = newSettings.station_id ?? this.getSetting('station_id') ?? '';
     const ocppPort  = parseInt(newSettings.ocpp_port, 10) || 8887;
     const server    = OcppServer.getInstance(this.homey, ocppPort);
-    server.setCredentials(stationId, newSettings.ocpp_username, newSettings.ocpp_password);
 
     // newSettings, not getSetting(): Homey persists only after this method resolves, so
     // reading the stored value here would still give the old one and the tile would appear
@@ -363,6 +363,12 @@ class SmartChargerOcppDevice extends Device {
     if (newSettings.charger_model === '7ks' && String(newSettings.number_of_phases) === '3') {
       throw new Error('SCharger-7KS-S0 only supports Mono-Phase wiring — please set "Number of phases" to 1.');
     }
+
+    // After the checks that can refuse the page, so a refused save moves nothing.
+    if (changedKeys.includes('station_id')) {
+      server.renameDevice((oldSettings && oldSettings.station_id) ?? '', stationId, this);
+    }
+    server.setCredentials(stationId, newSettings.ocpp_username, newSettings.ocpp_password);
     // The 22KT-S0 is not refused on one phase: Huawei's manual lists it for TN/TT three-phase,
     // TN/TT single-phase and IT single-phase, and its own entry here says "Mono-Phase or
     // Tri-Phase". Until 1.2.288 a single-phase 22KT could not save its settings at all.
@@ -1540,6 +1546,11 @@ class SmartChargerOcppDevice extends Device {
       }
       this._validateProfileRequest(amps, this._getPhases());
       this.log(`[OCPP] ${amps} A after a 0 A pause — resuming`);
+      // Both, as chargeNow does: resumeCharging starts at _txnAmps first, and the pause keeps
+      // _txnAmps on purpose. Setting only resumeAmps resumed at the current from BEFORE the
+      // pause — 16 A, when the EMS had paused at 0 A and then asked for 7 A, and the EMS only
+      // sends a current when it changes, so it never corrected it (review 2026-10-10).
+      this._txnAmps = amps;
       this.stitchedSession.resumeAmps = amps;
       return this.resumeCharging('user');
     }
