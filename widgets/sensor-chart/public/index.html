@@ -291,6 +291,16 @@ function fitHeight(Homey, el) {
 /* ── end of the shared block ── */
 
 /* ── Helpers ─────────────────────────────────────────── */
+/* For text that goes into innerHTML. The series names are device names or labels typed into
+   the widget settings, and the tooltip was the one place that pasted them in as markup: a
+   name with "<" or "&" broke the tooltip, and one carrying a tag ran it (review 2026-10-10).
+   The legend sets textContent and never had the problem. */
+function escHtml(s) {
+  return String(s).replace(/[&<>\x22\x27]/g, function(c) { /* \x22 \x27: the two quotes */
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 function fmt(v) {
   if (v === null || v === undefined || isNaN(v)) return '—';
   var a = Math.abs(v);
@@ -598,7 +608,7 @@ function showHover(mouseX) {
     rows++;
     html += '<div class="tt-row">'
           + '<span class="tt-dot" style="background:' + COLORS[i] + '"></span>'
-          + '<span class="tt-name">' + (names[i] || 'S'+(i+1)) + '</span>'
+          + '<span class="tt-name">' + escHtml(names[i] || 'S'+(i+1)) + '</span>'
           + '<span class="tt-val" style="color:' + COLORS[i] + '">' + fmt(pt.v) + '</span>'
           + '</div>';
     /* update legend value to reflect hovered position */

@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.321",
+  "version": "1.2.322",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -8361,6 +8361,14 @@
                 }
               },
               {
+                "id": "Standby: battery empty",
+                "label": {
+                  "en": "Standby: battery empty",
+                  "de": "Standby: Batterie leer",
+                  "nl": "Stand-by: batterij leeg"
+                }
+              },
+              {
                 "id": "Starting",
                 "label": {
                   "en": "Starting",
@@ -8449,11 +8457,27 @@
                 }
               },
               {
+                "id": "Shutdown: DC switches disconnected",
+                "label": {
+                  "en": "Shutdown: DC switches disconnected",
+                  "de": "Abschaltung: DC-Schalter getrennt",
+                  "nl": "Uitschakeling: DC-schakelaars open"
+                }
+              },
+              {
                 "id": "Shutdown: rapid shutdown",
                 "label": {
                   "en": "Shutdown: rapid shutdown",
                   "de": "Abschaltung: Schnellabschaltung",
                   "nl": "Uitschakeling: snelle uitschakeling"
+                }
+              },
+              {
+                "id": "Shutdown: input underpower",
+                "label": {
+                  "en": "Shutdown: input underpower",
+                  "de": "Abschaltung: Eingangsleistung zu gering",
+                  "nl": "Uitschakeling: ingangsvermogen te laag"
                 }
               },
               {
@@ -8497,11 +8521,35 @@
                 }
               },
               {
+                "id": "Grid scheduling: dry contact",
+                "label": {
+                  "en": "Grid scheduling: dry contact",
+                  "de": "Netzregelung: potentialfreier Kontakt",
+                  "nl": "Netregeling: potentiaalvrij contact"
+                }
+              },
+              {
                 "id": "Grid scheduling: Q-P curve",
                 "label": {
                   "en": "Grid scheduling: Q-P curve",
                   "de": "Netzregelung: Q-P-Kurve",
                   "nl": "Netregeling: Q-P-curve"
+                }
+              },
+              {
+                "id": "Spot-check ready",
+                "label": {
+                  "en": "Spot-check ready",
+                  "de": "Stichprobenprüfung bereit",
+                  "nl": "Steekproefcontrole gereed"
+                }
+              },
+              {
+                "id": "Spot-checking",
+                "label": {
+                  "en": "Spot-checking",
+                  "de": "Stichprobenprüfung läuft",
+                  "nl": "Steekproefcontrole bezig"
                 }
               },
               {
@@ -8526,6 +8574,14 @@
                   "en": "I-V scanning",
                   "de": "I-V-Scan",
                   "nl": "I-V-scan"
+                }
+              },
+              {
+                "id": "DC input detection",
+                "label": {
+                  "en": "DC input detection",
+                  "de": "DC-Eingangserkennung",
+                  "nl": "DC-ingangsdetectie"
                 }
               },
               {
@@ -14823,6 +14879,14 @@
                 }
               },
               {
+                "id": "Standby: battery empty",
+                "label": {
+                  "en": "Standby: battery empty",
+                  "de": "Standby: Batterie leer",
+                  "nl": "Stand-by: batterij leeg"
+                }
+              },
+              {
                 "id": "Starting",
                 "label": {
                   "en": "Starting",
@@ -14911,11 +14975,27 @@
                 }
               },
               {
+                "id": "Shutdown: DC switches disconnected",
+                "label": {
+                  "en": "Shutdown: DC switches disconnected",
+                  "de": "Abschaltung: DC-Schalter getrennt",
+                  "nl": "Uitschakeling: DC-schakelaars open"
+                }
+              },
+              {
                 "id": "Shutdown: rapid shutdown",
                 "label": {
                   "en": "Shutdown: rapid shutdown",
                   "de": "Abschaltung: Schnellabschaltung",
                   "nl": "Uitschakeling: snelle uitschakeling"
+                }
+              },
+              {
+                "id": "Shutdown: input underpower",
+                "label": {
+                  "en": "Shutdown: input underpower",
+                  "de": "Abschaltung: Eingangsleistung zu gering",
+                  "nl": "Uitschakeling: ingangsvermogen te laag"
                 }
               },
               {
@@ -14959,11 +15039,35 @@
                 }
               },
               {
+                "id": "Grid scheduling: dry contact",
+                "label": {
+                  "en": "Grid scheduling: dry contact",
+                  "de": "Netzregelung: potentialfreier Kontakt",
+                  "nl": "Netregeling: potentiaalvrij contact"
+                }
+              },
+              {
                 "id": "Grid scheduling: Q-P curve",
                 "label": {
                   "en": "Grid scheduling: Q-P curve",
                   "de": "Netzregelung: Q-P-Kurve",
                   "nl": "Netregeling: Q-P-curve"
+                }
+              },
+              {
+                "id": "Spot-check ready",
+                "label": {
+                  "en": "Spot-check ready",
+                  "de": "Stichprobenprüfung bereit",
+                  "nl": "Steekproefcontrole gereed"
+                }
+              },
+              {
+                "id": "Spot-checking",
+                "label": {
+                  "en": "Spot-checking",
+                  "de": "Stichprobenprüfung läuft",
+                  "nl": "Steekproefcontrole bezig"
                 }
               },
               {
@@ -14988,6 +15092,14 @@
                   "en": "I-V scanning",
                   "de": "I-V-Scan",
                   "nl": "I-V-scan"
+                }
+              },
+              {
+                "id": "DC input detection",
+                "label": {
+                  "en": "DC input detection",
+                  "de": "DC-Eingangserkennung",
+                  "nl": "DC-ingangsdetectie"
                 }
               },
               {
