@@ -851,7 +851,7 @@ power) and Notifications.
 | Charging paused                          | Smart Charger (OCPP)            | –                                                    | Fires when a session is paused via the Pause button or flow action       |
 | Charging resumed                         | Smart Charger (OCPP)            | `amps`, `phases`, `phase_label`, `message`           | Fires when a paused session is resumed                                   |
 | Charging limit changed                   | Smart Charger (OCPP)            | `amps`, `previous_amps`, `phases`, `phase_label`, `message` | Fires when the SetChargingProfile limit is changed during a session |
-| Charger disconnected                     | Smart Charger (OCPP)            | –                                                    | Fires when the OCPP WebSocket connection drops                           |
+| Charger disconnected                     | Smart Charger (OCPP)            | –                                                    | Fires when the OCPP WebSocket connection drops. A running session is kept: the charger carries on and reports when it is back (since 1.2.310) |
 
 ### Conditions
 

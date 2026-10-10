@@ -15,6 +15,10 @@ const BLOCK_AMPS          = 0; // server converts 0A → 1W (Huawei firmware bug
 const INIT_PROFILE_DEDUP_MS = 10_000;
 const IDLE_GUARD_MS       = 300_000;
 const QUICK_ABORT_MS      = 2000;
+// How long a transaction may stand beside "Available" before it is closed here. A charger
+// unplugged while offline delivers its queued StopTransaction when it is back, usually
+// within seconds; one that rebooted may never send it at all.
+const STALE_TXN_GRACE_MS  = 30_000;
 const MAX_SESSION_HIST    = 10;
 const OFFLINE_AFTER_MS    = 180_000;
 const LOW_POWER_W         = 100;
@@ -480,6 +484,10 @@ class SmartChargerOcppDevice extends Device {
       this.homey.clearTimeout(this._pendingStartNotificationTimeout);
       this._pendingStartNotificationTimeout = null;
     }
+    if (this._staleTxnTimer) {
+      this.homey.clearTimeout(this._staleTxnTimer);
+      this._staleTxnTimer = null;
+    }
   }
 
   // ─── Called by OcppServer ────────────────────────────────────────────────
@@ -534,10 +542,17 @@ class SmartChargerOcppDevice extends Device {
     }
   }
 
+  // A lost connection does not end a transaction. OCPP 1.6 has the charger carry on charging
+  // and deliver what happened meanwhile — MeterValues, StopTransaction — once it is back. Until
+  // 1.2.310 this dropped _txnId, and nothing brought it back: the charger's "Charging" after the
+  // reconnect was no change of state, so no session hook ran. Homey's off switch then did
+  // nothing ("No active transaction to stop"), a 0 A pause had "nothing to pause", and a new
+  // limit went to the default profile, which the session's own profile overrides — the EMS
+  // had lost the car for the rest of the session (review 2026-10-10). The transaction and its
+  // auto-start block stay; a transaction that really ended while the charger was away is
+  // closed by _watchStaleTransaction.
   onOcppDisconnected() {
-    this.log('[OCPP] Charger disconnected');
-    this._txnId = null;
-    this._autoStartBlocked = false;
+    this.log(`[OCPP] Charger disconnected${this._txnId ? ` — transaction ${this._txnId} kept, the charger carries on without us` : ''}`);
     this._set('ocpp_server_status', 'waiting').catch(() => {});
     // 'error' not 'idle': connectivity loss must be visible to the user
     this._setChargingState('error').catch(() => {});
@@ -566,6 +581,8 @@ class SmartChargerOcppDevice extends Device {
     this.log('[OCPP] StatusNotification:', JSON.stringify(payload));
     const rawStatus  = payload.status || '';
     const homeyState = OCPP_STATUS_MAP[rawStatus] || 'idle';
+    this._lastRawStatus = rawStatus;
+    if (rawStatus === 'Available' && this._txnId) this._watchStaleTransaction(this._txnId);
 
     // First StatusNotification after restart confirms charger is live — clear
     // the restart-guard so the idle guard can run normally from here on.
@@ -590,6 +607,31 @@ class SmartChargerOcppDevice extends Device {
       .catch(() => {});
 
     this._fireFaultTrigger(payload, rawStatus);
+  }
+
+  /**
+   * "Available" means no car and no session, so a transaction still held beside it ended while
+   * the charger was away — or the StopTransaction is on its way. Give that message
+   * STALE_TXN_GRACE_MS; if the charger still reports Available and has not sent it, close the
+   * transaction here, as a stop with the reason EVDisconnected at the last meter reading.
+   * The server's own map already forgets a transaction on Available; this is the device's half.
+   *
+   * Needed since a dropped connection keeps the transaction (onOcppDisconnected): a charger
+   * that lost power reboots, reports Available and may never send the stop. It applies just as
+   * much to a transaction restored from the store after an app restart.
+   */
+  _watchStaleTransaction(txnId) {
+    if (this._staleTxnTimer) return;
+    this._staleTxnTimer = this.homey.setTimeout(() => {
+      this._staleTxnTimer = null;
+      if (this._txnId !== txnId || this._lastRawStatus !== 'Available') return;
+      this.log(`[OCPP] Transaction ${txnId} ended while the charger was away — it reports Available `
+        + `and sent no StopTransaction in ${STALE_TXN_GRACE_MS / 1000} s; closing it here`);
+      this._locallyClosedTxnId = txnId;
+      const meterStop = Math.round((this.getCapabilityValue('meter_power') || 0) * 1000);
+      this.onStopTransaction({ transactionId: txnId, meterStop, reason: 'EVDisconnected', closedLocally: true })
+        .catch((err) => this.log('[OCPP] Closing the stale transaction failed:', err.message));
+    }, STALE_TXN_GRACE_MS);
   }
 
   // Every StatusNotification carries errorCode, and it used to go no further than the log
@@ -910,6 +952,16 @@ class SmartChargerOcppDevice extends Device {
   async onStopTransaction(payload) {
     this.log('[OCPP] StopTransaction:', JSON.stringify(payload));
 
+    // The charger's own stop for a transaction already closed here by _watchStaleTransaction,
+    // delivered late from its offline queue. Booking it again would record a second session
+    // with the whole meter reading as its energy.
+    if (!payload.closedLocally && payload.transactionId != null && !this._txnId
+        && payload.transactionId === this._locallyClosedTxnId) {
+      this.log(`[OCPP] StopTransaction for ${payload.transactionId} arrived after it was closed here — already accounted`);
+      this._locallyClosedTxnId = null;
+      return;
+    }
+
     const meterStop  = payload.meterStop || 0;
     const reason     = payload.reason || 'Unknown';
     const durationMs = this._txnStartTime ? (Date.now() - this._txnStartTime) : 0;
@@ -1184,7 +1236,7 @@ class SmartChargerOcppDevice extends Device {
       return;
     }
     try {
-      const response = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'));
+      const response = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'), this._txnId);
       this.log('[OCPP] RemoteStop response:', JSON.stringify(response));
     } catch (e) {
       this.log('[OCPP] RemoteStop failed:', e.message);
@@ -1230,7 +1282,7 @@ class SmartChargerOcppDevice extends Device {
     const pauseMessage = 'Charging paused';
 
     try {
-      const stopResponse = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'));
+      const stopResponse = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'), this._txnId);
       if (stopResponse && stopResponse.status === 'Rejected') {
         throw new Error('Charger rejected the stop request');
       }
