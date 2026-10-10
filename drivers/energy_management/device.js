@@ -5,7 +5,7 @@ const { withSettingsLog } = require('../../lib/change-log');
 const HomeyLocalApi = require('../../lib/homey-local-api');
 
 const {
-  TICK_MS, TICK_MIN_S, TICK_MAX_S, GRID_SENSOR_HOLD_MS, BATTERY_SOC_HOLD_MS, SLOW_REFRESH_MS, HISTORY_SAVE_MS, TICK_MAX_DT_MS,
+  TICK_MS, TICK_MIN_S, TICK_MAX_S, GRID_SENSOR_HOLD_MS, CHARGER_STATE_HOLD_MS, BATTERY_SOC_HOLD_MS, SLOW_REFRESH_MS, HISTORY_SAVE_MS, TICK_MAX_DT_MS,
   AMPS_LADDER, MODES, HIST, TRIGGER_BUDGET_MS,
 } = require('../../lib/ems/constants');
 
@@ -629,8 +629,12 @@ class EmsDevice extends Device {
       // stays quiet.
       this._consecTickErrors = (this._consecTickErrors || 0) + 1;
       if (this._consecTickErrors >= 2) {
-        await this._setMode(MODES.ERROR, `Tick-Fehler: ${e.message}`)
-          .catch(() => { /* the mode write itself may be what is failing */ });
+        // _setMode only proposes; _flushMode applies. This used to read
+        // `await this._setMode(…).catch(…)` — _setMode returns nothing, so `.catch` threw a
+        // TypeError inside this catch, _flushMode never ran and the tile kept its last good
+        // status: the very "dead EMS looks alive" this block exists for (review 2026-10-10).
+        this._setMode(MODES.ERROR, `Tick-Fehler: ${e.message}`);
+        await this._flushMode().catch(() => { /* the mode write itself may be what is failing */ });
       }
     } finally {
       const dt = Date.now() - t0;
@@ -1155,6 +1159,26 @@ class EmsDevice extends Device {
       normal: 'ems_battery_normal_mode',
     };
 
+    // A battery that leaves price control while it is force-charging or held is handed back.
+    // The loop below skips it, and until 1.2.314 nothing else looked at it: switching price
+    // control off, or removing the battery, in "charge" or "hold" left it there for good —
+    // and the widget then showed price control off, so nothing hinted at it (review
+    // 2026-10-10). The export-limit coordinator already does the same for its own off.
+    const priced = new Set(devices.filter((d) => d.price_charge_enabled).map((d) => d.id));
+    for (const [id, st] of this._batteryStates) {
+      if (priced.has(id) || (st.priceMode !== 'charge' && st.priceMode !== 'hold')) continue;
+      const was = st.priceMode;
+      st.priceMode = 'normal';
+      this.log(`[EMS] battery ${id}: price control off while in "${was}" → ems_battery_normal_mode`);
+      this._addHistoryEvent(HIST.DEVICE, 'battery_normal', `price control off (was ${was})`, id);
+      await this._settleWithin(
+        this.homey.flow
+          .getTriggerCard(TRIGGER_BY_MODE.normal)
+          .trigger({ battery_device_id: id }, { battery_device_id: id })
+          .catch((e) => this.log(`[EMS] trigger ${TRIGGER_BY_MODE.normal} failed: ${e.message}`)),
+        TRIGGER_BUDGET_MS, `battery ${id} price control off`);
+    }
+
     for (const device of devices) {
       if (!device.price_charge_enabled) continue;
       const soc = battery.socPerDevice?.[device.id] ?? null;
@@ -1309,7 +1333,11 @@ class EmsDevice extends Device {
       return this._cap(d.id, cap, { measured: true });
     }));
     const valid = vals.filter((v) => v !== null);
-    if (!valid.length) {
+    // One unreadable meter of several is a failed reading too. The page says the meters are
+    // summed, and the sum of the rest is not the grid: meter A at −3000 W plus meter B unread
+    // (really +2500 W) gave 3 kW of export that did not exist (review 2026-10-10). Until
+    // 1.2.314 only "all of them unreadable" counted as a failure.
+    if (valid.length < vals.length) {
       // How long the sensor has been silent, not how many ticks were missed. The window
       // this guards is a safety one — the EMS keeps controlling on the last known grid
       // value inside it — so it has to mean the same minute regardless of tick length.
@@ -1317,10 +1345,10 @@ class EmsDevice extends Device {
       if (!this._gridSensorFailSince) this._gridSensorFailSince = Date.now();
       const failedMs = Date.now() - this._gridSensorFailSince;
       if (failedMs < GRID_SENSOR_HOLD_MS && this._lastValidGridW !== null) {
-        this.log(`[EMS] _getGridW: sensor fail #${this._gridSensorFail} (${Math.round(failedMs / 1000)}s/${GRID_SENSOR_HOLD_MS / 1000}s), using cached ${this._lastValidGridW}W`);
+        this.log(`[EMS] _getGridW: sensor fail #${this._gridSensorFail} (${vals.length - valid.length} of ${vals.length} unread, ${Math.round(failedMs / 1000)}s/${GRID_SENSOR_HOLD_MS / 1000}s), using cached ${this._lastValidGridW}W`);
         return this._lastValidGridW; // stale but safe for a short window
       }
-      this.log('[EMS] _getGridW: persistent failure, all reads returned null');
+      this.log(`[EMS] _getGridW: persistent failure, ${vals.length - valid.length} of ${vals.length} meter(s) returned null`);
       return null;
     }
     const result         = valid.reduce((a, b) => a + b, 0);
@@ -1352,7 +1380,25 @@ class EmsDevice extends Device {
       // estimate floor would overstate a self-capping car's real draw.
       // "connected" = car is physically plugged in (Easee: plugged_in_paused / ready_to_charge / car_connected / completed / charging)
       const DISCONNECTED_STATES = new Set(['standby', 'plugged_out', 'unplugged', 'available', 'idle', null, undefined, false]);
-      const connected  = !DISCONNECTED_STATES.has(rawState);
+      // null is what _cap gives when the read FAILED, not a state the charger reported. One
+      // such tick used to read as "unplugged": instant charging was switched off for good,
+      // the charge session split in two, and the restart waited out the flip cooldown
+      // (review 2026-10-10). The last state read stands for CHARGER_STATE_HOLD_MS; a charger
+      // never read, or silent for longer, is unplugged as before.
+      let connected;
+      if (rawState === null || rawState === undefined) {
+        const silentMs = st.connectedReadAt ? Date.now() - st.connectedReadAt : Infinity;
+        connected = st.lastConnected === true && silentMs < CHARGER_STATE_HOLD_MS;
+        if (connected && !st.stateHoldLogged) {
+          st.stateHoldLogged = true;
+          this.log(`[EMS] charger ${c.id}: plug state could not be read — keeping "plugged in" for up to ${CHARGER_STATE_HOLD_MS / 1000}s`);
+        }
+      } else {
+        connected = !DISCONNECTED_STATES.has(rawState);
+        st.lastConnected = connected;
+        st.connectedReadAt = Date.now();
+        st.stateHoldLogged = false;
+      }
       return {
         id:          c.id,
         maxAmps:     parseInt(c.max_amps,  10) || 16,
