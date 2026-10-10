@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.312",
+  "version": "1.2.313",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [

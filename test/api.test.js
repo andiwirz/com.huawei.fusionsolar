@@ -200,6 +200,46 @@ test('putEmsConfig — an off toggle stays off, and a body that claims otherwise
   assert.strictEqual(homey._store.ems_config.offpeak_enabled, false);
 });
 
+// The battery thresholds without a ramp have no field on the page any more, but the EMS reads
+// them — min_battery_soc is the hard stop when no ramp is configured, and the ems-battery
+// widget writes it there. Every save of the page used to drop them, and the stop fell back
+// to 80 % (review 2026-10-10, 1.2.313).
+test('putEmsConfig — a stop set in the widget survives a save of the settings page', async () => {
+  const batteryMixin = require('../lib/ems/battery');
+  const widgetMixin  = require('../lib/ems/widget');
+  const homey = settingsHomey({ ems_config: { share_soc_low: 0, share_soc_high: 0, min_battery_soc: 60 } });
+  const ems = {
+    ...batteryMixin, ...widgetMixin,
+    homey,
+    _getConfig: () => ({ ...(homey._store.ems_config || {}) }),
+    _validateConfig: () => false,
+    _applyWidgetChange: () => {},
+  };
+  assert.deepStrictEqual(await ems.setEmsBatteryZones({ stopSoc: 30 }), { ok: true, stopSoc: 30 });
+
+  // What emsSave sends: every field the page has, and none of these three.
+  await api.putEmsConfig({ homey, body: { share_soc_low: 0, share_soc_high: 0, chargers: [] } });
+
+  const cfg = homey._store.ems_config;
+  assert.strictEqual(cfg.min_battery_soc, 30, 'the widget\'s stop was dropped by the page save');
+  assert.strictEqual(cfg.min_battery_soc_low, 0);
+  assert.strictEqual(ems._batteryZones(cfg, { soc: 50 }).minSoc, 30, 'the hard stop fell back to 80 %');
+});
+
+test('putEmsConfig — the full-battery threshold from before 1.2.108 is kept too, and a body that sends one wins', async () => {
+  const homey = settingsHomey({ ems_config: { min_battery_soc: 25, battery_full_soc: 90 } });
+  await api.putEmsConfig({ homey, body: { chargers: [] } });
+  assert.strictEqual(homey._store.ems_config.battery_full_soc, 90);
+  assert.strictEqual(homey._store.ems_config.min_battery_soc, 25);
+
+  await api.putEmsConfig({ homey, body: { min_battery_soc: 40 } });
+  assert.strictEqual(homey._store.ems_config.min_battery_soc, 40, 'a page that sends the key no longer owns it');
+
+  const fresh = settingsHomey({});
+  await api.putEmsConfig({ homey: fresh, body: { chargers: [] } });
+  assert.ok(!('min_battery_soc' in fresh._store.ems_config), 'a key nobody ever set was invented');
+});
+
 test('putEmsConfig — a first save with nothing stored yet yields false, not undefined', async () => {
   const homey = settingsHomey({});
   await api.putEmsConfig({ homey, body: { min_battery_soc: 20 } });

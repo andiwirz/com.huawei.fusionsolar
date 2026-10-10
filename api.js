@@ -35,6 +35,10 @@ const {
 } = require('./lib/modbus-registers');
 const { DRIVER_SPEC_REGISTERS } = require('./lib/modbus-spec-registers');
 
+// EMS config keys the settings page has no field for but the EMS still reads — written by the
+// ems-battery widget or left from before 1.2.108. putEmsConfig keeps them across a save.
+const EMS_KEYS_NOT_ON_THE_PAGE = ['min_battery_soc', 'min_battery_soc_low', 'battery_full_soc'];
+
 // What a Modbus request costs depends entirely on which device answers it. Measured on one
 // plant within the same minute: the SDongle answers for itself in about 190 ms, and relays
 // for the inverter behind it in about 1.6 s. Eight requests is therefore 1.5 s on one and
@@ -2541,10 +2545,22 @@ module.exports = {
    * here. Carrying it forward is what stops a visit to the settings page from silently
    * resetting the low-tariff switch — which only surfaces later, when the capability is
    * re-initialised (a migration, a re-pair) and is restored from exactly this value.
+   *
+   * The battery thresholds without a ramp are the same kind of key (1.2.313). Their inputs
+   * left the page with the SOC zones in 1.2.108, but they still decide: `min_battery_soc` is
+   * the hard stop when no ramp is configured, and the ems-battery widget writes it there.
+   * Every save of the page dropped them, and _batteryZones fell back to `?? 80` — a stop set
+   * to 30 % in the widget became 80 % the next time anyone saved the settings, and every
+   * device stayed off below it, without a word (review 2026-10-10). Carried forward unless
+   * the page sends them itself, which it would the day it has a field for them again.
    */
   async putEmsConfig({ homey, body }) {
     const stored = homey.settings.get('ems_config') || {};
-    homey.settings.set('ems_config', { ...body, offpeak_enabled: stored.offpeak_enabled === true });
+    const kept = {};
+    for (const key of EMS_KEYS_NOT_ON_THE_PAGE) {
+      if (!(key in (body || {})) && stored[key] !== undefined) kept[key] = stored[key];
+    }
+    homey.settings.set('ems_config', { ...body, ...kept, offpeak_enabled: stored.offpeak_enabled === true });
     try {
       const driver  = homey.drivers.getDriver('energy_management');
       for (const device of driver.getDevices()) {
