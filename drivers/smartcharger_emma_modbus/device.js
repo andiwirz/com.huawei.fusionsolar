@@ -6,12 +6,20 @@ const {
   SMARTCHARGER_REGISTERS,
   isSmartChargerDataValid,
 } = require('../../lib/modbus-registers');
-const { readModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { readModbusRegisters, parseIntSafe, unavailableMessage, notRead } = require('../../lib/modbus-client');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const modbusPolling = require('../../lib/modbus-polling');
 
 const DEFAULT_INTERVAL_S = 30;
 const MIN_INTERVAL_S     = 10;
+
+// The three registers the charging state is derived from.
+const VOLTAGES = ['phaseAVoltage', 'phaseBVoltage', 'phaseCVoltage'];
+// How many polls in a row the last state stands in for voltages that were not read. A flow
+// card writing to another device on the same EMMA cuts a poll short, and a batch can time
+// out on its own — one or two polls, not more. Past that the registers are not coming, and
+// the state falls back to what it always was without them: unplugged.
+const VOLTS_UNREAD_MAX_HELD = 3;
 
 // Homey's evcharger_charging_state is a fixed enum and accepts only these five words:
 // plugged_in_charging, plugged_in_discharging, plugged_in_paused, plugged_in, plugged_out.
@@ -185,45 +193,65 @@ class SmartChargerModbusDevice extends Device {
 
       // Derive charging state from voltage presence:
       // If any phase voltage > 10 V, a car session is likely active
-      const hasVoltage = (d.phaseAVoltage ?? 0) > 10
-        || (d.phaseBVoltage ?? 0) > 10
-        || (d.phaseCVoltage ?? 0) > 10;
-      const chargingState = hasVoltage ? 'charging' : 'idle';
-      // This driver's own word drives everything below; Homey gets the translated one.
-      await this._set('evcharger_charging_state', HOMEY_EV_STATE[chargingState]);
-      await this._set('evcharger_charging', chargingState === 'charging');
+      const live = VOLTAGES.some((k) => (d[k] ?? 0) > 10);
+      let chargingState = live ? 'charging' : 'idle';
+      // A voltage that was not READ is not 0 V. `?? 0` made it one, so a poll cut short in
+      // the middle of a charge read as the car being unplugged: "charging stopped" fired, the
+      // session ended, and the next poll started both again — one charge, two sessions
+      // (review 2026-10-10). The last state stands instead, for a few polls; null when there
+      // is none yet, and then nothing below is touched. A register the EMMA says it does not
+      // have (exception 2) is still 0 V, as before.
+      let held = false;
+      if (!live && notRead(d, ...VOLTAGES)) {
+        this._voltsUnread = (this._voltsUnread || 0) + 1;
+        if (this._voltsUnread <= VOLTS_UNREAD_MAX_HELD) {
+          chargingState = this._prevChargingState;
+          held = true;
+        } else if (this._voltsUnread === VOLTS_UNREAD_MAX_HELD + 1) {
+          this.log(`[SmartCharger] Phase voltages not read for ${this._voltsUnread} polls — taking the charger as unplugged`);
+        }
+      } else {
+        this._voltsUnread = 0;
+      }
 
       // measure_power: estimated while charging, 0 while idle
-      if (chargingState !== 'charging') this._powerEstW = 0;
+      if (chargingState === 'idle') this._powerEstW = 0;
       await this._set('measure_power', this._powerEstW);
 
-      if (this._prevChargingState !== null && chargingState !== this._prevChargingState) {
-        if (chargingState === 'charging') {
-          this.homey.flow.getDeviceTriggerCard('smartcharger_charging_started')
-            .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_started failed:', err.message));
-        } else {
-          this.homey.flow.getDeviceTriggerCard('smartcharger_charging_stopped')
-            .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_stopped failed:', err.message));
-        }
-      }
+      if (chargingState !== null) {
+        // This driver's own word drives everything below; Homey gets the translated one.
+        await this._set('evcharger_charging_state', HOMEY_EV_STATE[chargingState]);
+        await this._set('evcharger_charging', chargingState === 'charging');
 
-      // Session anchors for the widget: set on idle→charging, cleared on charging→idle
-      if (chargingState === 'charging' && !this._sessionStartedAt) {
-        this._sessionStartedAt     = Date.now();
-        this._sessionMeterStartKwh = d.totalEnergyCharged ?? null;
-        await this.setStoreValue('mbSession', { startedAt: this._sessionStartedAt, meterStartKwh: this._sessionMeterStartKwh }).catch(() => {});
-        this.log('[SmartCharger] Session started');
-      } else if (chargingState !== 'charging' && this._sessionStartedAt) {
-        this._sessionStartedAt     = null;
-        this._sessionMeterStartKwh = null;
-        await this.setStoreValue('mbSession', null).catch(() => {});
-        this.log('[SmartCharger] Session ended');
+        if (this._prevChargingState !== null && chargingState !== this._prevChargingState) {
+          if (chargingState === 'charging') {
+            this.homey.flow.getDeviceTriggerCard('smartcharger_charging_started')
+              .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_started failed:', err.message));
+          } else {
+            this.homey.flow.getDeviceTriggerCard('smartcharger_charging_stopped')
+              .trigger(this, {}).catch((err) => this.log('Flow trigger smartcharger_charging_stopped failed:', err.message));
+          }
+        }
+
+        // Session anchors for the widget: set on idle→charging, cleared on charging→idle
+        if (chargingState === 'charging' && !this._sessionStartedAt) {
+          this._sessionStartedAt     = Date.now();
+          this._sessionMeterStartKwh = d.totalEnergyCharged ?? null;
+          await this.setStoreValue('mbSession', { startedAt: this._sessionStartedAt, meterStartKwh: this._sessionMeterStartKwh }).catch(() => {});
+          this.log('[SmartCharger] Session started');
+        } else if (chargingState !== 'charging' && this._sessionStartedAt) {
+          this._sessionStartedAt     = null;
+          this._sessionMeterStartKwh = null;
+          await this.setStoreValue('mbSession', null).catch(() => {});
+          this.log('[SmartCharger] Session ended');
+        }
+        this._prevChargingState = chargingState;
       }
-      this._prevChargingState = chargingState;
 
       this._failureCount = 0;
       if (!this.getAvailable()) await this.setAvailable();
-      logPollOk(this, 'Poll OK: state=' + chargingState);
+      logPollOk(this, 'Poll OK: state=' + (chargingState ?? 'unknown')
+        + (held ? ` (voltages not read, ${this._voltsUnread}/${VOLTS_UNREAD_MAX_HELD} — last state kept)` : ''));
 
     } catch (err) {
       this._failureCount += 1;
