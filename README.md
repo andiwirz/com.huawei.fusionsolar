@@ -591,9 +591,11 @@ A local orchestration device (Homey class `other`) that decides, on a configurab
 
 Older releases had three SoC zones (reserve / normal / an "orange" flat watt budget). That is gone. There is now **one threshold and one ramp**, configured under *Home Batteries*:
 
-- **Below the lower SoC point** nothing runs. Every controllable load is off and the battery takes the whole production. This point *is* the hard stop — "0 % share at the lower point" therefore means what it reads like.
+- **Below the lower SoC point** nothing runs. Every controllable load is off and the battery takes the whole production. This point *is* the hard stop — "0 % share at the lower point" therefore means what it reads like. A charger that keeps drawing there — a stop that did not land, or a car started in the charger's own app — gets the stop again on every tick, and the history says so once the stops plainly do not reach it (since 1.2.308; before, it was stopped once).
 - **Between the two points** the devices' share of production rises linearly with SoC: the fuller the battery, the more of the sun the devices may claim, and the less goes into charging.
 - **At the upper point** the battery stops having priority.
+
+**Chargers are steered by what they measure** (since 1.2.308). A charger that ignores its start — drawing under 500 W although the EMS started it — is started once more after 90 s and stopped after 5 minutes, then left alone for 5, 10, 20, up to 30 minutes before the next try from surplus; a car that is full or at its own limit looks the same and is handled the same way. Until 1.2.308 the current the EMS had commanded counted as drawn, so such a charger kept its share of the surplus indefinitely. A charger switched out of EMS control (widget or settings) is left alone entirely: its draw is no longer counted as surplus the EMS could hand out, and the current last commanded to it is forgotten.
 
 Two guards sit under the ramp, both from field measurements:
 
