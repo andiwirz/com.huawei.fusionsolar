@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.2.311",
+  "version": "1.2.312",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -11589,9 +11589,9 @@
           "nl": "Nul-teruglevering uitschakelen voor [[device]]"
         },
         "hint": {
-          "en": "Deactivates zero export: puts back the feed-in mode and limit that were in force before 'Enable zero export' ran (registers 47416 and 47415) — a standing feed-in limit stays a limit. If no earlier state is known, for instance because zero export was switched on outside this app, it returns to \"Unlimited\" (register 47415 = 0).",
-          "de": "Deaktiviert die Nulleinspeisung: stellt den Modus samt Grenze wieder her, der vor 'Nulleinspeisung aktivieren' galt (Register 47416 und 47415) — eine stehende Einspeisegrenze bleibt eine Grenze. Ist kein früherer Zustand bekannt, etwa weil die Nulleinspeisung ausserhalb dieser App eingeschaltet wurde, geht er auf „Unbegrenzt“ (Register 47415 = 0).",
-          "nl": "Schakelt nul-teruglevering uit: zet de modus en limiet terug die golden vóór 'Nul-teruglevering inschakelen' (registers 47416 en 47415) — een vaste terugleverlimiet blijft een limiet. Is er geen eerdere toestand bekend, bijvoorbeeld omdat nul-teruglevering buiten deze app is ingeschakeld, dan gaat hij naar „Onbegrensd” (register 47415 = 0)."
+          "en": "Deactivates zero export: puts back the feed-in mode and limit that were in force before 'Enable zero export' ran (registers 47416 and 47415) — a standing feed-in limit stays a limit. Without a remembered state nothing is written: if zero export is not on, there is nothing to disable; if it was switched on outside this app, the feed-in mode before it is unknown — the card fails, the timeline says so, and the inverter stays at zero export until the feed-in mode is set in its device settings.",
+          "de": "Deaktiviert die Nulleinspeisung: stellt den Modus samt Grenze wieder her, der vor 'Nulleinspeisung aktivieren' galt (Register 47416 und 47415) — eine stehende Einspeisegrenze bleibt eine Grenze. Ohne gemerkten Zustand wird nichts geschrieben: Ist keine Nulleinspeisung aktiv, gibt es nichts zu deaktivieren; wurde sie ausserhalb dieser App eingeschaltet, ist der Einspeisemodus davor unbekannt – die Karte scheitert, die Zeitleiste sagt es, und der Wechselrichter bleibt bei der Nulleinspeisung, bis der Einspeisemodus in seinen Geräteeinstellungen gesetzt wird.",
+          "nl": "Schakelt nul-teruglevering uit: zet de modus en limiet terug die golden vóór 'Nul-teruglevering inschakelen' (registers 47416 en 47415) — een vaste terugleverlimiet blijft een limiet. Zonder onthouden toestand wordt er niets geschreven: staat nul-teruglevering niet aan, dan is er niets uit te schakelen; is ze buiten deze app ingeschakeld, dan is de terugleveringsmodus daarvoor onbekend – de kaart faalt, de tijdlijn zegt het, en de omvormer blijft op nul-teruglevering tot de terugleveringsmodus in zijn apparaatinstellingen wordt ingesteld."
         },
         "args": [
           {

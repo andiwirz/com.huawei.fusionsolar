@@ -885,7 +885,7 @@ power) and Notifications.
 | Set max feed-in power             | Sets the feed-in limit in watts (reg 47416). Requires a power meter (DTSU666).                     |
 | Set max feed-in power (%)         | Switches to *Limited by power (%)* (47415 = 7) and sets the limit (reg 47418). Requires a power meter. |
 | Enable zero export                | 47415 = 6, 47416 = 0 W. Remembers the mode and limit in force before.                              |
-| Disable zero export               | Puts back the mode and limit from before *Enable zero export* — watt limit first (47416), then the mode (47415). Only when nothing was remembered does it fall back to *Unlimited*. |
+| Disable zero export               | Puts back the mode and limit from before *Enable zero export* — watt limit first (47416), then the mode (47415). With nothing remembered it writes nothing (since 1.2.312): zero export off means nothing to disable; zero export switched on outside the app leaves the mode before it unknown, so the card fails, the timeline says so, and the inverter stays at zero export. |
 | Set inverter output limit (W)     | Caps inverter AC output in watts (reg 40126). Works without a power meter.                         |
 | Set inverter output limit (%)     | Caps inverter AC output as % of rated power (reg 40125). Works without a power meter.              |
 | Remove inverter output limit      | Sets 40126 to rated power × 1.1 and 40125 to 100 %.                                                |
@@ -897,8 +897,10 @@ power) and Notifications.
 > main fuse, or a grid operator's 60/70 % rule. Until 1.2.264, *Disable zero export* returned to
 > *Unlimited* regardless, and *Enable zero export* had already overwritten the watt limit with
 > 0 W, so a negative-price flow quietly removed that protection. Both cards now hand the
-> earlier state back. *Enable/disable grid export limit* keeps its literal meaning: off is
-> *Unlimited*.
+> earlier state back. Until 1.2.312 *Disable zero export* still fell back to *Unlimited* when
+> nothing was remembered — and the memory is cleared after each restore, so a second run took
+> the limit off after all. It now writes nothing in that case. *Enable/disable grid export
+> limit* keeps its literal meaning: off is *Unlimited*.
 
 #### Battery LUNA2000 (Modbus)
 

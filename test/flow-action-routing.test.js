@@ -206,7 +206,12 @@ test('with one device every card does exactly what it did before', async () => {
 
 test('the recording is not empty — every card wrote something or said why not', () => {
   const golden = JSON.parse(fs.readFileSync(GOLDEN, 'utf8'));
-  const silent = Object.entries(golden).filter(([, ev]) => !ev.some((e) => e[0] === 'write' || e[0] === 'refused')).map(([k]) => k);
+  // Silent on purpose, and only these: run on its own in the base state (feed-in limited to
+  // 5000 W), "Disable zero export" finds zero export off and nothing remembered, so there is
+  // nothing to disable. Until 1.2.312 it wrote Unlimited here — the bug that took standing
+  // limits off. Its real work, after "Enable", is recorded by the zero-export pair below.
+  const QUIET = new Set(['sun2000_modbus sun2000_disable_zero_export {}']);
+  const silent = Object.entries(golden).filter(([k, ev]) => !QUIET.has(k) && !ev.some((e) => e[0] === 'write' || e[0] === 'refused')).map(([k]) => k);
   assert.deepStrictEqual(silent, []);
   assert.ok(Object.keys(golden).length > 60, `only ${Object.keys(golden).length} runs recorded`);
 });

@@ -110,6 +110,9 @@ const FEED_IN_MODES = new Set(['0', '1', '5', '6', '7']);
 // The state "Enable zero export" itself leaves behind: limited by power, at 0 W. Never worth
 // remembering — a second "enable" would otherwise save zero export as the thing to return to.
 const isOwnZeroExport = (state) => !!state && state.mode === '6' && state.maxFeedInW === 0;
+// Zero export by any means: the app's own (above), or the inverter's "Zero power grid
+// connection" mode set in the SUN2000 app or by the installer.
+const isZeroExport = (state) => isOwnZeroExport(state) || (!!state && state.mode === '5');
 
 // Setting id → the name a person would recognise, for the timeline note when the inverter
 // refuses a write from the settings page.
@@ -288,6 +291,16 @@ class SUN2000ModbusDevice extends Device {
    * watt limit on 47416 (the setting the poll keeps in step with it). null while either is
    * unknown — remembering half a state would restore the wrong half.
    */
+  // "Disable zero export" found zero export on and nothing to go back to — see the card. A flow
+  // fired by the EMS around negative prices is watched by nobody, so the card's own error alone
+  // would go unseen while the inverter keeps feeding in nothing.
+  _notifyZeroExportKept() {
+    if (this.getSetting('enable_timeline_notifications') === false) return;
+    this.homey.notifications.createNotification({
+      excerpt: `${this.getName()}: zero export stays on — it was not switched on by this app, so the feed-in mode before it is unknown. Set the feed-in mode in the device settings.`,
+    }).catch((e) => this.log('Timeline notification failed:', e.message));
+  }
+
   _feedInState() {
     const mode = this.getCapabilityValue('activepower_controlmode');
     const w    = parseFloat(this.getSetting('max_feed_in_power'));
@@ -522,38 +535,52 @@ class SUN2000ModbusDevice extends Device {
         // So the state "Enable zero export" replaced is put back: the watt limit first, then
         // the mode. If the limit write fails the mode is not touched, the inverter stays at
         // zero export — the restrictive side — and the remembered state is kept for the next
-        // attempt. Only when nothing was remembered (zero export switched on outside this app,
-        // or before it could read the inverter) does it fall back to Unlimited, and says so.
+        // attempt.
+        //
+        // With nothing remembered, nothing is written (1.2.312). Until then this fell back to
+        // Unlimited whatever the inverter was doing — and the state is cleared after every
+        // restore, so a SECOND "Disable" took a standing 5 kW limit off (review 2026-10-10,
+        // Gerhard's situation in issue #35). Now:
+        //   · zero export is not on      → nothing to disable; the card succeeds, the log says so
+        //   · it is on, set outside the app → the mode before it is unknown; Andi's call: the
+        //                                    card fails and says so, the inverter stays at zero
+        //                                    export — the restrictive side, as above
+        //   · the mode was not read yet  → the card fails; try again in a minute
         const reg   = CONTROL_WRITE_MAP.activepower_controlmode;
         const saved = self.getStoreValue(ZERO_EXPORT_RESTORE_KEY);
         const valid = !!saved && FEED_IN_MODES.has(saved.mode) && Number.isFinite(saved.maxFeedInW);
         const now   = self._feedInState();
+        if (!valid) {
+          if (!now) {
+            self.log('[sun2000_disable_zero_export] the feed-in mode has not been read yet — nothing written');
+            throw new Error(self.homey.__('modbus.zeroExport.notReadYet'));
+          }
+          if (!isZeroExport(now)) {
+            self.log(`[sun2000_disable_zero_export] zero export is not on (mode ${now.mode}, ${now.maxFeedInW} W) — nothing to disable, nothing written`);
+            return;
+          }
+          self.log(`[sun2000_disable_zero_export] zero export is on (mode ${now.mode}) but was not switched on by this app — `
+            + 'the feed-in mode before it is unknown, nothing written');
+          self._notifyZeroExportKept();
+          throw new Error(self.homey.__('modbus.zeroExport.noEarlierState'));
+        }
         self._writeInProgress = true;
         (async () => {
           try {
-            if (valid) {
-              self.log(`Write start  [sun2000_disable_zero_export] restoring mode ${saved.mode} with `
-                + `${saved.maxFeedInW} W — reg 47416=${saved.maxFeedInW}, reg 47415=${saved.mode}`);
-              if (now && !isOwnZeroExport(now)) {
-                self.log('[sun2000_disable_zero_export] zero export was no longer active — '
-                  + 'putting back the state from before it anyway');
-              }
-              await writeModbusU32(host(), port(), unitId(), 47416, saved.maxFeedInW);
-              await writeModbusRegister(host(), port(), unitId(), reg, parseInt(saved.mode, 10));
-              await self.setStoreValue(ZERO_EXPORT_RESTORE_KEY, null);
-              self.log('Write OK     [sun2000_disable_zero_export]');
-              self._updatingFromModbus = true;
-              await self._set('activepower_controlmode', saved.mode).catch(() => {});
-              self._updatingSettingFromModbus = true;
-              await self.setSettings({ max_feed_in_power: saved.maxFeedInW }).catch(() => {});
-            } else {
-              self.log('Write start  [sun2000_disable_zero_export] reg 47415=0 — no earlier feed-in '
-                + 'mode is known, returning to Unlimited');
-              await writeModbusRegister(host(), port(), unitId(), reg, 0);
-              self.log('Write OK     [sun2000_disable_zero_export]');
-              self._updatingFromModbus = true;
-              await self._set('activepower_controlmode', '0').catch(() => {});
+            self.log(`Write start  [sun2000_disable_zero_export] restoring mode ${saved.mode} with `
+              + `${saved.maxFeedInW} W — reg 47416=${saved.maxFeedInW}, reg 47415=${saved.mode}`);
+            if (now && !isOwnZeroExport(now)) {
+              self.log('[sun2000_disable_zero_export] zero export was no longer active — '
+                + 'putting back the state from before it anyway');
             }
+            await writeModbusU32(host(), port(), unitId(), 47416, saved.maxFeedInW);
+            await writeModbusRegister(host(), port(), unitId(), reg, parseInt(saved.mode, 10));
+            await self.setStoreValue(ZERO_EXPORT_RESTORE_KEY, null);
+            self.log('Write OK     [sun2000_disable_zero_export]');
+            self._updatingFromModbus = true;
+            await self._set('activepower_controlmode', saved.mode).catch(() => {});
+            self._updatingSettingFromModbus = true;
+            await self.setSettings({ max_feed_in_power: saved.maxFeedInW }).catch(() => {});
           } catch (err) {
             self.error('Write failed [sun2000_disable_zero_export]:', err.message);
           } finally {

@@ -82,6 +82,10 @@
       "order": "Zeile {{line}}: „{{text}}“ muss nach dem Start enden, am selben Tag. Ein Fenster über Mitternacht sind zwei Zeilen: …-23:59 und 00:00-….",
       "overlap": "Zeile {{line}}: „{{other}}“ überschneidet sich mit „{{text}}“ an einem gemeinsamen Tag.",
       "tooMany": "{{count}} Fenster – die Batterie fasst höchstens {{max}}."
+    },
+    "zeroExport": {
+      "notReadYet": "Der Einspeisemodus wurde noch nicht vom Wechselrichter gelesen, deshalb wurde nichts geschrieben. Bitte in einer Minute nochmals versuchen.",
+      "noEarlierState": "Die Nulleinspeisung wurde nicht von dieser App eingeschaltet, der Einspeisemodus davor ist deshalb unbekannt. Es wurde nichts geschrieben: den Einspeisemodus in den Geräteeinstellungen des Wechselrichters unter „Einspeiseleistungs-Begrenzung“ setzen."
     }
   },
   "settings": {

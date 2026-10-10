@@ -276,23 +276,7 @@
    }
   ]
  ],
- "sun2000_modbus sun2000_disable_zero_export {}": [
-  [
-   "write",
-   "reg",
-   "192.0.2.1",
-   502,
-   1,
-   47415,
-   0
-  ],
-  [
-   "set",
-   "A",
-   "activepower_controlmode",
-   "0"
-  ]
- ],
+ "sun2000_modbus sun2000_disable_zero_export {}": [],
  "sun2000_modbus sun2000_startup {}": [
   [
    "write",

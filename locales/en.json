@@ -82,6 +82,10 @@
       "order": "Line {{line}}: \"{{text}}\" must end after it starts, on the same day. A window over midnight is two lines: …-23:59 and 00:00-….",
       "overlap": "Line {{line}}: \"{{other}}\" overlaps \"{{text}}\" on a day they share.",
       "tooMany": "{{count}} windows — the battery holds at most {{max}}."
+    },
+    "zeroExport": {
+      "notReadYet": "The feed-in mode has not been read from the inverter yet, so nothing was written. Please try again in a minute.",
+      "noEarlierState": "Zero export was not switched on by this app, so the feed-in mode before it is unknown. Nothing was written: set the feed-in mode in the inverter's device settings, under \"Feed-in Power Control\"."
     }
   },
   "settings": {

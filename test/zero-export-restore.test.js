@@ -38,6 +38,7 @@ const InverterDevice = require(path.join('..', 'drivers', 'sun2000_modbus', 'dev
 Module._load = origLoad;
 
 const app = require(path.join('..', 'app.json'));
+const en  = require(path.join('..', 'locales', 'en.json'));
 const KEY = 'zero_export_restore';
 
 // A device in a given feed-in state, with the flow cards registered and their listeners kept.
@@ -53,7 +54,13 @@ function makeDevice({ mode = '6', maxFeedInW = 5000, store = {} } = {}) {
     registerArgumentAutocompleteListener() { return this; },
     trigger: async () => {},
   });
-  d.homey = { flow: { getActionCard: card, getConditionCard: card, getDeviceTriggerCard: card, getTriggerCard: card } };
+  d.notes    = [];
+  d.homey = {
+    flow: { getActionCard: card, getConditionCard: card, getDeviceTriggerCard: card, getTriggerCard: card },
+    __: (key) => key.split('.').reduce((o, k) => (o ? o[k] : undefined), en) ?? key,
+    notifications: { createNotification: async (n) => { d.notes.push(n.excerpt); } },
+  };
+  d.getName = () => 'Inverter';
   d.getCapabilityValue = (c) => (c in d.values ? d.values[c] : null);
   d._set = async (c, v) => { d.values[c] = v; };
   d.getSetting = (k) => d.settings[k];
@@ -172,23 +179,80 @@ test('a feed-in state not known yet is not half-remembered', async () => {
   assert.ok(d.logs.some((l) => l.includes('not known yet')));
 });
 
-// ── without a remembered state ──────────────────────────────────────────────────
+// ── without a remembered state: nothing is written (1.2.312) ─────────────────────
+//
+// Until 1.2.312 this fell back to Unlimited whatever the inverter was doing. The state is
+// cleared after every restore, so the SECOND "Disable" of an evening took a standing 5 kW
+// limit off (review of 2026-10-10, Gerhard's situation in issue #35).
 
-test('with nothing remembered it falls back to Unlimited, as before, and says so', async () => {
-  // Zero export switched on in the SUN2000 app, say. There is nothing to restore.
+const outcome = async (d, cardId) => {
+  try { await run(d, cardId); return null; } catch (err) { return err; }
+};
+
+test('a second "Disable" keeps the standing limit — the reported bug', async () => {
   writes.length = 0;
-  const d = makeDevice({ mode: '6', maxFeedInW: 0 });
-  await run(d, 'sun2000_disable_zero_export');
+  const d = makeDevice({ mode: '6', maxFeedInW: 5000 });
+  await run(d, 'sun2000_enable_zero_export');
+  await run(d, 'sun2000_disable_zero_export');                     // restores 5000 W, clears the memory
+  writes.length = 0;
+  const err = await outcome(d, 'sun2000_disable_zero_export');      // again, an hour later
 
-  assert.deepStrictEqual(regs(), ['47415=0']);
-  assert.ok(d.logs.some((l) => l.includes('no earlier feed-in mode is known')));
+  assert.strictEqual(err, null, 'nothing to disable is not a failure');
+  assert.deepStrictEqual(regs(), [], 'the 5 kW limit was taken off');
+  assert.ok(d.logs.some((l) => l.includes('zero export is not on (mode 6, 5000 W) — nothing to disable')));
+});
+
+test('with zero export off and nothing remembered, nothing is written — limited or unlimited', async () => {
+  for (const [mode, w] of [['6', 5000], ['0', 0], ['7', 3000], ['1', 0]]) {
+    writes.length = 0;
+    const d = makeDevice({ mode, maxFeedInW: w });
+    assert.strictEqual(await outcome(d, 'sun2000_disable_zero_export'), null, `mode ${mode}`);
+    assert.deepStrictEqual(regs(), [], `mode ${mode}: something was written`);
+    assert.deepStrictEqual(d.notes, []);
+  }
+});
+
+test('zero export switched on outside this app: nothing written, the card fails and the timeline says so', async () => {
+  // Andi's call: the mode before it is unknown, so the inverter stays on the restrictive side.
+  // Both kinds — the app's own (limited by power at 0 W) and Huawei's "Zero power grid
+  // connection" mode, set in the SUN2000 app or by the installer.
+  for (const [mode, w] of [['6', 0], ['5', 0], ['5', 5000]]) {
+    writes.length = 0;
+    const d = makeDevice({ mode, maxFeedInW: w });
+    const err = await outcome(d, 'sun2000_disable_zero_export');
+
+    assert.ok(err, `mode ${mode}/${w} W: the card succeeded although it did nothing`);
+    assert.strictEqual(err.message, en.modbus.zeroExport.noEarlierState);
+    assert.deepStrictEqual(regs(), [], `mode ${mode}: something was written`);
+    assert.strictEqual(d.notes.length, 1);
+    assert.match(d.notes[0], /zero export stays on/);
+  }
+});
+
+test('a feed-in mode not read yet: nothing written, the card fails and asks to try again', async () => {
+  writes.length = 0;
+  const d = makeDevice({ mode: null, maxFeedInW: 5000 });
+  const err = await outcome(d, 'sun2000_disable_zero_export');
+  assert.ok(err);
+  assert.strictEqual(err.message, en.modbus.zeroExport.notReadYet);
+  assert.deepStrictEqual(regs(), []);
 });
 
 test('a remembered state that makes no sense is not written to the inverter', async () => {
   writes.length = 0;
   const d = makeDevice({ store: { [KEY]: { mode: '42', maxFeedInW: 'lots' } } });
-  await run(d, 'sun2000_disable_zero_export');
-  assert.deepStrictEqual(regs(), ['47415=0']);
+  assert.strictEqual(await outcome(d, 'sun2000_disable_zero_export'), null);
+  assert.deepStrictEqual(regs(), []);
+});
+
+test('the error texts exist in all three languages and point to the device settings', () => {
+  const group = app.drivers.find((x) => x.id === 'sun2000_modbus').settings
+    .find((g) => (g.children || []).some((c) => c.id === 'mode_active_power_control')).label;
+  for (const l of ['en', 'de', 'nl']) {
+    const loc = require(path.join('..', 'locales', `${l}.json`)).modbus.zeroExport;
+    assert.ok(loc.notReadYet && loc.noEarlierState, l);
+    assert.ok(loc.noEarlierState.includes(group[l]), `${l}: does not name "${group[l]}"`);
+  }
 });
 
 // ── across a restart, and when someone changed things in between ────────────────

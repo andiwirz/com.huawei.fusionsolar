@@ -82,6 +82,10 @@
       "order": "Regel {{line}}: „{{text}}” moet na de start eindigen, op dezelfde dag. Een venster over middernacht zijn twee regels: …-23:59 en 00:00-….",
       "overlap": "Regel {{line}}: „{{other}}” overlapt met „{{text}}” op een dag die ze delen.",
       "tooMany": "{{count}} vensters – de batterij bevat er hoogstens {{max}}."
+    },
+    "zeroExport": {
+      "notReadYet": "De terugleveringsmodus is nog niet van de omvormer gelezen, daarom is er niets geschreven. Probeer het over een minuut opnieuw.",
+      "noEarlierState": "Nul-teruglevering is niet door deze app ingeschakeld, dus de terugleveringsmodus daarvoor is onbekend. Er is niets geschreven: stel de terugleveringsmodus in bij de apparaatinstellingen van de omvormer, onder „Begrenzing terugleververmogen”."
     }
   },
   "settings": {
