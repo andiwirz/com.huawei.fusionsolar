@@ -103,3 +103,15 @@ test('the EMS charger-current trigger says what its tokens carry', () => {
   const words = { en: ['per phase', '0 A means stop'], de: ['pro Phase', '0 A heisst Laden stoppen'], nl: ['per fase', '0 A betekent laden stoppen'] };
   for (const l of LANGS) for (const w of words[l]) assert.ok(card('ems_set_charger_current').hint[l].includes(w), `${l}: ${w}`);
 });
+
+// Andi, 2026-10-10: the tooltips say what a card or a setting does, not which other
+// integration it resembles. Code comments and the README may still name the sources.
+test('no tooltip names Home Assistant', () => {
+  const app = require('../app.json');
+  const flatS = (l) => (l || []).flatMap((x) => (x.type === 'group' ? flatS(x.children) : [x]));
+  const hits = [];
+  const check = (where, hint) => { for (const l of LANGS) if (/Home.?Assistant|\bHA\b/.test((hint || {})[l] || '')) hits.push(`${where} (${l})`); };
+  for (const k of ['triggers', 'conditions', 'actions']) for (const c of app.flow[k]) check(c.id, c.hint);
+  for (const d of app.drivers) for (const s of flatS(d.settings)) check(`${d.id}/${s.id}`, s.hint);
+  assert.deepStrictEqual(hits, []);
+});

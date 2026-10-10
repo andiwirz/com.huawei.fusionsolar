@@ -1,4 +1,9 @@
 {
+  "1.2.311": {
+    "en": "Tooltips: the force charge/discharge cards and the Time of Use windows of the LUNA2000 now say what they do without referring to another integration.",
+    "de": "Tooltips: Die Karten zum Zwangsladen und -entladen und die Zeitfenster der zeitabhängigen Nutzung der LUNA2000 sagen jetzt, was sie tun, ohne auf eine andere Integration zu verweisen.",
+    "nl": "Tooltips: de kaarten voor geforceerd laden en ontladen en de Time of Use-vensters van de LUNA2000 zeggen nu wat ze doen zonder naar een andere integratie te verwijzen."
+  },
   "1.2.310": {
     "en": "OCPP charger: a charger that reconnects — after a power cut or a WiFi drop — keeps working. Its old connection, found dead only later, used to remove the new one, and every command then failed with \"not connected\". A dropped connection also no longer ends the charging session in the app: Stop, pause and new limits work again after the reconnect, as after an app update. A session that really ended while the charger was away is closed once the charger reports no car for 30 seconds without sending its stop.",
     "de": "OCPP-Ladestation: Eine Station, die sich neu verbindet – nach einem Stromausfall oder einem WLAN-Aussetzer –, bleibt steuerbar. Ihre alte Verbindung, die erst später als tot erkannt wurde, entfernte bisher die neue, und jeder Befehl scheiterte danach mit „not connected“. Ein Verbindungsabbruch beendet ausserdem die Ladesitzung in der App nicht mehr: Stopp, Pause und neue Grenzen wirken nach dem Wiederverbinden wieder, auch nach einem App-Update. Eine Sitzung, die während des Abbruchs wirklich endete, wird geschlossen, sobald die Station 30 Sekunden lang kein Auto meldet, ohne ihren Stopp zu schicken.",
