@@ -78,7 +78,8 @@ class EmsDevice extends Device {
     this._lastValidGridW   = null; // sensor failure protection: last known good grid value
     this._gridSensorFail   = 0;   // consecutive ticks without valid grid reading
     this._loggedNoMeterDevices   = false; // one-shot log flag for missing meter config
-    this._schedulerFired         = new Map(); // taskId → Date of last fire
+    this._schedulerFired         = new Map(); // taskId → 'YYYY-MM-DD HH:MM' it last ran for (lib/ems/price.js)
+    this._schedulerCheckedAt     = null;      // when the scheduler last looked — its catch-up window starts here
     this._devCache               = new Map(); // per-tick device-object cache (cleared each tick)
 
     // Export limit coordinator state — persisted so an active limit survives an
@@ -765,6 +766,9 @@ class EmsDevice extends Device {
       // A switched-off EMS releases nothing. Leaving the last figure standing would draw a
       // flat line through the whole outage at whatever was released the moment it stopped.
       await this._set('measure_released_surplus', 0);
+      // A task due while the EMS is off is not run when it comes back on, not even within the
+      // scheduler's catch-up window: the next check starts from its own minute.
+      this._schedulerCheckedAt = null;
       if (!enabled) {
         await this._setMode(MODES.DISABLED, '—');
       } else {
