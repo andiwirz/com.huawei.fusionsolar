@@ -27,7 +27,10 @@ class FusionSolarKioskDriver extends Driver {
       const raw = await fetchKioskData(buildApiUrl(baseUrl, kk));
       const kpi = extractKpiValues(raw);
 
-      this.log(`Pairing: validated kk=${kk}, power=${kpi.realTimePower}W`);
+      // Only the end of the key: kk is the share token, and it alone gives read access to the
+      // plant's kiosk data. The app log can be copied from the settings page and is posted
+      // in issues (review 2026-10-10).
+      this.log(`Pairing: validated kk=…${String(kk).slice(-4)}, power=${kpi.realTimePower}W`);
 
       // Return kk so the front-end can pass it to Homey.createDevice()
       return { success: true, kk, kpi };

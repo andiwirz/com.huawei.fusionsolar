@@ -186,7 +186,11 @@ class FusionSolarApp extends App {
    */
   _msUntilLocalMidnight(nowMs = Date.now()) {
     const tz = localTime.safeTz(this._getHomeyTz());
-    return localTime.nextLocalMidnight(tz, nowMs) - nowMs + 5000;
+    // Never less than a minute. A delay of zero or less refires at once and reschedules at
+    // once; that is how a midnight that local-time placed in the past became an hour of
+    // back-to-back timers (review 2026-10-10). Fixed there; this keeps any other way of
+    // getting it wrong from turning into a loop.
+    return Math.max(60_000, localTime.nextLocalMidnight(tz, nowMs) - nowMs + 5000);
   }
 
   /**
