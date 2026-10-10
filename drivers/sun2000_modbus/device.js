@@ -167,17 +167,15 @@ class SUN2000ModbusDevice extends Device {
     const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
 
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
-      await this._stopPolling();
-      await this._startPolling();
-      this._fetchAndUpdate().catch((err) => {
-        this.error('Fetch after settings change failed:', err.message);
-      });
+      await this._restartPolling(newSettings);
     }
 
     if (!this._updatingSettingFromModbus && this._settingsInitialized) {
-      const address  = this.getSetting('address');
-      const port     = parseInt(this.getSetting('port'), 10) || 502;
-      const modbusId = parseIntSafe(this.getSetting('modbus_id'), 1);
+      // From the page being saved: a new address entered together with a new value used to
+      // send the value to the old one, getSetting() not having it yet.
+      const address  = newSettings.address ?? this.getSetting('address');
+      const port     = parseInt(newSettings.port ?? this.getSetting('port'), 10) || 502;
+      const modbusId = parseIntSafe(newSettings.modbus_id ?? this.getSetting('modbus_id'), 1);
 
       // One shape for every write from this page: start, OK, or failed — and a failure puts
       // the setting back, so the page never shows a value the inverter does not have.

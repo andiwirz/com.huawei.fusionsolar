@@ -8,7 +8,9 @@
   },
   "errors": {
     "noUrl": "No Kiosk URL configured. Please check the device settings.",
-    "fetchFailed": "Data fetch failed"
+    "fetchFailed": "Data fetch failed",
+    "ocppStationIdTaken": "Station ID {{id}} on port {{port}} is already used by \"{{name}}\". Each charger needs its own Station ID.",
+    "ocppAnyStationTaken": "\"{{name}}\" already accepts any charger without a Station ID on port {{port}}. Enter this charger's Station ID here."
   },
   "openapi": {
     "pair": {

@@ -123,6 +123,7 @@ test('other settings leave the store and the warning alone', async () => {
   d._stopPolling = async () => {};
   d._startPolling = async () => {};
   d._fetchAndUpdate = async () => {};
+  d._restartPolling = async () => {}; // 1.2.323: the restart goes through the mixin
   await d.onSettings({ newSettings: { poll_interval: 30 }, changedKeys: ['poll_interval'] });
   assert.deepStrictEqual(d.store, {});
   assert.deepStrictEqual(d.calls, []);

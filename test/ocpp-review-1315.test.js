@@ -112,11 +112,12 @@ const fakeServer = {
   renameDevice(oldId, newId) { fakeServer.renamed.push([oldId, newId]); },
   setCredentials(id, user) { fakeServer.creds.push([id, user]); },
   isConnected: () => true,
+  holderOf: () => null, // 1.2.323: onSettings asks whether the Station ID is free
 };
 const origLoad = Module._load;
 Module._load = function (request, parent, isMain) {
   if (request === 'homey') return { Device: class {} };
-  if (request === '../../lib/ocpp-server') return { getInstance: () => fakeServer };
+  if (request === '../../lib/ocpp-server') return { getInstance: () => fakeServer, existing: () => fakeServer };
   return origLoad.call(this, request, parent, isMain);
 };
 const OcppDevice = require('../drivers/smartcharger_ocpp/device.js');

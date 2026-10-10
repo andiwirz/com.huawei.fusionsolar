@@ -8,7 +8,9 @@
   },
   "errors": {
     "noUrl": "Keine Kiosk URL konfiguriert. Bitte überprüfe die Geräteeinstellungen.",
-    "fetchFailed": "Datenabruf fehlgeschlagen"
+    "fetchFailed": "Datenabruf fehlgeschlagen",
+    "ocppStationIdTaken": "Die Station-ID {{id}} auf Port {{port}} nutzt bereits „{{name}}“. Jeder Lader braucht eine eigene Station-ID.",
+    "ocppAnyStationTaken": "„{{name}}“ nimmt auf Port {{port}} bereits jeden Lader ohne Station-ID an. Trage hier die Station-ID dieses Laders ein."
   },
   "openapi": {
     "pair": {

@@ -101,17 +101,14 @@ class LUNA2000EmmaModbusDevice extends Device {
     const modeWrites = pendingModeWrites(this, MODE_SETTINGS, newSettings, changedKeys);
 
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
-      await this._stopPolling();
-      await this._startPolling();
-      this._fetchAndUpdate().catch((err) => {
-        this.error('Fetch after settings change failed:', err.message);
-      });
+      await this._restartPolling(newSettings);
     }
 
     if (changedKeys.includes('max_grid_charge_power') && !this._updatingSettingFromModbus) {
-      const address  = this.getSetting('address');
-      const port     = parseInt(this.getSetting('port'), 10) || 502;
-      const modbusId = parseIntSafe(this.getSetting('modbus_id'), 0);
+      // From the page being saved — see the luna2000_modbus driver.
+      const address  = newSettings.address ?? this.getSetting('address');
+      const port     = parseInt(newSettings.port ?? this.getSetting('port'), 10) || 502;
+      const modbusId = parseIntSafe(newSettings.modbus_id ?? this.getSetting('modbus_id'), 0);
       const kw       = parseFloat(newSettings.max_grid_charge_power) || 0;
       const raw      = Math.round(kw * 1000);
       this.log(`Write max grid charge power: ${kw} kW → reg 40002 raw=${raw}`);

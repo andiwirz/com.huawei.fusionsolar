@@ -315,11 +315,13 @@ class SmartChargerOcppDevice extends Device {
     this._updateSessionTileSensors().catch(() => {});
 
     // ── Register with OcppServer ────────────────────────────────────────────
+    // The server of this device's port: one per port since 1.2.323.
     const stationId = this.getSetting('station_id');
-    const ocppPort  = parseInt(this.getSetting('ocpp_port'), 10) || 8887;
-    const server    = OcppServer.getInstance(this.homey, ocppPort);
-    server.registerDevice(stationId, this);
-    server.setCredentials(stationId, this.getSetting('ocpp_username'), this.getSetting('ocpp_password'));
+    this._ocppPort  = parseInt(this.getSetting('ocpp_port'), 10) || 8887;
+    const server    = this._ocppServer();
+    if (server.registerDevice(stationId, this)) {
+      server.setCredentials(stationId, this.getSetting('ocpp_username'), this.getSetting('ocpp_password'));
+    }
 
     await this._set('ocpp_server_status', 'starting');
     await this._applyTargetPowerRange();
@@ -347,8 +349,19 @@ class SmartChargerOcppDevice extends Device {
   async onSettings({ oldSettings, newSettings, changedKeys }) {
     // newSettings: getSetting() still holds the old Station ID until this method resolves.
     const stationId = newSettings.station_id ?? this.getSetting('station_id') ?? '';
+    const oldId     = (oldSettings && oldSettings.station_id) ?? this.getSetting('station_id') ?? '';
     const ocppPort  = parseInt(newSettings.ocpp_port, 10) || 8887;
-    const server    = OcppServer.getInstance(this.homey, ocppPort);
+    const oldPort   = this._ocppPort ?? (parseInt(this.getSetting('ocpp_port'), 10) || 8887);
+    const moving    = ocppPort !== oldPort || changedKeys.includes('station_id');
+
+    // A Station ID another device holds on that port is refused here, with its name, rather
+    // than taken from it — see OcppServer.registerDevice. Asked of the server without starting
+    // one: a port nobody uses yet has nobody to collide with.
+    if (moving) {
+      const there  = OcppServer.existing(ocppPort);
+      const holder = there && there.holderOf(stationId, this);
+      if (holder) throw new Error(this._stationIdTakenText(stationId, holder.getName(), ocppPort));
+    }
 
     // newSettings, not getSetting(): Homey persists only after this method resolves, so
     // reading the stored value here would still give the old one and the tile would appear
@@ -365,8 +378,22 @@ class SmartChargerOcppDevice extends Device {
     }
 
     // After the checks that can refuse the page, so a refused save moves nothing.
-    if (changedKeys.includes('station_id')) {
-      server.renameDevice((oldSettings && oldSettings.station_id) ?? '', stationId, this);
+    //
+    // A new port is a different server. Until 1.2.323 there was only one, and saving any
+    // setting of any device restarted it on that device's port — with two chargers on two
+    // ports, whichever device was saved last cut the other charger off (review 2026-10-10).
+    // The device now leaves the server of its old port, which stops when nobody is left on
+    // it, and joins the one of its new port.
+    let server;
+    if (ocppPort !== oldPort) {
+      const left = OcppServer.existing(oldPort);
+      if (left) left.unregisterDevice(oldId, this);
+      this._ocppPort = ocppPort;
+      server = this._ocppServer();
+      server.registerDevice(stationId, this);
+    } else {
+      server = this._ocppServer();
+      if (changedKeys.includes('station_id')) server.renameDevice(oldId, stationId, this);
     }
     server.setCredentials(stationId, newSettings.ocpp_username, newSettings.ocpp_password);
     // The 22KT-S0 is not refused on one phase: Huawei's manual lists it for TN/TT three-phase,
@@ -463,13 +490,48 @@ class SmartChargerOcppDevice extends Device {
 
   async onDeleted() {
     this._clearTimers();
-    OcppServer.getInstance(this.homey).unregisterDevice(this.getSetting('station_id'));
+    this._leaveOcppServer();
     this.log('[OCPP] Device deleted');
   }
 
   async onUninit() {
     this._clearTimers();
-    OcppServer.getInstance(this.homey).unregisterDevice(this.getSetting('station_id'));
+    this._leaveOcppServer();
+  }
+
+  // Without starting a server to leave: both of the two above may run for one device.
+  _leaveOcppServer() {
+    const server = OcppServer.existing(this._ocppPort ?? this.getSetting('ocpp_port'));
+    if (server) server.unregisterDevice(this.getSetting('station_id'), this);
+  }
+
+  /** The server this device is registered with — the one of its port. */
+  _ocppServer() {
+    return OcppServer.getInstance(this.homey, this._ocppPort ?? (parseInt(this.getSetting('ocpp_port'), 10) || 8887));
+  }
+
+  _stationIdTakenText(stationId, holderName, port) {
+    return stationId
+      ? this.homey.__('errors.ocppStationIdTaken', { id: stationId, name: holderName, port })
+      : this.homey.__('errors.ocppAnyStationTaken', { name: holderName, port });
+  }
+
+  // From the server, when the Station ID is held by another device on this port. The device
+  // says so instead of waiting in silence — and the offline watchdog leaves that message alone.
+  onRegistrationRefused(stationId, holderName, port) {
+    this._stationIdTaken = true;
+    const text = this._stationIdTakenText(stationId, holderName, port);
+    this.log(`[OCPP] Not registered: ${text}`);
+    this.setUnavailable(text).catch(() => {});
+  }
+
+  // From the server, when the device holds its Station ID — at once, or once the device that
+  // held it is gone or moved.
+  onRegistered() {
+    if (!this._stationIdTaken) return;
+    this._stationIdTaken = false;
+    this.log('[OCPP] Station ID free — registered');
+    this.setAvailable().catch(() => {});
   }
 
   _clearTimers() {
@@ -529,7 +591,7 @@ class SmartChargerOcppDevice extends Device {
   async _applyInitialProfile(reason) {
     if (this._txnId && !this._autoStartBlocked) return; // live session — leave alone
 
-    const server    = OcppServer.getInstance(this.homey);
+    const server    = this._ocppServer();
     const stationId = this.getSetting('station_id');
     if (!server.isConnected(stationId)) return;
 
@@ -575,7 +637,7 @@ class SmartChargerOcppDevice extends Device {
     const bootAmps    = autoStart ? defaultAmps : BLOCK_AMPS;
     this.homey.setTimeout(async () => {
       try {
-        const r = await OcppServer.getInstance(this.homey)
+        const r = await this._ocppServer()
           .setMaxCurrentAsync(this.getSetting('station_id'), bootAmps, this._getPhases());
         this.log(`[OCPP] Boot profile ${bootAmps}A → ${(r && r.status) || 'no status'}`);
       } catch (e) { this.log(`[OCPP] Boot profile ${bootAmps}A failed: ${e.message}`); }
@@ -915,7 +977,7 @@ class SmartChargerOcppDevice extends Device {
       this._txnAmps = BLOCK_AMPS;
       this.log(`[OCPP] Auto-start OFF — blocking with ${BLOCK_AMPS}A TxProfile`);
       try {
-        const r = await OcppServer.getInstance(this.homey)
+        const r = await this._ocppServer()
           .setTxProfileAsync(this.getSetting('station_id'), txnId, BLOCK_AMPS, this._getPhases());
         this.log(`[OCPP] Block TxProfile → ${(r && r.status) || 'no status'}`);
       } catch (e) { this.log('[OCPP] Block TxProfile failed:', e.message); }
@@ -1001,7 +1063,7 @@ class SmartChargerOcppDevice extends Device {
 
       this.homey.setTimeout(async () => {
         try {
-          const r = await OcppServer.getInstance(this.homey)
+          const r = await this._ocppServer()
             .setMaxCurrentAsync(this.getSetting('station_id'), BLOCK_AMPS, this._getPhases());
           this.log(`[OCPP] Masked pause: ${BLOCK_AMPS}A hold → ${(r && r.status) || 'no status'}`);
         } catch (e) { this.log(`[OCPP] Masked pause hold failed: ${e.message}`); }
@@ -1038,7 +1100,7 @@ class SmartChargerOcppDevice extends Device {
         try {
           this._manualStartRequested = true;
           this.sessionPhaseOverride = retryPhases;
-          const server = OcppServer.getInstance(this.homey);
+          const server = this._ocppServer();
           const limit = await server.setMaxCurrentAsync(stationId, retryAmps, retryPhases || this._devicePhases());
           const start = await server.remoteStartAsync(stationId);
           this.log(`[OCPP] Quick-abort retry: profile → ${(limit && limit.status) || 'no status'}, `
@@ -1106,7 +1168,7 @@ class SmartChargerOcppDevice extends Device {
     const restoreAmps = autoStart ? defaultAmps : BLOCK_AMPS;
     this.homey.setTimeout(async () => {
       try {
-        const r = await OcppServer.getInstance(this.homey)
+        const r = await this._ocppServer()
           .setMaxCurrentAsync(this.getSetting('station_id'), restoreAmps, this._getPhases());
         this.log(`[OCPP] Restore profile ${restoreAmps}A → ${(r && r.status) || 'no status'}`);
       } catch (e) { this.log(`[OCPP] Restore profile ${restoreAmps}A failed: ${e.message}`); }
@@ -1166,7 +1228,7 @@ class SmartChargerOcppDevice extends Device {
 
   async _startChargingInner(amps, overridePhases, owner) {
     const stationId   = this.getSetting('station_id');
-    const server      = OcppServer.getInstance(this.homey);
+    const server      = this._ocppServer();
     const defaultAmps = parseInt(this.getSetting('default_charging_amps'), 10) || 16;
 
     // Set (or clear) session phase override before any _getPhases() call
@@ -1242,7 +1304,7 @@ class SmartChargerOcppDevice extends Device {
       return;
     }
     try {
-      const response = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'), this._txnId);
+      const response = await this._ocppServer().remoteStopAsync(this.getSetting('station_id'), this._txnId);
       this.log('[OCPP] RemoteStop response:', JSON.stringify(response));
     } catch (e) {
       this.log('[OCPP] RemoteStop failed:', e.message);
@@ -1288,7 +1350,7 @@ class SmartChargerOcppDevice extends Device {
     const pauseMessage = 'Charging paused';
 
     try {
-      const stopResponse = await OcppServer.getInstance(this.homey).remoteStopAsync(this.getSetting('station_id'), this._txnId);
+      const stopResponse = await this._ocppServer().remoteStopAsync(this.getSetting('station_id'), this._txnId);
       if (stopResponse && stopResponse.status === 'Rejected') {
         throw new Error('Charger rejected the stop request');
       }
@@ -1408,7 +1470,7 @@ class SmartChargerOcppDevice extends Device {
   async releaseCharger() {
     this.log('[OCPP] Releasing charger: ChangeAvailability → Operative');
     try {
-      const response = await OcppServer.getInstance(this.homey).changeAvailabilityAsync(this.getSetting('station_id'), 0, 'Operative');
+      const response = await this._ocppServer().changeAvailabilityAsync(this.getSetting('station_id'), 0, 'Operative');
       this.log('[OCPP] ChangeAvailability response:', JSON.stringify(response));
     } catch (e) {
       this.log('[OCPP] Release failed:', e.message);
@@ -1453,7 +1515,7 @@ class SmartChargerOcppDevice extends Device {
   async rebootCharger(type = 'Soft') {
     this._expectedOfflineUntil = Date.now() + 300_000;
     this.log(`[OCPP] Sending Reset (${type}) to charger...`);
-    const response = await OcppServer.getInstance(this.homey).resetAsync(this.getSetting('station_id'), type);
+    const response = await this._ocppServer().resetAsync(this.getSetting('station_id'), type);
     this.log(`[OCPP] Reset (${type}) response: ${JSON.stringify(response)}`);
     return response;
   }
@@ -1475,7 +1537,7 @@ class SmartChargerOcppDevice extends Device {
     this._validateProfileRequest(amps, this._getPhases());
 
     const stationId  = this.getSetting('station_id');
-    const server     = OcppServer.getInstance(this.homey);
+    const server     = this._ocppServer();
     const prevAmps   = this._txnAmps;
     const prevPhases = this._getPhases();
 
@@ -1569,7 +1631,8 @@ class SmartChargerOcppDevice extends Device {
   // ─── Offline watchdog ─────────────────────────────────────────────────────
 
   async _checkChargerOnline() {
-    const server   = OcppServer.getInstance(this.homey);
+    if (this._stationIdTaken) return; // not registered — "offline" would be the wrong reason
+    const server   = this._ocppServer();
     // This charger's own last message, not the server's: with two chargers on one Homey the
     // server-wide time kept a silent one looking online for as long as the other talked.
     const lastSeen = server ? server.lastMessageAtFor(this.getSetting('station_id') || '') : null;
@@ -1627,7 +1690,7 @@ class SmartChargerOcppDevice extends Device {
         if (this._startInFlight || this.assumeActiveFromRestart) return;
         if (!this._txnId) {
           try {
-            const r = await OcppServer.getInstance(this.homey)
+            const r = await this._ocppServer()
               .setMaxCurrentAsync(this.getSetting('station_id'), BLOCK_AMPS, this._getPhases());
             this.log(`[OCPP] Idle guard: refreshed 0A TxDefaultProfile → ${(r && r.status) || 'no status'}`);
           } catch (e) { this.log(`[OCPP] Idle guard refresh failed: ${e.message}`); }

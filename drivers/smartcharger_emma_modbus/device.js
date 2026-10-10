@@ -88,13 +88,9 @@ class SmartChargerModbusDevice extends Device {
     });
   }
 
-  async onSettings({ changedKeys }) {
+  async onSettings({ newSettings, changedKeys }) {
     if (['address', 'port', 'modbus_id', 'poll_interval'].some((k) => changedKeys.includes(k))) {
-      await this._stopPolling();
-      await this._startPolling();
-      this._fetchAndUpdate().catch((err) => {
-        this.error('Fetch after settings change failed:', err.message);
-      });
+      await this._restartPolling(newSettings);
     }
   }
 

@@ -8,7 +8,9 @@
   },
   "errors": {
     "noUrl": "Geen Kiosk URL geconfigureerd. Controleer de apparaatinstellingen.",
-    "fetchFailed": "Ophalen van gegevens mislukt"
+    "fetchFailed": "Ophalen van gegevens mislukt",
+    "ocppStationIdTaken": "Station ID {{id}} op poort {{port}} wordt al gebruikt door \"{{name}}\". Elke lader heeft een eigen Station ID nodig.",
+    "ocppAnyStationTaken": "\"{{name}}\" accepteert op poort {{port}} al elke lader zonder Station ID. Vul hier de Station ID van deze lader in."
   },
   "openapi": {
     "pair": {
