@@ -84,7 +84,7 @@ class FusionSolarBatteryDevice extends Device {
     if (stationChanged) {
       const oldCode = this.getStoreValue('_prev_station_code');
       await this.setStoreValue('_prev_station_code', newSettings.station_code);
-      this.homey.app.getCoordinator().reregister(this, oldCode);
+      this.homey.app.getCoordinator().reregister(this, oldCode, newSettings.station_code);
     } else if (changedKeys.some((k) => ['base_url_region', 'base_url', 'username', 'system_code', 'poll_interval'].includes(k))) {
       // newSettings, not getSetting(): Homey persists only after this resolves, so the
       // coordinator would otherwise copy the OLD values onto the sibling devices.
