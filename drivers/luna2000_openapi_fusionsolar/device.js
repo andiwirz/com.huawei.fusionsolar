@@ -229,8 +229,13 @@ class FusionSolarBatteryDevice extends Device {
       await this.removeCapability('battery_rated_capacity').catch(() => {});
     }
     await this._set('measure_voltage.battery',       avg('busbar_u'));
-    await this._set('meter_power.charged',           sumKwh('total_charged_energy'));
-    await this._set('meter_power.discharged',        sumKwh('total_discharged_energy'));
+    // The two lifetime totals Homey Energy reads, summed over every battery of the plant. A
+    // poll that leaves one battery out — no dataItemMap for it, or the field missing — lowers
+    // the sum, the next one restores it, and Homey books the restored amount as new energy:
+    // with two batteries, one battery's whole lifetime in a day (review 2026-10-10). The dip
+    // is held, as for the inverter's station total (lib/capability-set.js, issue #34).
+    await this._setCumulative('meter_power.charged',    sumKwh('total_charged_energy'));
+    await this._setCumulative('meter_power.discharged', sumKwh('total_discharged_energy'));
 
     const battModeVal = num(maps[0].ch_discharge_model);
     if (battModeVal !== null) {

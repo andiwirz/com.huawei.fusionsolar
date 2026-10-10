@@ -52,6 +52,10 @@ const BATT_KPI = {
 
 function fakeBattery({ caps = [] } = {}) {
   const d = Object.create(BatteryDevice.prototype);
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, val) => { d.store[k] = val; };
   d.values = {};
   d.caps = new Set(['measure_power', 'measure_battery', ...caps]);
   d._prevSoc = null;
@@ -167,6 +171,10 @@ const PS_KPI = {
 
 function fakeMeter({ timeline = true, caps = [] } = {}) {
   const d = Object.create(MeterDevice.prototype);
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, val) => { d.store[k] = val; };
   d.values = {};
   d.notes  = [];
   d.triggered = [];

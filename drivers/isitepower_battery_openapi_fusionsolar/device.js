@@ -81,9 +81,11 @@ class ISitePowerBatteryDevice extends Device {
     await this._set('measure_power.batt_discharge', v.dischargeW);
     await this._set('measure_voltage.battery', v.battVoltage);
 
-    // total_discharge from API (cumulative kWh) — no need to accumulate
+    // total_discharge from API (cumulative kWh) — no need to accumulate. Summed over the
+    // racks, so a rack missing from one poll lowers it; held at its high-water mark like every
+    // lifetime total Homey Energy reads (lib/capability-set.js, review 2026-10-10).
     if (v.totalDischargeKwh !== null) {
-      await this._set('meter_power.discharged', v.totalDischargeKwh);
+      await this._setCumulative('meter_power.discharged', v.totalDischargeKwh);
     }
 
     // charged kWh — API has no total_charge field, must accumulate locally

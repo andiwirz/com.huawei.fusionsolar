@@ -189,6 +189,14 @@ test('the inverter and the meter driver agree on the same EMMA reading', async (
   const inv = await poll(EMMA_PLANT);
 
   const m = Object.create(MeterDevice.prototype);
+
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+
+  m.store = {};
+
+  m.getStoreValue = (k) => m.store[k];
+
+  m.setStoreValue = async (k, val) => { m.store[k] = val; };
   m.values = {};
   m.caps = new Set(['measure_power', 'meter_power', 'meter_power.exported']);
   m._prevExporting = null;

@@ -46,6 +46,10 @@ const EMMA_KPI = {
 
 function fakeMeter() {
   const d = Object.create(MeterDevice.prototype);
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, val) => { d.store[k] = val; };
   d.values = {};
   d.caps = new Set(['measure_power', 'meter_power', 'meter_power.exported']);
   d._prevExporting = null;
@@ -65,6 +69,10 @@ const poll = async (kpiByType) => {
 
 test('EMMA is asked for at all — without the type nothing is ever fetched', () => {
   const d = Object.create(MeterDevice.prototype);
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, val) => { d.store[k] = val; };
   assert.ok(d.getDevTypes().includes(23070),
     'the coordinator only fetches the types this returns, so leaving 23070 out is exactly '
     + 'why the device showed no values at all');

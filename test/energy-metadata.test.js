@@ -81,7 +81,9 @@ test('the OpenAPI battery fills the meters it now declares', () => {
     ['meter_power.discharged', 'total_discharged_energy'],
   ]) {
     assert.ok(d.capabilities.includes(cap), `${cap} is no longer declared`);
-    assert.match(src, new RegExp(`_set\\('${cap.replace('.', '\\.')}',\\s*sumKwh\\('${field}'\\)\\)`),
+    // Through the high-water mark since 1.2.320: a sum over the plant's batteries that one
+    // poll leaves a battery out of must not fall (test/openapi-review-1320.test.js).
+    assert.match(src, new RegExp(`_setCumulative\\('${cap.replace('.', '\\.')}',\\s*sumKwh\\('${field}'\\)\\)`),
       `${cap} is declared but nothing writes it, so the meter would sit at zero for ever`);
   }
 });

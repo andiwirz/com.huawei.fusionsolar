@@ -177,8 +177,10 @@ class FusionSolarMeterDevice extends Device {
         await setOptional('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
       }
       this._fireExportImportTriggers(activePower);
-      await this._set('meter_power',          sumKwh(emmaMaps, 'active_cap'));
-      await this._set('meter_power.exported', sumKwh(emmaMaps, 'reverse_active_cap'));
+      // Lifetime totals summed over the plant's meters: a partial answer must not lower them,
+      // or Homey books the recovery as energy — see the power-sensor branch below.
+      await this._setCumulative('meter_power',          sumKwh(emmaMaps, 'active_cap'));
+      await this._setCumulative('meter_power.exported', sumKwh(emmaMaps, 'reverse_active_cap'));
 
       // Everything the power sensor offers except the frequency, which EMMA does not
       // report — adding that capability would leave a permanently empty row on the tile.
@@ -226,8 +228,12 @@ class FusionSolarMeterDevice extends Device {
         await setOptional('powermeter_state_string', gridWatts === 0 ? '0 W' : `${gridWatts} W ${label}`);
       }
       this._fireExportImportTriggers(activePower);
-      await this._set('meter_power',            sumKwh(psMaps, 'reverse_active_cap'));
-      await this._set('meter_power.exported',   sumKwh(psMaps, 'active_cap'));
+      // Through the high-water mark, not straight: these are sums over every power sensor of
+      // the plant, and one sensor missing from a poll lowered them. Homey re-anchors on a
+      // falling cumulative meter and counts the recovery as new energy — one sensor's whole
+      // lifetime of import in a day (review 2026-10-10; mechanism in lib/capability-set.js).
+      await this._setCumulative('meter_power',            sumKwh(psMaps, 'reverse_active_cap'));
+      await this._setCumulative('meter_power.exported',   sumKwh(psMaps, 'active_cap'));
 
       // Add extra capabilities dynamically on first successful fetch
       for (const cap of EXTRA_CAPABILITIES) {

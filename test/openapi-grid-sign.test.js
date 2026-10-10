@@ -63,6 +63,10 @@ const PS_KPI = {
 
 function fakeMeter() {
   const d = Object.create(MeterDevice.prototype);
+  // The lifetime totals go through _setCumulative, which keeps its high-water mark in the store.
+  d.store = {};
+  d.getStoreValue = (k) => d.store[k];
+  d.setStoreValue = async (k, val) => { d.store[k] = val; };
   d.values = {};
   d.caps = new Set(['measure_power', 'meter_power', 'meter_power.exported']);
   d._prevExporting = null;

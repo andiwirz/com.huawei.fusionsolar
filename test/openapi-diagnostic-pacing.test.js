@@ -36,6 +36,7 @@ let devList = [
   { id: 1001, devTypeId: 1 }, { id: 1002, devTypeId: 39 },
   { id: 1003, devTypeId: 47 }, { id: 1004, devTypeId: 62 },
 ];
+let devListAnswer = null; // set to a whole answer — a refusal — instead of the list above
 const origLoad = Module._load;
 Module._load = function (request, parent, isMain) {
   if (request === './lib/openapi-client') {
@@ -43,7 +44,7 @@ Module._load = function (request, parent, isMain) {
       login:                async () => 'tok',
       getStationList:       async () => ({ stations: [{ stationCode: 'NE=1', stationName: 'test' }] }),
       getStationRealKpiRaw: async () => stationAnswer,
-      getDevList:           async () => ({ devices: devList }),
+      getDevList:           async () => devListAnswer || ({ devices: devList }),
       getDevRealKpi: async (baseUrl, token, ids, devTypeId) => {
         calls.push({ devTypeId, at: Date.now() });
         return { devices: [{ dataItemMap: { live: true } }], failCode: null, failMessage: null };
@@ -267,4 +268,21 @@ test('a rate-limited type is still reported with its code', () => {
   const table  = client.slice(from, client.indexOf('};', from));
   assert.match(table, /^\s*407:.*[Rr]ate limit/m,
     '407 no longer reads as a rate limit, which is the one code this report exists to show');
+});
+
+// ── A refused device list is reported as refused (1.2.320) ───────────────────
+
+test('a refused device list reads as refused in the report, not as "ok, 0 device(s)"', async () => {
+  devListAnswer = { expired: false, devices: [], failCode: 407, failMessage: 'Rate limit (407)' };
+  try {
+    const report = await run(fakeHomey());
+    const step = report.steps.find((st) => st.step === 'getDevList(NE=1)');
+    assert.strictEqual(step.ok, false);
+    assert.strictEqual(step.data, 'refused — failCode 407: Rate limit (407)');
+  } finally {
+    devListAnswer = null;
+  }
+  const report = await run(fakeHomey({ polled: { 1: [{}], 39: [{}], 47: [{}], 62: [{}] } }));
+  const step = report.steps.find((st) => st.step === 'getDevList(NE=1)');
+  assert.deepStrictEqual([step.ok, step.data], [true, '4 device(s)']);
 });

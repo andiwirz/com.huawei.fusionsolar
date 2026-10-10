@@ -2654,9 +2654,14 @@ module.exports = {
           result.steps.push({ step: `getStationRealKpi(${code})`, ok: false, data: err.message });
         }
 
-        const { devices } = await openapiGetDevList(baseUrl, token, code);
+        // A refused list carries its reason since 1.2.320; it used to read here as "ok, 0
+        // device(s)" — the same mistake the poller made with it.
+        const { devices, failCode: listFailCode, failMessage: listFailMessage } = await openapiGetDevList(baseUrl, token, code);
         stationResult.devices = devices;
-        result.steps.push({ step: `getDevList(${code})`, ok: true, data: `${devices.length} device(s)` });
+        result.steps.push({
+          step: `getDevList(${code})`, ok: !listFailMessage,
+          data: listFailMessage ? `refused — failCode ${listFailCode}: ${listFailMessage}` : `${devices.length} device(s)`,
+        });
 
         const byType = {};
         const unsupported = [];
