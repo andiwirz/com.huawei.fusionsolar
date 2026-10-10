@@ -11,7 +11,7 @@ const {
   pvStringRegisters,
   MAX_PV_STRINGS,
 } = require('../../lib/modbus-registers');
-const { readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
+const { notRead, readModbusRegisters, writeModbusRegister, writeModbusU32, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { pendingModeWrites, syncModeSettings, applyModeWrites, revertModeSetting } = require('../../lib/mode-settings');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
 const { keepLast } = require('../../lib/capability-order');
@@ -757,10 +757,15 @@ class SUN2000ModbusDevice extends Device {
         this._ratedPowerW = data.ratedPower;
       }
 
+      // PV input power not read this poll is not 0 W. It used to be published as 0, as a
+      // successful poll: "power changed" fired with 0, the 0 went into the history behind
+      // "power above … for N minutes", and the tile dipped — whenever a flow card's write cut
+      // the poll short (review 2026-10-10). Now the last value stands until the next read.
       const prevPower = this.getCapabilityValue('measure_power');
-      const newPower  = data.inputPower ?? 0;
+      const powerRead = data.inputPower !== null && data.inputPower !== undefined;
+      const newPower  = powerRead ? data.inputPower : prevPower;
 
-      await this._set('measure_power',              newPower);
+      if (powerRead) await this._set('measure_power', newPower);
       await this._set('measure_power.active_power', data.activePower ?? null);
       await this._set('measure_temperature.invertor', data.internalTemperature ?? null);
       await this._set('meter_power',                data.accumulatedYieldEnergy ?? null);
@@ -774,7 +779,7 @@ class SUN2000ModbusDevice extends Device {
         await this._set(`measure_voltage.pv${i}`, data[`pv${i}Voltage`] ?? null);
         await this._set(`measure_current.pv${i}`, data[`pv${i}Current`] ?? null);
       }
-      await this._updateOptimizerCapabilities(data.totalOptimizers, data.onlineOptimizers);
+      await this._updateOptimizerCapabilities(data.totalOptimizers, data.onlineOptimizers, notRead(data, 'totalOptimizers'));
 
       if (data.deviceStatus !== null && data.deviceStatus !== undefined) {
         const label = statusLabel(data.deviceStatus);
@@ -803,19 +808,19 @@ class SUN2000ModbusDevice extends Device {
         await this._fetchControl(address, port, modbusId);
       }
 
-      if (prevPower !== newPower) {
+      if (powerRead && prevPower !== newPower) {
         await this.homey.flow
           .getDeviceTriggerCard('modbus_power_changed')
           .trigger(this, { power: newPower })
           .catch((err) => this.log('Flow trigger modbus_power_changed failed:', err.message));
       }
-      this._trackPower(newPower);
+      if (powerRead) this._trackPower(newPower);
 
       this._failureCount = 0;
       // The version strings end the tile, after whatever this poll may have added (1.2.301).
       await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
       if (!this.getAvailable()) await this.setAvailable();
-      logPollOk(this, 'Poll OK: PV=' + Math.round(newPower) + 'W');
+      logPollOk(this, powerRead ? 'Poll OK: PV=' + Math.round(newPower) + 'W' : 'Poll OK: PV not read this time, last value kept');
 
     } catch (err) {
       this._failureCount += 1;
@@ -868,8 +873,10 @@ class SUN2000ModbusDevice extends Device {
     }
   }
 
-  async _updateOptimizerCapabilities(total, online) {
+  async _updateOptimizerCapabilities(total, online, unread = false) {
     const hasOptimizers = typeof total === 'number' && Number.isFinite(total) && total > 0;
+    // Not read is not "no optimizers" — see notRead() in lib/modbus-client.js.
+    if (!hasOptimizers && unread) return;
 
     if (hasOptimizers) {
       for (const cap of OPTIMIZER_CAPABILITIES) {
@@ -895,6 +902,12 @@ class SUN2000ModbusDevice extends Device {
       const meter = await readModbusRegisters(address, port, modbusId, POWER_METER_REGISTERS, shouldAbort);
 
       if (!isPowerMeterDataValid(meter)) {
+        // A meter not read this poll keeps its capabilities and values; only one the
+        // inverter says it does not have loses them. Until 1.2.316 a flow card's write that
+        // cut this read short removed measure_power.grid_active_power — the grid figure the
+        // energy management reads by default — and the import/export meters, to add them
+        // back on the next poll (review 2026-10-10).
+        if (notRead(meter, 'powerMeterActivePower')) return;
         for (const cap of POWER_METER_CAPABILITIES) {
           if (this.hasCapability(cap)) await this.removeCapability(cap);
         }

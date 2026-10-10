@@ -50,7 +50,8 @@ test('the German tooltips write Swiss ss and a comma before "wenn"', () => {
 
 test('"power output changed" names the register the trigger really carries', () => {
   // SUN2000 Modbus fires with inputPower (PV input), the EMMA inverter with the EMMA's PV power.
-  assert.match(read('drivers/sun2000_modbus/device.js'), /const newPower\s+= data\.inputPower \?\? 0;/);
+  // Since 1.2.316 a poll that did not read it keeps the last value instead of publishing 0.
+  assert.match(read('drivers/sun2000_modbus/device.js'), /const newPower\s+= powerRead \? data\.inputPower : prevPower;/);
   assert.match(read('drivers/sun2000_emma_modbus/device.js'), /pvOutputPower/);
   const pvIn = String(REG.REGISTERS.inputPower[0]);
   const emma = String(REG.SUN2000_EMMA_DATA_REGISTERS.pvOutputPower[0]);
