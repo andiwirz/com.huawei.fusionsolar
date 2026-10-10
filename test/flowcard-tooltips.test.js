@@ -115,3 +115,13 @@ test('no tooltip names Home Assistant', () => {
   for (const d of app.drivers) for (const s of flatS(d.settings)) check(`${d.id}/${s.id}`, s.hint);
   assert.deepStrictEqual(hits, []);
 });
+
+// The App Store shows the changelog, so the same rule applies to it (Andi, 2026-10-10).
+test('no changelog entry names Home Assistant', () => {
+  const changelog = require('../.homeychangelog.json');
+  const hits = [];
+  for (const [version, entry] of Object.entries(changelog)) {
+    for (const l of LANGS) if (/Home.?Assistant|\bHA\b/.test((entry || {})[l] || '')) hits.push(`${version} (${l})`);
+  }
+  assert.deepStrictEqual(hits, []);
+});
