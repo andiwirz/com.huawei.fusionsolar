@@ -493,7 +493,7 @@ Reads EV charger data via the EMMA Energy Management Module.
 
 ### Smart Charger (OCPP)
 
-Runs an OCPP 1.6 JSON WebSocket server on port 8887 so compatible EV chargers (Huawei SCharger, Easee Home, and others) can connect directly to Homey without a cloud intermediary. One Homey device is created per charger (Station ID).
+Runs an OCPP 1.6 JSON WebSocket server (port 8887 unless changed) so compatible EV chargers (Huawei SCharger, Easee Home, and others) can connect directly to Homey without a cloud intermediary. One Homey device is created per charger (Station ID). Chargers set to different ports each get a server of their own, so changing or saving one never cuts the other off (since 1.2.323).
 
 #### Readable Capabilities
 
@@ -541,8 +541,8 @@ Configure the SCharger via FusionSolar → *Device Commissioning* → *OCPP Sett
 
 | Group | Setting | Default | Description |
 |-------|---------|---------|-------------|
-| Connection | Station ID | – | Unique identifier matching the Path field on the charger |
-| Connection | OCPP port | 8887 | WebSocket server port |
+| Connection | Station ID | – | Unique identifier matching the Path field on the charger. Empty accepts the first charger that connects and keeps it for as long as it stays connected; a second unknown charger is answered but reaches no device. Each Station ID — the empty one included — belongs to one device per port: a second device asking for it is shown as unavailable with the name of the device that holds it, and takes over when that one is deleted or changed |
+| Connection | OCPP port | 8887 | WebSocket server port. Each port has its own server; changing it moves only this device |
 | Connection | Username / Password | – | Optional Basic Auth credentials (must match charger settings) |
 | Charger | Charger vendor | Huawei | Not read from the charger; edit freely |
 | Charger | Charger model | Other / not sure | Hardware variant; the 7KS rejects three phases |
@@ -1231,7 +1231,7 @@ the last 50 entries per device, kept in the device's own store:
 |--------|------------------|
 | Settings | A saved device settings page: every changed setting from old to new (passwords, keys, codes and user names masked), or why the page was not saved |
 | Flow | Every action flow card that ran, with its arguments. Data feeds (electricity price, price forecast) appear in the live log only |
-| Device | A value changed on the device itself — in the FusionSolar app, say — once the app reads it (`Setting follows the device`, `Mode dropdown follows the device`) |
+| Device | A value changed on the device itself — in the FusionSolar app, say — once the app reads it (`Setting follows the device`, `Mode dropdown follows the device`). A poll that read the device before a save ended stores nothing, so the value just saved is not briefly put back (`Setting sync skipped … read before the last save` in the live log, since 1.2.323) |
 | Failed | A write the device refused (the setting is put back where the app can), and a flow card the app refused, with the reason |
 
 A repeat of the same entry within 15 minutes — a flow that adjusts a charger every minute —
@@ -1249,7 +1249,7 @@ and each flow card (`[flow] …`). It is cleared by a restart or an update, and 
 - **Modbus (SUN2000/SDongle):** TCP connection via [`jsmodbus`](https://www.npmjs.com/package/jsmodbus) following the Huawei SUN2000 Modbus Interface Definition A. All Modbus devices on the same host share a serialised queue (`withHostLock`) — no concurrent connections
 - **EMMA Modbus:** TCP connection to the SUN2000MA Energy Management Module (unit ID 0). All three EMMA device types (inverter, battery, meter) read from the same EMMA register range — no SDongle or DTSU666 required. R/W access to ESS control registers (40000–40002) via FC06/FC16
 - **Energy Management System:** A 15-second decision loop running on Homey. Reads PV/house/grid/battery from the paired devices, allocates solar surplus across a fixed load priority (instant → battery-protect → EV solar/off-peak → simple loads), and acts by firing flow trigger cards rather than writing to devices directly (brand-agnostic). Internally modular (`lib/ems/*` mixins: charger control, simple devices, battery zones, price, export limit, history) with debounced history persistence, config validation and a diagnostics snapshot (`getEmsDiag`). Core decision logic is covered by unit tests (`node --test`).
-- **OCPP 1.6:** Singleton WebSocket server (port 8887) running inside Homey. Implements BootNotification, Heartbeat, StatusNotification, MeterValues, StartTransaction, StopTransaction, Authorize, DataTransfer. Outgoing calls are fully async with response tracking (`_pendingCalls` map, 10 s timeout): RemoteStartTransaction, RemoteStopTransaction, SetChargingProfile (TxDefaultProfile stackLevel 0 / TxProfile stackLevel 1, `chargingRateUnit: 'W'`, Absolute kind), ChangeAvailability, Reset. SetChargingProfile uses Watts (0 A → 1 W to work around a Huawei firmware bug where a 0 W TxDefaultProfile is unreliable). Supports optional HTTP Basic Authentication per station. Station ID is extracted from the WebSocket URL path (`ws://homey-ip:8887/[station-id]`). Masked Pause/Resume stitches two physical transactions into a single logical session preserving cumulative energy and start time. Power-verified start: the `charging_started` trigger fires only after > 100 W is confirmed (90 s watchdog). Offline watchdog triggers a flow card after 3 minutes of silence and suppresses alerts for 5 minutes after a reboot command.
+- **OCPP 1.6:** One WebSocket server per configured port (8887 by default) running inside Homey; a device moves between them when its port changes, and a server stops when its last device leaves. Station IDs are unique per server (a second device is refused and queued), and the device without a Station ID keeps the charger it took while that charger stays connected. Implements BootNotification, Heartbeat, StatusNotification, MeterValues, StartTransaction, StopTransaction, Authorize, DataTransfer. Outgoing calls are fully async with response tracking (`_pendingCalls` map, 10 s timeout): RemoteStartTransaction, RemoteStopTransaction, SetChargingProfile (TxDefaultProfile stackLevel 0 / TxProfile stackLevel 1, `chargingRateUnit: 'W'`, Absolute kind), ChangeAvailability, Reset. SetChargingProfile uses Watts (0 A → 1 W to work around a Huawei firmware bug where a 0 W TxDefaultProfile is unreliable). Supports optional HTTP Basic Authentication per station. Station ID is extracted from the WebSocket URL path (`ws://homey-ip:8887/[station-id]`). Masked Pause/Resume stitches two physical transactions into a single logical session preserving cumulative energy and start time. Power-verified start: the `charging_started` trigger fires only after > 100 W is confirmed (90 s watchdog). Offline watchdog triggers a flow card after 3 minutes of silence and suppresses alerts for 5 minutes after a reboot command.
 
 ---
 
