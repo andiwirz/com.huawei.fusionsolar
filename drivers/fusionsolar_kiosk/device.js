@@ -9,6 +9,9 @@ const { applyEnergyWarning, rememberEnergyExclude } = require('../../lib/energy-
 
 const DEFAULT_INTERVAL_MIN = 10;
 const MIN_INTERVAL_MIN = 5;
+// How long the poll right after a save waits for Homey to store the settings — the same two
+// seconds as the Modbus drivers (lib/modbus-polling.js) and the cloud coordinator.
+const SETTINGS_LAND_MS = 2000;
 
 class FusionSolarKioskDevice extends Device {
 
@@ -31,11 +34,7 @@ class FusionSolarKioskDevice extends Device {
       await this._updateEnergyWarning({ ...this.getSettings(), ...newSettings });
     }
     if (changedKeys.includes('kiosk_url') || changedKeys.includes('poll_interval')) {
-      await this._stopPolling();
-      await this._startPolling();
-      this._fetchAndUpdate().catch((err) => {
-        this.error('Fetch after settings change failed:', err.message);
-      });
+      await this._restartPolling(newSettings);
     }
   }
 
@@ -97,24 +96,45 @@ class FusionSolarKioskDevice extends Device {
 
   // ─── Polling ──────────────────────────────────────────────────────────────
 
-  _intervalMs() {
-    let min = parseInt(this.getSetting('poll_interval'), 10);
+  // `settings`: the ones being saved, from onSettings. Read from getSetting() the interval was
+  // still the old one at that moment, so a new interval took effect only at the next restart of
+  // the timer; and the poll right after the save, run at once, used the old URL — the pattern
+  // the Modbus drivers had until 1.2.323 (review 2026-10-10).
+  _intervalMs(settings = null) {
+    const raw = (settings && settings.poll_interval !== undefined) ? settings.poll_interval : this.getSetting('poll_interval');
+    let min = parseInt(raw, 10);
     if (!Number.isFinite(min) || min < MIN_INTERVAL_MIN) min = DEFAULT_INTERVAL_MIN;
     return min * 60 * 1000;
   }
 
-  async _startPolling() {
+  async _startPolling(settings = null) {
     this._timer = this.homey.setInterval(() => {
       this._fetchAndUpdate().catch((err) => {
         this.error('Poll failed:', err.message);
       });
-    }, this._intervalMs());
+    }, this._intervalMs(settings));
+  }
+
+  // A new timer on the new interval, and one poll once the new URL is stored.
+  async _restartPolling(newSettings) {
+    await this._stopPolling();
+    await this._startPolling(newSettings);
+    this._fetchAfterSave = this.homey.setTimeout(() => {
+      this._fetchAfterSave = null;
+      this._fetchAndUpdate().catch((err) => {
+        this.error('Fetch after settings change failed:', err.message);
+      });
+    }, SETTINGS_LAND_MS);
   }
 
   async _stopPolling() {
     if (this._timer) {
       this.homey.clearInterval(this._timer);
       this._timer = null;
+    }
+    if (this._fetchAfterSave) {
+      this.homey.clearTimeout(this._fetchAfterSave);
+      this._fetchAfterSave = null;
     }
   }
 
