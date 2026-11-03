@@ -663,6 +663,8 @@ A local orchestration device (Homey class `other`) that decides, on a configurab
 
 **Control model:** the EMS does not write to other devices directly. Instead it **fires flow trigger cards** (e.g. *Set charger current*, *Start heat pump*) that you link to the corresponding device action cards in your own flows. This keeps it compatible with any charger/heat-pump brand, not just Huawei.
 
+**A charger of another app** needs a *charging state* that says whether a car is plugged in. The settings take `evcharger_charging_state` where the app has it, otherwise a value named after the plug, cable or connection — the Keba app's `plug_status`, for example — and `onoff` only when there is nothing else, since on a wallbox it usually says whether the charger is enabled. Read as the state, `onoff` breaks the stop: a flow that switches the charger off at 0 A makes the EMS see an unplugged car, and it never starts the charger again. Until 1.3.10 only `onoff` and values with *charging* in their name could be chosen. A charging state saved earlier stays as it is.
+
 #### Capabilities
 
 | Capability            | Description                                                                 |

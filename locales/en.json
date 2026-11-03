@@ -607,7 +607,7 @@
       "simpleDevicePowerHint": "While running, the EMS counts the measured {{label}} load as available surplus, so it is not switched off again immediately.",
       "simpleDeviceNoPowerCap": "No power capability — the device switches on/off from raw solar surplus only (it cannot count its own draw as surplus).",
       "chargingState": "Charging state:",
-      "chargerCapsNote": "<b>Charging state</b> tells the EMS whether the car is connected and charging. <b>Power (W)</b> is used to track actual consumption. The EMS sends charging current commands via Flow — set up the trigger in the \"Flow setup\" section below.",
+      "chargerCapsNote": "<b>Charging state</b> tells the EMS whether a car is plugged in. If the charger's app has a value of its own for that (e.g. <i>plug_status</i>), choose it: <i>onoff</i> usually only says whether the charger is enabled. <b>Power (W)</b> is used to track actual consumption. The EMS sends charging current commands via Flow — set up the trigger in the \"Flow setup\" section below.",
       "deviceLabel": {
         "boiler": "boiler",
         "poolPump": "pool pump",

@@ -607,7 +607,7 @@
       "simpleDevicePowerHint": "Terwijl actief telt de EMS het gemeten verbruik van {{label}} mee als beschikbaar overschot, zodat het apparaat niet meteen weer wordt uitgeschakeld.",
       "simpleDeviceNoPowerCap": "Geen vermogen-capability — het apparaat schakelt alleen op basis van ruw zonneoverschot aan/uit (kan het eigen verbruik niet als overschot meetellen).",
       "chargingState": "Laadstatus:",
-      "chargerCapsNote": "<b>Laadstatus</b> vertelt de EMS of de auto is aangesloten en aan het laden is. <b>Vermogen (W)</b> wordt gebruikt om het werkelijke verbruik bij te houden. De EMS stuurt laadstroomcommando's via een Flow — stel de trigger in de sectie \"Flow instellen\" hieronder in.",
+      "chargerCapsNote": "<b>Laadstatus</b> vertelt de EMS of er een auto is aangesloten. Heeft de app van de lader daar een eigen waarde voor (bijv. <i>plug_status</i>), kies die dan: <i>onoff</i> zegt meestal alleen of de lader is vrijgegeven. <b>Vermogen (W)</b> wordt gebruikt om het werkelijke verbruik bij te houden. De EMS stuurt laadstroomcommando's via een Flow — stel de trigger in de sectie \"Flow instellen\" hieronder in.",
       "deviceLabel": {
         "boiler": "boiler",
         "poolPump": "zwembadpomp",

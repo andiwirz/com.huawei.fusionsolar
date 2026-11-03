@@ -607,7 +607,7 @@
       "simpleDevicePowerHint": "Während des Betriebs zählt das EMS die gemessene {{label}}-Last als verfügbaren Überschuss, damit das Gerät nicht sofort wieder ausgeschaltet wird.",
       "simpleDeviceNoPowerCap": "Keine Leistungs-Capability — das Gerät schaltet nur anhand des rohen Solarüberschusses ein/aus (kann seinen eigenen Verbrauch nicht als Überschuss zählen).",
       "chargingState": "Ladestatus:",
-      "chargerCapsNote": "<b>Ladestatus</b> zeigt dem EMS, ob das Fahrzeug angeschlossen ist und lädt. <b>Leistung (W)</b> dient zur Verfolgung des tatsächlichen Verbrauchs. Das EMS sendet Ladestrom-Befehle per Flow — den Trigger im Abschnitt \"Flow setup\" unten einrichten.",
+      "chargerCapsNote": "<b>Ladestatus</b> zeigt dem EMS, ob ein Fahrzeug angesteckt ist. Hat die App des Laders dafür einen eigenen Wert (z. B. <i>plug_status</i>), diesen wählen: <i>onoff</i> sagt meist nur, ob der Lader freigegeben ist. <b>Leistung (W)</b> dient zur Verfolgung des tatsächlichen Verbrauchs. Das EMS sendet Ladestrom-Befehle per Flow — den Trigger im Abschnitt \"Flow setup\" unten einrichten.",
       "deviceLabel": {
         "boiler": "Boiler",
         "poolPump": "Poolpumpen",

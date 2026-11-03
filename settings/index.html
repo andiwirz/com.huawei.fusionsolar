@@ -5385,8 +5385,20 @@
       ) || emsDetectCap(caps, [], function(c) { return c.indexOf('measure_power') === 0; });
     }
 
+    // Whether a car is plugged in, as a charger of another app names it: the Keba app has
+    // plug_status ("Plugged in", true/false) and charge_status beside onoff (1.3.10).
+    function emsIsPlugCap(c) {
+      var lc = c.toLowerCase();
+      return !/^(alarm|measure|meter)_/.test(lc) &&
+        (lc.indexOf('plug') !== -1 || lc.indexOf('cable') !== -1 || lc.indexOf('connect') !== -1);
+    }
+
+    // onoff last: on a wallbox it says whether the charger is enabled, not whether a car is
+    // there. Read as the state, a flow that switches the box off at 0 A made the EMS see
+    // "unplugged" and never start it again.
     function emsDetectChargerState(caps) {
-      return emsDetectCap(caps, ['evcharger_charging_state', 'charging_state', 'onoff']);
+      return emsDetectCap(caps, ['evcharger_charging_state', 'charging_state'], emsIsPlugCap)
+          || emsDetectCap(caps, ['onoff']);
     }
 
     function emsDetectChargerPower(caps) {
@@ -5495,7 +5507,7 @@
       var defState = (stored && stored.cap_state) || emsDetectChargerState(caps) || '';
       var defPower = (stored && stored.cap_power) || emsDetectChargerPower(caps) || '';
 
-      var stateCaps = caps.filter(function(c) { return c.indexOf('charging') !== -1 || c === 'onoff'; });
+      var stateCaps = caps.filter(function(c) { return c.indexOf('charging') !== -1 || emsIsPlugCap(c) || c === 'onoff'; });
       var powerCaps = caps.filter(function(c) { return c.indexOf('measure_power') === 0; });
 
       infoEl.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding-top:4px';
