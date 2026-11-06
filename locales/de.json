@@ -10,7 +10,9 @@
     "noUrl": "Keine Kiosk URL konfiguriert. Bitte überprüfe die Geräteeinstellungen.",
     "fetchFailed": "Datenabruf fehlgeschlagen",
     "ocppStationIdTaken": "Die Station-ID {{id}} auf Port {{port}} nutzt bereits „{{name}}“. Jeder Lader braucht eine eigene Station-ID.",
-    "ocppAnyStationTaken": "„{{name}}“ nimmt auf Port {{port}} bereits jeden Lader ohne Station-ID an. Trage hier die Station-ID dieses Laders ein."
+    "ocppAnyStationTaken": "„{{name}}“ nimmt auf Port {{port}} bereits jeden Lader ohne Station-ID an. Trage hier die Station-ID dieses Laders ein.",
+    "emsSettingRange": "{{name}} muss zwischen {{min}} und {{max}} liegen.",
+    "emsBatteryUnknown": "Diese Batterie ist im EMS nicht mehr eingerichtet. Wähle sie in der Flow-Karte neu."
   },
   "openapi": {
     "pair": {

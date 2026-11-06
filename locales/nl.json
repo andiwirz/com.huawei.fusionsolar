@@ -10,7 +10,9 @@
     "noUrl": "Geen Kiosk URL geconfigureerd. Controleer de apparaatinstellingen.",
     "fetchFailed": "Ophalen van gegevens mislukt",
     "ocppStationIdTaken": "Station ID {{id}} op poort {{port}} wordt al gebruikt door \"{{name}}\". Elke lader heeft een eigen Station ID nodig.",
-    "ocppAnyStationTaken": "\"{{name}}\" accepteert op poort {{port}} al elke lader zonder Station ID. Vul hier de Station ID van deze lader in."
+    "ocppAnyStationTaken": "\"{{name}}\" accepteert op poort {{port}} al elke lader zonder Station ID. Vul hier de Station ID van deze lader in.",
+    "emsSettingRange": "{{name}} moet tussen {{min}} en {{max}} liggen.",
+    "emsBatteryUnknown": "Deze batterij is niet meer in het EMS ingesteld. Kies hem opnieuw in de flowkaart."
   },
   "openapi": {
     "pair": {

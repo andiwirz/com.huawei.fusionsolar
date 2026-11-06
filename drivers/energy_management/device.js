@@ -287,9 +287,40 @@ class EmsDevice extends Device {
       return enabled;
     });
 
+    this._registerSettingCards();
+
     this._applyPriceCurrencyUnit(this._getConfig());
     this._startTick();
     this.log('[EMS] initialized');
+  }
+
+  // Settings a flow may change (1.3.12, issues #37/#38): the forecast correction factor and one
+  // battery's price-control values, written where the settings page keeps them
+  // (setPvForecastFactor in lib/ems/pvForecast.js, setBatteryPriceSetting in priceForecast.js).
+  _registerSettingCards() {
+    const factorCard = this.homey.flow.getActionCard('ems_set_pv_forecast_factor');
+    factorCard.registerRunListener(async (args) => {
+      if (args.device.id !== this.id) return;
+      await this.setPvForecastFactor(args.factor);
+    });
+
+    const batteryPriceCard = this.homey.flow.getActionCard('ems_set_battery_price_value');
+    batteryPriceCard.registerArgumentAutocompleteListener('battery', async (query) => {
+      const q = (query || '').toLowerCase();
+      const out = [];
+      for (const b of this._getConfig().battery_devices || []) {
+        if (!b.id) continue;
+        const name = (await this._widgetDeviceName(b.id)) || b.id;
+        if (!q || name.toLowerCase().includes(q)) out.push({ id: b.id, name });
+      }
+      return out;
+    });
+    batteryPriceCard.registerRunListener(async (args) => {
+      if (args.device.id !== this.id) return;
+      const id = args.battery && args.battery.id;
+      if (!id) throw new Error(this.homey.__('errors.emsBatteryUnknown'));
+      await this.setBatteryPriceSetting(id, args.setting, args.value);
+    });
   }
 
   // A deploy is a clean shutdown, so these are the writes that make an app update cost the

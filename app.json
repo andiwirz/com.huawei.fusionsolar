@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.3.11",
+  "version": "1.3.12",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -14130,6 +14130,147 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "ems_set_pv_forecast_factor",
+        "title": {
+          "en": "Set solar forecast correction factor",
+          "de": "Korrekturfaktor der Solarprognose setzen",
+          "nl": "Correctiefactor van de zonprognose instellen"
+        },
+        "titleFormatted": {
+          "en": "Set solar forecast correction factor to [[factor]]",
+          "de": "Korrekturfaktor der Solarprognose auf [[factor]] setzen",
+          "nl": "Correctiefactor van de zonprognose instellen op [[factor]]"
+        },
+        "hint": {
+          "en": "Sets the correction factor under App Settings → EMS → Data sources → Solar Forecast and saves it there, as if typed into the field. It applies at once to the forecast values, the chart and every EMS decision that uses the forecast, e.g. 0.8 when Solcast forecasts 25 % more than your plant yields. Allowed: 0.3–1.5; a value outside fails the flow.",
+          "de": "Setzt den Korrekturfaktor unter App-Einstellungen → EMS → Datenquellen → Solarprognose und speichert ihn dort, wie von Hand eingetragen. Er gilt sofort für die Prognosewerte, die Grafik und jede EMS-Entscheidung, die die Prognose nutzt, z. B. 0,8, wenn Solcast 25 % mehr vorhersagt, als die Anlage liefert. Erlaubt: 0,3–1,5; ein Wert ausserhalb lässt den Flow fehlschlagen.",
+          "nl": "Stelt de correctiefactor in onder App-instellingen → EMS → Gegevensbronnen → Zonprognose en slaat hem daar op, alsof hij is ingetypt. Hij geldt meteen voor de prognosewaarden, de grafiek en elke EMS-beslissing die de prognose gebruikt, bijv. 0,8 als Solcast 25 % meer voorspelt dan je installatie levert. Toegestaan: 0,3–1,5; een waarde daarbuiten laat de flow mislukken."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=energy_management"
+          },
+          {
+            "type": "number",
+            "name": "factor",
+            "title": {
+              "en": "Factor",
+              "de": "Faktor",
+              "nl": "Factor"
+            },
+            "min": 0.3,
+            "max": 1.5,
+            "step": 0.01,
+            "placeholder": {
+              "en": "e.g. 0.8",
+              "de": "z.B. 0.8",
+              "nl": "bijv. 0.8"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ems_set_battery_price_value",
+        "title": {
+          "en": "Set battery price control value",
+          "de": "Wert der Batterie-Preissteuerung setzen",
+          "nl": "Waarde van de batterij-prijssturing instellen"
+        },
+        "titleFormatted": {
+          "en": "Set [[setting]] of [[battery]] to [[value]]",
+          "de": "[[setting]] von [[battery]] auf [[value]] setzen",
+          "nl": "[[setting]] van [[battery]] instellen op [[value]]"
+        },
+        "hint": {
+          "en": "Changes one value of a home battery's price-optimised charging under App Settings → EMS → Data sources → Home Batteries and saves it there, as if typed into the field; the EMS decides with it from its next cycle. Ranges as on the page: target SOC 0–100 %, charge power 0–50 kW, reserve peak hours 0–24 h, no grid charging above forecast 0–500 kWh (0 = off). A value outside fails the flow. Does not switch price control on or off.",
+          "de": "Ändert einen Wert des preisoptimierten Ladens einer Hausbatterie unter App-Einstellungen → EMS → Datenquellen → Hausbatterien und speichert ihn dort, wie von Hand eingetragen; das EMS entscheidet ab seinem nächsten Durchlauf damit. Bereiche wie auf der Seite: Ziel-SOC 0–100 %, Ladeleistung 0–50 kW, Spitzenzeit-Reserve 0–24 h, Netzladen aus ab Sonnenprognose 0–500 kWh (0 = aus). Ein Wert ausserhalb lässt den Flow fehlschlagen. Schaltet die Preissteuerung nicht ein oder aus.",
+          "nl": "Wijzigt één waarde van het prijsgeoptimaliseerd laden van een thuisbatterij onder App-instellingen → EMS → Gegevensbronnen → Thuisbatterijen en slaat die daar op, alsof hij is ingetypt; het EMS beslist ermee vanaf zijn volgende cyclus. Bereiken zoals op de pagina: streefwaarde SOC 0–100 %, laadvermogen 0–50 kW, reserve-piekuren 0–24 u, geen netladen boven prognose 0–500 kWh (0 = uit). Een waarde daarbuiten laat de flow mislukken. Zet de prijssturing niet aan of uit."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=energy_management"
+          },
+          {
+            "type": "autocomplete",
+            "name": "battery",
+            "title": {
+              "en": "Battery",
+              "de": "Batterie",
+              "nl": "Batterij"
+            },
+            "placeholder": {
+              "en": "Select battery",
+              "de": "Batterie wählen",
+              "nl": "Batterij kiezen"
+            }
+          },
+          {
+            "type": "dropdown",
+            "name": "setting",
+            "title": {
+              "en": "Value",
+              "de": "Wert",
+              "nl": "Waarde"
+            },
+            "values": [
+              {
+                "id": "target_soc",
+                "label": {
+                  "en": "Target SOC (%)",
+                  "de": "Ziel-SOC (%)",
+                  "nl": "Streefwaarde SOC (%)"
+                }
+              },
+              {
+                "id": "charge_power",
+                "label": {
+                  "en": "Charge power (kW)",
+                  "de": "Ladeleistung (kW)",
+                  "nl": "Laadvermogen (kW)"
+                }
+              },
+              {
+                "id": "reserve_hours",
+                "label": {
+                  "en": "Reserve peak hours (h)",
+                  "de": "Spitzenzeit-Reserve (h)",
+                  "nl": "Reserve-piekuren (u)"
+                }
+              },
+              {
+                "id": "solar_max_kwh",
+                "label": {
+                  "en": "No grid charging above forecast (kWh)",
+                  "de": "Netzladen aus ab Sonnenprognose (kWh)",
+                  "nl": "Geen netladen boven prognose (kWh)"
+                }
+              }
+            ]
+          },
+          {
+            "type": "number",
+            "name": "value",
+            "title": {
+              "en": "New value",
+              "de": "Neuer Wert",
+              "nl": "Nieuwe waarde"
+            },
+            "min": 0,
+            "max": 500,
+            "step": 0.1,
+            "placeholder": {
+              "en": "e.g. 80",
+              "de": "z.B. 80",
+              "nl": "bijv. 80"
+            }
           }
         ]
       }
