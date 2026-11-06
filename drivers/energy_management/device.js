@@ -8,6 +8,7 @@ const { readMemory } = require('../../lib/memory-usage');
 const {
   TICK_MS, TICK_MIN_S, TICK_MAX_S, GRID_SENSOR_HOLD_MS, CHARGER_STATE_HOLD_MS, BATTERY_SOC_HOLD_MS, SLOW_REFRESH_MS, HISTORY_SAVE_MS, TICK_MAX_DT_MS,
   AMPS_LADDER, MODES, HIST, TRIGGER_BUDGET_MS, BAT_FULL_ON_PCT, BAT_FULL_GAP_PCT,
+  PV_FORECAST_FACTOR_MIN, PV_FORECAST_FACTOR_MAX,
 } = require('../../lib/ems/constants');
 
 // EMS behaviour is split into lib/ems/* mixins to keep this orchestrator readable.
@@ -379,6 +380,8 @@ class EmsDevice extends Device {
     this._dropCarTargetOverrides(cfg);
     this._syncCarCapabilities(cfg).catch((e) => this.error('[EMS] car cap sync:', e.message));
     this._syncPvForecastCapabilities(cfg).catch((e) => this.error('[EMS] pv cap sync:', e.message));
+    this._applyPvForecastFactor(cfg);
+    this._updatePvForecastCapabilities().catch((e) => this.error('[EMS] pv cap update:', e.message));
     this._priceUnitApplied = null; // currency may have changed → re-apply unit next tick
     this._stopTick();
     this._startTick();
@@ -398,6 +401,7 @@ class EmsDevice extends Device {
     };
     clamp(cfg, 'tick_interval_s', TICK_MIN_S, TICK_MAX_S);
     clamp(cfg, 'min_battery_soc', 0, 100);
+    clamp(cfg, 'pv_forecast_factor', PV_FORECAST_FACTOR_MIN, PV_FORECAST_FACTOR_MAX);
     clamp(cfg, 'min_battery_soc_low', 0, 100);
     if (Number(cfg.min_battery_soc_low) > 0 && Number(cfg.min_battery_soc_low) >= Number(cfg.min_battery_soc)) {
       warns.push(`min_battery_soc_low ≥ min_battery_soc → low zone disabled`);

@@ -830,6 +830,8 @@
       "apiKeyPlaceholder": "Solcast API-sleutel",
       "resourceIdLabel": "Resource-/Site-ID('s)",
       "resourceIdPlaceholder": "Eén per regel (of komma-gescheiden) — bijv.\nabcd-1234-ef56-7890\n9876-5432-dcba-0fed",
+      "factorLabel": "Correctiefactor",
+      "factorHint": "Vermenigvuldigt de hele voorspelling — 0,8 als Solcast 25 % meer voorspelt dan je installatie oplevert; 1 laat haar zoals ze is (0,3–1,5). Geldt meteen, voor de grafiek, de voorspellingswaarden en elke EMS-beslissing.",
       "desc": "Gratis <strong>Hobbyist</strong>-account bij <a href=\"https://toolkit.solcast.com.au/live-forecast\" target=\"_blank\" rel=\"noopener\">Solcast Toolkit</a> — registreer je PV-systeem met exacte gegevens, kopieer dan je <strong>API-sleutel</strong> (onder <em>Your name → Your API key</em>) en <strong>Resource-ID</strong> (klik op je locatie op de kaart). <strong>Meerdere locaties</strong> (bijv. noord- + zuiddak) — voer er één per regel in; hun prognoses worden <strong>opgeteld</strong>. Nieuwe accounts krijgen <strong>10 API-aanroepen/dag</strong> (oudere accounts 50) en <em>elke locatie is één aanroep</em>, dus de app spreidt de aanroepen automatisch om binnen budget te blijven (≈ 8 aanroepen/dag totaal, of het nu 1 of meerdere locaties zijn) en cachet over herstarts heen — <em>geen flows nodig</em>. Het resultaat verschijnt onder <em>Diagnose → EMS-diagnose</em>.",
       "chartNow": "nu",
       "chartAlt": "Voorspeld PV-vermogen voor de komende dag",

@@ -830,6 +830,8 @@
       "apiKeyPlaceholder": "Solcast API key",
       "resourceIdLabel": "Resource / Site ID(s)",
       "resourceIdPlaceholder": "One per line (or comma-separated) — e.g.\nabcd-1234-ef56-7890\n9876-5432-dcba-0fed",
+      "factorLabel": "Correction factor",
+      "factorHint": "Multiplies the whole forecast — 0.8 if Solcast predicts 25 % more than your plant yields, 1 leaves it as it is (0.3–1.5). Applies at once, to the chart, the forecast values and every EMS decision.",
       "desc": "Free <strong>Hobbyist</strong> account at <a href=\"https://toolkit.solcast.com.au/live-forecast\" target=\"_blank\" rel=\"noopener\">Solcast Toolkit</a> — register your PV system with its exact details, then copy your <strong>API key</strong> (under <em>Your name → Your API key</em>) and <strong>Resource ID</strong> (click your site on the map). <strong>Multiple sites</strong> (e.g. north + south roof) — enter one per line; their forecasts are <strong>summed</strong>. New accounts get <strong>10 API calls/day</strong> (older accounts 50) and <em>each site is one call</em>, so the app spaces fetches out automatically to stay within budget (≈ 8 calls/day total whether 1 or several sites) and caches across restarts — <em>no flows needed</em>. Result appears under <em>Diagnostics → EMS Diagnostics</em>.",
       "chartNow": "now",
       "chartAlt": "Forecast PV output over the coming day",

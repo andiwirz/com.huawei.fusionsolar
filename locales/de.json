@@ -830,6 +830,8 @@
       "apiKeyPlaceholder": "Solcast API-Schlüssel",
       "resourceIdLabel": "Resource-/Standort-ID(s)",
       "resourceIdPlaceholder": "Eine pro Zeile (oder kommagetrennt) — z. B.\nabcd-1234-ef56-7890\n9876-5432-dcba-0fed",
+      "factorLabel": "Korrekturfaktor",
+      "factorHint": "Multipliziert die ganze Prognose — 0,8, wenn Solcast 25 % mehr vorhersagt, als deine Anlage liefert; 1 lässt sie, wie sie ist (0,3–1,5). Gilt sofort, für die Grafik, die Prognosewerte und jede EMS-Entscheidung.",
       "desc": "Kostenloses <strong>Hobbyist</strong>-Konto unter <a href=\"https://toolkit.solcast.com.au/live-forecast\" target=\"_blank\" rel=\"noopener\">Solcast Toolkit</a> — registriere deine PV-Anlage mit genauen Angaben, kopiere dann deinen <strong>API-Schlüssel</strong> (unter <em>Your name → Your API key</em>) und die <strong>Resource ID</strong> (auf deinen Standort in der Karte klicken). <strong>Mehrere Standorte</strong> (z. B. Nord- + Süddach) — eine ID pro Zeile eintragen; die Prognosen werden <strong>summiert</strong>. Neue Konten erhalten <strong>10 API-Aufrufe/Tag</strong> (ältere Konten 50), und <em>jeder Standort zählt als ein Aufruf</em> — die App verteilt die Abfragen daher automatisch, um im Budget zu bleiben (≈ 8 Aufrufe/Tag insgesamt, egal ob 1 oder mehrere Standorte), und cached über Neustarts hinweg — <em>keine Flows nötig</em>. Ergebnis erscheint unter <em>Diagnostics → EMS Diagnostics</em>.",
       "chartNow": "jetzt",
       "chartAlt": "Prognostizierte PV-Leistung für den kommenden Tag",

@@ -1588,6 +1588,14 @@
               <textarea id="ems-solcast-resource-id" rows="2" placeholder="One per line (or comma-separated) — e.g.&#10;abcd-1234-ef56-7890&#10;9876-5432-dcba-0fed" data-i18n-placeholder="pvForecast.resourceIdPlaceholder"
                      style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--c-separator);border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit"></textarea>
             </div>
+            <div style="margin-bottom:8px">
+              <label style="font-size:13px;font-weight:600;color:var(--c-label-strong);display:block;margin-bottom:3px" data-i18n="pvForecast.factorLabel">Correction factor</label>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <input id="ems-pvforecast-factor" type="number" value="1" min="0.3" max="1.5" step="0.01"
+                  style="width:72px;padding:6px 10px;border:1px solid var(--c-separator);border-radius:6px;font-size:13px;background:var(--c-card)">
+                <span style="font-size:12px;color:var(--c-label-2);flex:1;min-width:190px;line-height:1.4" data-i18n="pvForecast.factorHint">Multiplies the whole forecast — 0.8 if Solcast predicts 25 % more than your plant yields, 1 leaves it as it is (0.3–1.5). Applies at once, to the chart, the forecast values and every EMS decision.</span>
+              </div>
+            </div>
             <span class="ems-toggle-desc" data-i18n-html="pvForecast.desc">Free <strong>Hobbyist</strong> account at <a href="https://toolkit.solcast.com.au/live-forecast" target="_blank" rel="noopener">Solcast Toolkit</a> — register your PV system with its exact details, then copy your <strong>API key</strong> (under <em>Your name → Your API key</em>) and <strong>Resource ID</strong> (click your site on the map). <strong>Multiple sites</strong> (e.g. north + south roof) — enter one per line; their forecasts are <strong>summed</strong>. New accounts get <strong>10 API calls/day</strong> (older accounts 50) and <em>each site is one call</em>, so the app spaces fetches out automatically to stay within budget (≈ 8 calls/day total whether 1 or several sites) and caches across restarts — <em>no flows needed</em>. Result appears under <em>Diagnostics → EMS Diagnostics</em>.</span>
             <div id="ems-pv-chart" style="margin-top:10px;display:none"></div>
           </div>
@@ -8880,6 +8888,7 @@
       document.getElementById('ems-pvforecast-enabled').checked = !!cfg.pv_forecast_enabled;
       if (cfg.solcast_api_key     !== undefined) document.getElementById('ems-solcast-api-key').value     = cfg.solcast_api_key;
       if (cfg.solcast_resource_id !== undefined) document.getElementById('ems-solcast-resource-id').value = cfg.solcast_resource_id;
+      if (cfg.pv_forecast_factor  !== undefined) document.getElementById('ems-pvforecast-factor').value   = cfg.pv_forecast_factor;
       emsPvForecastToggle();
       emsRenderPriorityList(cfg);
     }
@@ -8976,6 +8985,8 @@
         pv_forecast_enabled:          document.getElementById('ems-pvforecast-enabled').checked,
         solcast_api_key:              document.getElementById('ems-solcast-api-key').value.trim(),
         solcast_resource_id:          document.getElementById('ems-solcast-resource-id').value.trim(),
+        // An empty or zero field is "no correction", not a forecast of nothing.
+        pv_forecast_factor:           parseFloat(document.getElementById('ems-pvforecast-factor').value) || 1,
       };
 
       var btn = document.getElementById('ems-save-btn');
