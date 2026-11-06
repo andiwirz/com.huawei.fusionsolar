@@ -1,6 +1,6 @@
 'use strict';
 
-// Two flow cards for settings that used to need the settings page (1.3.12, issues #37/#38).
+// Two flow cards for settings that used to need the settings page (1.3.13, issues #37/#38).
 //
 // RickD-CH wanted the forecast threshold of his battery's price control set by a flow (#38),
 // and the correction factor from #37 changes with the season. "Set solar forecast correction
@@ -236,9 +236,9 @@ test('the error texts exist in all three languages, with the three placeholders'
   }
 });
 
-test('the release: version 1.3.12 with a changelog entry naming both cards', () => {
-  assert.strictEqual(app.version, '1.3.12');
-  const entry = JSON.parse(read('.homeychangelog.json'))['1.3.12'];
+test('the release: version 1.3.13 with a changelog entry naming both cards', () => {
+  assert.strictEqual(app.version, '1.3.13');
+  const entry = JSON.parse(read('.homeychangelog.json'))['1.3.13'];
   for (const lang of ['en', 'de', 'nl']) {
     assert.ok(entry && entry[lang], `${lang} changelog missing`);
     assert.ok(entry[lang].includes(card('ems_set_pv_forecast_factor').title[lang]), `${lang}: factor card title not in the changelog`);

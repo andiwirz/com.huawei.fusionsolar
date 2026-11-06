@@ -294,7 +294,7 @@ class EmsDevice extends Device {
     this.log('[EMS] initialized');
   }
 
-  // Settings a flow may change (1.3.12, issues #37/#38): the forecast correction factor and one
+  // Settings a flow may change (1.3.13, issues #37/#38): the forecast correction factor and one
   // battery's price-control values, written where the settings page keeps them
   // (setPvForecastFactor in lib/ems/pvForecast.js, setBatteryPriceSetting in priceForecast.js).
   _registerSettingCards() {

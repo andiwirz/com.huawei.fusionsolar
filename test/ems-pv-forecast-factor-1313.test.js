@@ -1,6 +1,6 @@
 'use strict';
 
-// Correction factor for the Solcast forecast (1.3.12, issue #37).
+// Correction factor for the Solcast forecast (1.3.13, issue #37).
 //
 // RickD-CH compared a month of Solcast with his plant: 514 kWh forecast, 379 kWh yielded.
 // Solcast told good days from bad ones best, but 36 % too high — and the EMS works in kWh:
