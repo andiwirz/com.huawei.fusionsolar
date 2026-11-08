@@ -682,12 +682,14 @@ test('readRegisters — the in-flight wording is recognised as well as the queue
   );
 });
 
-// The retry that follows a first-request failure must not be able to swallow the verdict.
-test('readRegisters — the first-request retry does not hide a dead socket', async () => {
+// The first-request retry is for a device that drops the first request of a connection, not
+// for a dead socket: since 1.3.14 a lost connection ends the poll at once (log 06618e47 showed
+// one "no connection" line per register of every poll). The verdict must survive that.
+test('readRegisters — a dead socket is neither retried nor read any further, and still fails the poll', async () => {
   const regs = { a: [100, 1, 'UINT16', '', 0], b: [200, 1, 'UINT16', '', 0] };
   const client = hangUpClient(0);
   await assert.rejects(() => readRegisters(regs, client), (err) => err.modbusConnectionLost === true);
-  assert.ok(client.calls.length >= 2, 'the first request was not retried at all');
+  assert.strictEqual(client.calls.length, 1, 'requests went on after the socket was gone');
 });
 
 // Anything the device actually SAID keeps the old behaviour: those failures describe
@@ -708,10 +710,10 @@ test('readRegisters — registers read before the hang-up are kept, and the poll
   assert.strictEqual(out.far, null);
 });
 
-// The field shape: adjacent registers, so buildReadPlan makes one batch of them, and the
-// failure arrives on a group that gets bisected all the way down before the poll is over.
-// The verdict has to survive that whole cascade.
-test('readRegisters — a batch that hangs up still fails the poll, bisection and all', async () => {
+// The field shape: adjacent registers, so buildReadPlan makes one batch of them. Until 1.3.14
+// a lost connection on it was bisected all the way down, one doomed request per register;
+// now the batch is written off whole. The verdict has to hold either way.
+test('readRegisters — a batch that hangs up is not bisected, and still fails the poll', async () => {
   const regs = {};
   for (let i = 0; i < 8; i++) regs[`r${i}`] = [37760 + i, 1, 'UINT16', '', 0];
   const client = hangUpClient(0);
@@ -719,7 +721,7 @@ test('readRegisters — a batch that hangs up still fails the poll, bisection an
     () => readRegisters(regs, client),
     (err) => err.modbusConnectionLost === true,
   );
-  assert.ok(client.calls.length > 1, 'this never reached the bisection path, so it proves nothing');
+  assert.strictEqual(client.calls.length, 1, 'the batch was taken apart on a socket that was gone');
 });
 
 test('unavailableMessage — a hung-up socket names the connection, not the hardware', () => {
