@@ -418,6 +418,14 @@ before it was read once. With no windows at all the battery charges from surplus
 does not discharge. The EMMA battery keeps its windows in the EMMA (40004) and has no such field
 yet.
 
+Since 1.3.15 the card *Set Time of Use windows* sets the same windows from a flow, for a script
+that plans them (Homey does not let a script change a device setting — it answers "Missing scopes").
+The card's text is one line, so `;` (or `,`) separates the windows: `00:00-06:00/12345/+; 17:00-23:59/12345/-`.
+It is checked as the field is, and an error names the window by its place on the card. Unlike a save
+of the field the card waits for the write, so a mistake or a refused write fails the flow and the
+battery keeps its windows. Windows the battery already holds are not written again; an empty text
+clears them, as an empty field does.
+
 ---
 
 ### Battery LUNA2000 (EMMA Modbus)
@@ -1113,6 +1121,7 @@ out — they are no longer offered for new flows, and existing flows keep workin
 |---|---|
 | Set storage working mode | What the battery does on its own (register 47086). For charging by price or forecast, use the Energy Management device instead. "Maximise Self-Consumption" — the normal choice: surplus solar charges the battery; when the sun is not enough, it supplies the house. "Time of Use (LUNA2000)" — follows the charge and discharge windows stored in the inverter. Set them in the device settings or in the FusionSolar app, or the battery may discharge on a sunny morning. "Fully Fed to Grid" — as much solar as possible into the grid; the battery charges only with what exceeds the inverter's maximum output and discharges below it. "Third-party Scheduling" — only if an outside platform is connected; otherwise nothing controls the battery. "Fixed Charge/Discharge", "Time of Use (LG)" and "Adaptive" — meant for LG batteries or not described by Huawei; do not choose them with a LUNA2000. |
 | Set excess PV energy use in TOU mode | Only takes effect in the working mode "Time of Use (LUNA2000)": whether surplus solar goes into the grid or charges the battery (register 47299). In any other mode the setting does nothing. |
+| Set Time of Use windows | Replaces all charge and discharge windows the working mode "Time of Use (LUNA2000)" follows (register 47255), like the field "Charge/discharge windows (Time of Use)" in the battery's settings. Write start-end/days/+ or -, several windows separated by ; — for example 00:00-06:00/12345/+; 17:00-23:59/12345/-. Days 1 = Monday to 7 = Sunday; + charges (from the grid only with "Charge battery from grid"), - discharges. At most 14 windows, not overlapping on the same day; end with 23:59 rather than 00:00. Empty removes all windows. A mistake fails the flow, and nothing is written. |
 | Set remote charge/discharge mode | Who may command the battery from outside. "Local Control" means nobody, and that is what you want unless a third-party scheduler really is talking to the inverter. Any other value hands control over and overrides the storage working mode — without such a scheduler the battery then behaves unpredictably. (Modbus register 47589.) |
 | Stop force charge/discharge | Stops a forced charge or discharge of the LUNA2000: the stop command (register 47100 = 0), then the discharge power (47249), the duration (47083) and the mode (47246 = 0) are cleared, so the next run starts from known values. The same as "Set force charge/discharge" with "Stop". The card is done once the stop is written; if it cannot be sent, the card fails and the timeline warns that the run may still be going. |
 | Start charging until SoC % | Starts force charging the LUNA2000 at the given power until the target SoC is reached (registers 47101, 47247, mode 47246 = 1, start 47100). The card is done only once every value is written; if one step fails nothing starts, the card fails with the reason, and the timeline says it too. The power is capped at the battery's max charge or discharge power (registers 47075/47077); the card is refused while that limit is 0. Charging from the grid — at night, say — is also held to the battery's grid charge power (register 47242, which cannot exceed its limit 47244): if the battery charges slower than asked, raise it with "Set grid charge power". The log says so when the power asked for is above it. |

@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.3.14",
+  "version": "1.3.15",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -12611,6 +12611,45 @@
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "luna2000_set_tou_periods",
+        "title": {
+          "en": "Set Time of Use windows",
+          "de": "Lade-/Entladefenster setzen",
+          "nl": "Laad-/ontlaadvensters instellen"
+        },
+        "titleFormatted": {
+          "en": "Set Time of Use windows to [[periods]]",
+          "de": "Lade-/Entladefenster auf [[periods]] setzen",
+          "nl": "Laad-/ontlaadvensters instellen op [[periods]]"
+        },
+        "hint": {
+          "en": "Replaces all charge and discharge windows the working mode \"Time of Use (LUNA2000)\" follows (register 47255), like the field \"Charge/discharge windows (Time of Use)\" in the battery's settings. Write start-end/days/+ or -, several windows separated by ; — for example 00:00-06:00/12345/+; 17:00-23:59/12345/-. Days 1 = Monday to 7 = Sunday; + charges (from the grid only with \"Charge battery from grid\"), - discharges. At most 14 windows, not overlapping on the same day; end with 23:59 rather than 00:00. Empty removes all windows. A mistake fails the flow, and nothing is written.",
+          "de": "Ersetzt alle Lade- und Entladefenster, denen der Betriebsmodus „Zeitabhängige Nutzung (LUNA2000)“ folgt (Register 47255), wie das Feld „Lade-/Entladefenster (Zeitabhängige Nutzung)“ in den Einstellungen der Batterie. Schreibweise Start-Ende/Wochentage/+ oder -, mehrere Fenster mit ; getrennt — zum Beispiel 00:00-06:00/12345/+; 17:00-23:59/12345/-. Wochentage 1 = Montag bis 7 = Sonntag; + lädt (aus dem Netz nur mit „Batterie aus dem Netz laden“), - entlädt. Höchstens 14 Fenster, am selben Tag ohne Überschneidung; als Ende 23:59 statt 00:00. Leer entfernt alle Fenster. Bei einem Fehler scheitert der Flow, und es wird nichts geschrieben.",
+          "nl": "Vervangt alle laad- en ontlaadvensters die de bedrijfsmodus „Tijdgebonden gebruik (LUNA2000)” volgt (register 47255), zoals het veld „Laad-/ontlaadvensters (Time of Use)” in de instellingen van de batterij. Schrijf start-einde/dagen/+ of -, meerdere vensters gescheiden door ; — bijvoorbeeld 00:00-06:00/12345/+; 17:00-23:59/12345/-. Dagen 1 = maandag tot 7 = zondag; + laadt (uit het net alleen met „Batterij laden uit het net”), - ontlaadt. Hoogstens 14 vensters, niet overlappend op dezelfde dag; eindig met 23:59 in plaats van 00:00. Leeg verwijdert alle vensters. Bij een fout mislukt de flow en wordt er niets geschreven."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=luna2000_modbus"
+          },
+          {
+            "type": "text",
+            "name": "periods",
+            "title": {
+              "en": "Windows",
+              "de": "Fenster",
+              "nl": "Vensters"
+            },
+            "placeholder": {
+              "en": "00:00-06:00/12345/+; 17:00-23:59/12345/-",
+              "de": "00:00-06:00/12345/+; 17:00-23:59/12345/-",
+              "nl": "00:00-06:00/12345/+; 17:00-23:59/12345/-"
+            }
           }
         ]
       },

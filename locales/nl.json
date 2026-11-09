@@ -81,13 +81,16 @@
       "invalid": "Die waarde kan niet naar dit apparaat worden geschreven."
     },
     "tou": {
+      "line": "Regel {{line}}",
+      "window": "Venster {{line}}",
       "notReadYet": "De vensters kunnen worden gewijzigd zodra de app ze van de batterij heeft gelezen. Probeer het over een paar minuten opnieuw.",
-      "format": "Regel {{line}}: „{{text}}” is geen venster. Schrijf start-einde/dagen/+ of -, bijvoorbeeld 00:00-06:00/12345/+.",
-      "time": "Regel {{line}}: „{{text}}” heeft een tijd buiten 00:00–24:00.",
-      "days": "Regel {{line}}: „{{text}}” – geef elke dag één keer op, van 1 (maandag) tot 7 (zondag).",
-      "order": "Regel {{line}}: „{{text}}” moet na de start eindigen, op dezelfde dag. Een venster over middernacht zijn twee regels: …-23:59 en 00:00-….",
-      "overlap": "Regel {{line}}: „{{other}}” overlapt met „{{text}}” op een dag die ze delen.",
-      "tooMany": "{{count}} vensters – de batterij bevat er hoogstens {{max}}."
+      "format": "{{where}}: „{{text}}” is geen venster. Schrijf start-einde/dagen/+ of -, bijvoorbeeld 00:00-06:00/12345/+.",
+      "time": "{{where}}: „{{text}}” heeft een tijd buiten 00:00–24:00.",
+      "days": "{{where}}: „{{text}}” – geef elke dag één keer op, van 1 (maandag) tot 7 (zondag).",
+      "order": "{{where}}: „{{text}}” moet na de start eindigen, op dezelfde dag. Splits een venster over middernacht in tweeën: …-23:59 en 00:00-….",
+      "overlap": "{{where}}: „{{other}}” overlapt met „{{text}}” op een dag die ze delen.",
+      "tooMany": "{{count}} vensters – de batterij bevat er hoogstens {{max}}.",
+      "writeFailed": "De vensters konden niet worden geschreven ({{error}}). De batterij houdt haar vorige."
     },
     "zeroExport": {
       "notReadYet": "De terugleveringsmodus is nog niet van de omvormer gelezen, daarom is er niets geschreven. Probeer het over een minuut opnieuw.",

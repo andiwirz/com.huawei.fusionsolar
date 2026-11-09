@@ -485,6 +485,12 @@
    "1"
   ]
  ],
+ "luna2000_modbus luna2000_set_tou_periods {\"periods\":\"x\"}": [
+  [
+   "refused",
+   "The windows can be changed once the app has read them from the battery. Please try again in a few minutes."
+  ]
+ ],
  "luna2000_modbus luna2000_set_remote_mode {\"mode\":\"0\"}": [
   [
    "write",

@@ -81,13 +81,16 @@
       "invalid": "Dieser Wert kann nicht auf das Gerät geschrieben werden."
     },
     "tou": {
+      "line": "Zeile {{line}}",
+      "window": "Fenster {{line}}",
       "notReadYet": "Die Fenster lassen sich ändern, sobald die App sie von der Batterie gelesen hat. Bitte in ein paar Minuten nochmals versuchen.",
-      "format": "Zeile {{line}}: „{{text}}“ ist kein Fenster. Schreibweise Start-Ende/Wochentage/+ oder -, zum Beispiel 00:00-06:00/12345/+.",
-      "time": "Zeile {{line}}: „{{text}}“ hat eine Zeit ausserhalb von 00:00–24:00.",
-      "days": "Zeile {{line}}: „{{text}}“ – jeden Wochentag einmal angeben, von 1 (Montag) bis 7 (Sonntag).",
-      "order": "Zeile {{line}}: „{{text}}“ muss nach dem Start enden, am selben Tag. Ein Fenster über Mitternacht sind zwei Zeilen: …-23:59 und 00:00-….",
-      "overlap": "Zeile {{line}}: „{{other}}“ überschneidet sich mit „{{text}}“ an einem gemeinsamen Tag.",
-      "tooMany": "{{count}} Fenster – die Batterie fasst höchstens {{max}}."
+      "format": "{{where}}: „{{text}}“ ist kein Fenster. Schreibweise Start-Ende/Wochentage/+ oder -, zum Beispiel 00:00-06:00/12345/+.",
+      "time": "{{where}}: „{{text}}“ hat eine Zeit ausserhalb von 00:00–24:00.",
+      "days": "{{where}}: „{{text}}“ – jeden Wochentag einmal angeben, von 1 (Montag) bis 7 (Sonntag).",
+      "order": "{{where}}: „{{text}}“ muss nach dem Start enden, am selben Tag. Ein Fenster über Mitternacht in zwei aufteilen: …-23:59 und 00:00-….",
+      "overlap": "{{where}}: „{{other}}“ überschneidet sich mit „{{text}}“ an einem gemeinsamen Tag.",
+      "tooMany": "{{count}} Fenster – die Batterie fasst höchstens {{max}}.",
+      "writeFailed": "Die Fenster konnten nicht geschrieben werden ({{error}}). Die Batterie behält ihre bisherigen."
     },
     "zeroExport": {
       "notReadYet": "Der Einspeisemodus wurde noch nicht vom Wechselrichter gelesen, deshalb wurde nichts geschrieben. Bitte in einer Minute nochmals versuchen.",

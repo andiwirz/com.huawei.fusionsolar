@@ -323,8 +323,11 @@ class LUNA2000ModbusDevice extends Device {
   // in the FusionSolar app, and a battery switched to Time of Use with none set, or with old
   // ones, did what it pleased (issue #30).
 
-  /** What a save of the windows would write — or the reason it may not, in the user's language. */
-  _pendingTouWrite(text) {
+  /**
+   * What a save of the windows would write — or the reason it may not, in the user's language.
+   * `where` is how an error names the window: 'line' in the field, 'window' on the card.
+   */
+  _pendingTouWrite(text, where = 'line') {
     // Like the mode dropdowns: never write over windows the app has not seen. Until the first
     // read the field is empty, and saving it would erase the battery's real schedule.
     if (!this._touSeen) throw new Error(this.homey.__('modbus.tou.notReadYet'));
@@ -332,13 +335,47 @@ class LUNA2000ModbusDevice extends Device {
     try {
       periods = tou.parse(text);
     } catch (err) {
-      throw new Error(tou.message(this.homey, err));
+      throw new Error(tou.message(this.homey, err, where));
     }
     return { periods, words: tou.encode(periods), text: tou.format(periods) };
   }
 
-  /** Write the windows as one block, then show them as the battery will report them. */
-  async _writeTou({ periods, words, text }, previous, settings) {
+  /**
+   * The card "Set Time of Use windows" (1.3.15, asked for in the forum): the field's windows
+   * from a flow, for a script that plans them. A script cannot change a device setting — Homey
+   * answers "Missing scopes" — but it can hand a card a text tag.
+   *
+   * The card's text is one line, so `;` and `,` separate the windows as well as line breaks do
+   * (tou.fromCard), and an error names the window by its place on the card. Unlike a save of the
+   * field, the card waits for the write: a refused one fails the flow, and the battery keeps its
+   * windows, as the timeline then says too. Windows the battery already holds are not written
+   * again. No windows at all clears them, as an empty field does.
+   */
+  async _setTouFromFlow(raw) {
+    const pending = this._pendingTouWrite(tou.fromCard(raw), 'window');
+    const previous = this.getSetting('tou_periods') || '';
+    if (previous === pending.text) {
+      this.log(`TOU windows already set, nothing written: ${pending.text ? pending.text.split('\n').join(' · ') : 'none'}`);
+      return;
+    }
+    const settings = {
+      address:   this.getSetting('address'),
+      port:      this.getSetting('port'),
+      modbus_id: this.getSetting('modbus_id'),
+    };
+    try {
+      await this._writeTou(pending, previous, settings, { rethrow: true });
+    } catch (err) {
+      throw new Error(this.homey.__('modbus.tou.writeFailed').replace('{{error}}', err.message));
+    }
+  }
+
+  /**
+   * Write the windows as one block, then show them as the battery will report them. A failed
+   * write puts the previous windows back in the field and says so; `rethrow` also hands the
+   * error to the caller — the card, which fails the flow with it.
+   */
+  async _writeTou({ periods, words, text }, previous, settings, { rethrow = false } = {}) {
     const host = settings.address;
     const port = parseInt(settings.port, 10) || 502;
     const unit = parseIntSafe(settings.modbus_id, 1);
@@ -349,6 +386,7 @@ class LUNA2000ModbusDevice extends Device {
     } catch (err) {
       this._writeInProgress = false;
       await this._revertTou(previous, err);
+      if (rethrow) throw err;
       return;
     } finally {
       this._writeInProgress = false;
@@ -550,6 +588,9 @@ class LUNA2000ModbusDevice extends Device {
 
       cards['luna2000_set_excess_pv'] = ({ mode }) =>
         writeEnum('luna2000_set_excess_pv', 'storage_excess_pv_energy_use_in_tou', mode);
+
+      // The Time of Use windows, as in the settings field — see _setTouFromFlow (1.3.15).
+      cards['luna2000_set_tou_periods'] = ({ periods }) => self._setTouFromFlow(periods);
 
       cards['luna2000_set_remote_mode'] = ({ mode }) =>
         writeEnum('luna2000_set_remote_mode', 'remote_charge_discharge_control_mode', mode);
