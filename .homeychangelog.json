@@ -1,4 +1,9 @@
 {
+  "1.3.16": {
+    "en": "SDongle (Modbus): a power the dongle has no value for, such as right after an app restart while it is still busy, no longer shows up as 2147483647 W. The tile keeps the last reading instead, and the app log says when the dongle has no value and when it has one again.",
+    "de": "SDongle (Modbus): Eine Leistung, für die die Dongle keinen Wert hat, etwa direkt nach einem App-Neustart, solange sie noch ausgelastet ist, erscheint nicht mehr als 2147483647 W. Die Kachel behält stattdessen den letzten Messwert, und das App-Log sagt, wann die Dongle keinen Wert hat und wann wieder einen.",
+    "nl": "SDongle (Modbus): een vermogen waarvoor de dongle geen waarde heeft, bijvoorbeeld direct na een herstart van de app terwijl hij nog bezet is, verschijnt niet meer als 2147483647 W. De tegel houdt in plaats daarvan de laatste meting, en het app-log meldt wanneer de dongle geen waarde heeft en wanneer weer wel."
+  },
   "1.3.15": {
     "en": "Battery (Modbus): new flow card \"Set Time of Use windows\" sets the charge and discharge windows of the working mode \"Time of Use (LUNA2000)\" from a flow, for example from a script that plans them by price. It takes the same text as the field in the battery's settings, with several windows separated by ;. A mistake or a write the battery refuses fails the flow, and the battery keeps its windows.",
     "de": "Batterie (Modbus): Die neue Flow-Karte „Lade-/Entladefenster setzen“ setzt die Lade- und Entladefenster des Betriebsmodus „Zeitabhängige Nutzung (LUNA2000)“ aus einem Flow, zum Beispiel aus einem Skript, das sie nach Preis plant. Sie nimmt dieselbe Schreibweise wie das Feld in den Einstellungen der Batterie, mehrere Fenster mit ; getrennt. Bei einem Fehler oder wenn die Batterie das Schreiben ablehnt, scheitert der Flow, und die Batterie behält ihre Fenster.",

@@ -20,7 +20,8 @@ const html = fs.readFileSync(path.join(ROOT, 'drivers', 'sdongle_a_modbus', 'pai
 
 test('the warning stands on the reason: the SDongle\'s power is the house\'s consumption', () => {
   const src = fs.readFileSync(path.join(ROOT, 'drivers', 'sdongle_a_modbus', 'device.js'), 'utf8');
-  assert.match(src, /await this\._set\('measure_power',\s+data\.loadPower\s+\?\? null\);/);
+  assert.match(src, /await this\._set\('measure_power',\s+power\.loadPower\);/);
+  assert.match(src, /power\[key\] = huawei32\(data\[key\], SDONGLE_A_REGISTERS\[key\]\[2\]\);/);
   const app = require(path.join(ROOT, 'app.json'));
   const d = app.drivers.find((x) => x.id === 'sdongle_a_modbus');
   assert.ok(!d.energy, 'the driver has an energy block now — check whether the warning still applies');

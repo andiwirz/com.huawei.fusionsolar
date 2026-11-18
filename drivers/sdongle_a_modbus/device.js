@@ -5,6 +5,7 @@ const { withSettingsLog } = require('../../lib/change-log');
 const {
   SDONGLE_A_REGISTERS,
   isSdonglaADataValid,
+  huawei32,
 } = require('../../lib/modbus-registers');
 const { readModbusRegisters, parseIntSafe, unavailableMessage } = require('../../lib/modbus-client');
 const { logPollOk, logPollError } = require('../../lib/poll-log');
@@ -142,12 +143,28 @@ class SdonglaAModbusDevice extends Device {
         return;
       }
 
+      // A power the dongle has no value for comes as 0x7FFFFFFF / 0xFFFFFFFF; it becomes null,
+      // which _set skips, so the tile keeps the last real reading (1.3.16).
+      const power = {};
+      const noValue = [];
+      for (const key of ['loadPower', 'totalInputPower', 'gridPower', 'batteryPower', 'totalActivePower']) {
+        power[key] = huawei32(data[key], SDONGLE_A_REGISTERS[key][2]);
+        if (typeof data[key] === 'number' && power[key] === null) noValue.push(key);
+      }
+      // Said when it starts and when it ends, not every poll: a plant without a battery may
+      // well never have a value for one of them.
+      const noted = noValue.join(', ');
+      if (noted !== (this._noValueNoted || '')) {
+        this.log(noted ? `No value from the dongle for ${noted} — last reading kept` : 'The dongle has values for every power again');
+        this._noValueNoted = noted;
+      }
+
       // gridPower: spec sign convention already matches Homey (+import, -export)
-      await this._set('measure_power',                   data.loadPower        ?? null);
-      await this._set('measure_power.solar',             data.totalInputPower  ?? null);
-      await this._set('measure_power.grid_active_power', data.gridPower        ?? null);
-      await this._set('measure_power.battery',           data.batteryPower     ?? null);
-      await this._set('measure_power.active_power',      data.totalActivePower ?? null);
+      await this._set('measure_power',                   power.loadPower);
+      await this._set('measure_power.solar',             power.totalInputPower);
+      await this._set('measure_power.grid_active_power', power.gridPower);
+      await this._set('measure_power.battery',           power.batteryPower);
+      await this._set('measure_power.active_power',      power.totalActivePower);
 
       if (data.connectionType !== null && data.connectionType !== undefined) {
         const typeLabel = CONNECTION_TYPE_MAP[data.connectionType] ?? `Type ${data.connectionType}`;
@@ -165,7 +182,8 @@ class SdonglaAModbusDevice extends Device {
       // The version strings end the tile, after whatever this poll may have added (1.2.301).
       await keepLast(this, VERSION_CAPABILITIES).catch((err) => this.error('Capability order:', err.message));
       if (!this.getAvailable()) await this.setAvailable();
-      logPollOk(this, 'Poll OK: Solar=' + Math.round(data.totalInputPower ?? 0) + 'W Grid=' + Math.round(data.gridPower ?? 0) + 'W');
+      const w = (v) => (v === null ? 'n/a' : `${Math.round(v)}W`);
+      logPollOk(this, `Poll OK: Solar=${w(power.totalInputPower)} Grid=${w(power.gridPower)}`);
 
     } catch (err) {
       this._failureCount += 1;
