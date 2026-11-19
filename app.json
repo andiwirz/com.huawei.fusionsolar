@@ -1,6 +1,6 @@
 {
   "id": "com.huawei.fusionsolar",
-  "version": "1.3.17",
+  "version": "1.3.18",
   "compatibility": ">=12.13.0",
   "sdk": 3,
   "platforms": [
@@ -3930,7 +3930,7 @@
               },
               "min": 0,
               "max": 100000,
-              "step": 100,
+              "step": 1,
               "hint": {
                 "en": "Maximum power fed into the grid in watts (register 47416). Only effective when the active power control mode above is \"Limited by Power (kW)\". Synced from the inverter every 5 poll cycles.",
                 "de": "Maximale Einspeiseleistung in Watt (Register 47416). Nur wirksam, wenn der Wirkleistungs-Steuermodus oben auf „Leistungsbegrenzt (kW)“ steht. Wird alle 5 Abfragezyklen mit dem Wechselrichter synchronisiert.",
@@ -4798,7 +4798,7 @@
               },
               "min": 0,
               "max": 100000,
-              "step": 100,
+              "step": 1,
               "hint": {
                 "en": "Maximum power the battery charges at (register 47075). Synced from the inverter on every poll.",
                 "de": "Maximale Ladeleistung der Batterie (Register 47075). Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
@@ -4815,7 +4815,7 @@
               },
               "min": 0,
               "max": 100000,
-              "step": 100,
+              "step": 1,
               "hint": {
                 "en": "Maximum power the battery discharges at (register 47077). Synced from the inverter on every poll.",
                 "de": "Maximale Entladeleistung der Batterie (Register 47077). Wird bei jeder Abfrage mit dem Wechselrichter synchronisiert.",
@@ -4857,7 +4857,7 @@
               },
               "min": 0,
               "max": 100000,
-              "step": 100,
+              "step": 1,
               "hint": {
                 "en": "The power the battery charges from the grid at (register 47242) — the value FusionSolar shows and sets. It cannot exceed the upper limit for grid charging (register 47244), set below or with the flow card \"Set max power charge from grid\". Needs \"Charge battery from grid\": saving this turns it on if it is off. Synced from the inverter every fifth poll while grid charging is on.",
                 "de": "Leistung, mit der die Batterie aus dem Netz lädt (Register 47242) — der Wert, den FusionSolar anzeigt und setzt. Er kann die Obergrenze fürs Netzladen (Register 47244) nicht überschreiten; diese wird darunter oder mit der Flow-Karte „Maximale Netzladeleistung setzen“ gesetzt. Braucht „Batterie aus dem Netz laden“: Beim Speichern wird das eingeschaltet, falls es aus ist. Wird bei jeder fünften Abfrage mit dem Wechselrichter synchronisiert, solange das Netzladen eingeschaltet ist.",
@@ -4879,7 +4879,7 @@
               },
               "min": 0,
               "max": 100000,
-              "step": 100
+              "step": 1
             },
             {
               "id": "grid_charge_cutoff_soc",

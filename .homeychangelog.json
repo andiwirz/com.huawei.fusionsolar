@@ -1,4 +1,9 @@
 {
+  "1.3.18": {
+    "en": "Battery and inverter (Modbus): the power settings the app takes over from the device (max charge, discharge and grid charge power, the grid charge limit and the max feed-in power) now take whole watts instead of steps of 100 W. A battery reporting 2366 W was stored as 2400 W, so the app wrote the setting again on every sync and logged it every two minutes.",
+    "de": "Batterie und Wechselrichter (Modbus): Die Leistungseinstellungen, die die App vom Gerät übernimmt (max. Lade-, Entlade- und Netzladeleistung, die Obergrenze fürs Netzladen und die max. Einspeiseleistung), nehmen jetzt ganze Watt statt 100-W-Schritte. Eine Batterie, die 2366 W meldete, wurde als 2400 W gespeichert, deshalb schrieb die App die Einstellung bei jedem Abgleich neu und protokollierte das alle zwei Minuten.",
+    "nl": "Batterij en omvormer (Modbus): de vermogensinstellingen die de app van het apparaat overneemt (max. laad-, ontlaad- en netlaadvermogen, de bovengrens voor laden uit het net en het max. terugleververmogen) nemen nu hele watts in plaats van stappen van 100 W. Een batterij die 2366 W meldde, werd als 2400 W opgeslagen, waardoor de app de instelling bij elke synchronisatie opnieuw schreef en dat elke twee minuten logde."
+  },
   "1.3.17": {
     "en": "Inverter (Modbus): an inverter without a grid meter that reports the meter as 2147483647 W is now treated as having no meter. With two inverters, the widgets could take the grid power from that one and showed a frozen export of 2,147,483 kW, a house at 0 W and no import or export for the day.",
     "de": "Wechselrichter (Modbus): Ein Wechselrichter ohne Netzzähler, der den Zähler als 2147483647 W meldet, gilt jetzt als Wechselrichter ohne Zähler. Bei zwei Wechselrichtern konnten die Widgets die Netzleistung von diesem nehmen und zeigten eine eingefrorene Einspeisung von 2147483 kW, ein Haus mit 0 W und keinen Bezug und keine Einspeisung für den Tag.",
